@@ -2,6 +2,7 @@ package com.boomapps.steemapp.editor
 
 import android.Manifest
 import android.app.Activity
+import android.app.AlertDialog
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
@@ -66,7 +67,11 @@ class EditorActivity : BaseActivity() {
                 ViewState.FAULT_RESULT -> {
                     dismissProgress()
                     if (viewModel.stringError.isNotEmpty()) {
-                        Toast.makeText(this@EditorActivity, "Posting was saved, but not published due to error. " + viewModel.stringError + ".", Toast.LENGTH_LONG).show()
+                        val dialog = AlertDialog.Builder(this@EditorActivity).create()
+                        dialog.setTitle("Error on posting")
+                        dialog.setMessage("Posting was saved, but not published due to error. " + viewModel.stringError + ".")
+                        dialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(android.R.string.ok), {_, _ -> })
+                        dialog.show()
                     }
                 }
                 ViewState.SUCCESS_RESULT -> {
@@ -396,7 +401,7 @@ class EditorActivity : BaseActivity() {
         topIndicator_4.setBackgroundResource(R.drawable.drawable_indicator_active)
         actionButtonTopLeft.setImageResource(R.drawable.ic_arrow_back_black_24dp)
         actionButtonTopRight.visibility = View.INVISIBLE
-        actionButtonTopLeftTitle.setText(R.string.a_editor_action_left_t_post)
+        actionButtonTopLeftTitle.setText(R.string.a_editor_action_left_t_posing)
         val view = adapter.getViewAtPosition(3)
         if (view != null) {
             postingTab = PostingTab(view, tabsListener, viewModel)

@@ -248,7 +248,7 @@ public class Transaction implements Serializable {
             // by adding the maximal allowed offset to the current time.
             LOGGER.debug("No expiration date has been provided so the latest possible time is used.");
             return new TimePointSec(
-                    System.currentTimeMillis() + SteemJConfig.getInstance().getMaximumExpirationDateOffset() - 60000L);
+                    System.currentTimeMillis() + SteemJConfig.getInstance().getMaximumExpirationDateOffset());// - 60000L);
         }
 
         return this.expirationDate;

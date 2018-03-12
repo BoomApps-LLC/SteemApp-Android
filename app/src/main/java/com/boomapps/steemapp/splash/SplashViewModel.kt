@@ -79,7 +79,11 @@ class SplashViewModel : BaseViewModel() {
             }
 
             override fun onFailureRequestFinish(throwable: Throwable) {
-                stringError = throwable.localizedMessage
+                stringError = if (throwable.localizedMessage != null) {
+                    throwable.localizedMessage
+                } else {
+                    throwable.message?: "empty error"
+                }
                 loginState.value = LoginState.NO_EXT_DATA
             }
         })

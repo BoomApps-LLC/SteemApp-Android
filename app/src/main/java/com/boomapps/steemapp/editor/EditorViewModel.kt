@@ -24,7 +24,7 @@ class EditorViewModel : BaseViewModel() {
     val categories: ArrayList<CategoryItem> = arrayListOf()
     var activeTab: Int = 0
     var inputCategory: String = ""
-    var rewardPosition: Int = 0
+    var rewardPosition: Int = 1
     var upvoteState: Boolean = false
     var uploadedImageUrl: URL? = null
     var successCode: Int = -1
@@ -138,9 +138,9 @@ class EditorViewModel : BaseViewModel() {
         state.value = ViewState.PROGRESS
         val rewardsPercent: Short =
                 when (rewardPosition) {
-                    0 -> 0
-                    1 -> 10000
-                    2 -> 20000
+                    0 -> 10000
+                    1 -> 5000
+                    2 -> 0
                     else -> 30000
                 }
         NetworkRepository.get().postStory(title, story, getCategoriesName(), "", rewardsPercent, upvoteState, object : NetworkRepository.OnRequestFinishCallback {

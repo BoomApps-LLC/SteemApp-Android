@@ -1,5 +1,7 @@
 package eu.bittrade.libs.steemj.base.models;
 
+import android.util.Log;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
@@ -171,11 +173,12 @@ public class SignedTransaction extends Transaction implements ByteTransformable,
                             "The required encoding is not supported by your platform.", e);
                 }
 
-                String signature = requiredPrivateKey.signMessage(messageAsHash);
+                String signature = requiredPrivateKey.signMessage(messageAsHash); // hard calculations
                 byte[] signatureAsByteArray = Base64.decode(signature);
 
                 if (isCanonical(signatureAsByteArray)) {
-                    this.getExpirationDate().setDateTime(this.getExpirationDate().getDateTimeAsTimestamp() + 1);
+                    Log.d("SignedTransaction", "Sign:: !isCanonical >> getExpirationDate().getDateTimeAsTimestamp() + 31");
+                    this.getExpirationDate().setDateTime(this.getExpirationDate().getDateTimeAsTimestamp() + 31);
                 } else {
                     isCanonical = true;
                     this.signatures.add(CryptoUtils.HEX.encode(signatureAsByteArray));

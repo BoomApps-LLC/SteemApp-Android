@@ -52,7 +52,7 @@
         android:layout_marginTop="30dp"
         android:backgroundTint="@color/violet"
         android:ems="10"
-        android:hint="Posting key"
+        android:hint="@string/hint_input_posting_key"
         android:inputType="textPersonName"
         android:paddingBottom="4dp"
         android:paddingLeft="8dp"

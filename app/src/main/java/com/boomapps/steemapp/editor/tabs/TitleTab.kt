@@ -18,7 +18,6 @@ class TitleTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
 
     override fun initComponents() {
         storyTitle = view.findViewById(R.id.storyTitle)
-        storyTitle.setText(viewModel.title)
         storyTitle.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
 
@@ -38,5 +37,6 @@ class TitleTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
                 dataListener.onDataChange(value.length > 0)
             }
         })
+        storyTitle.setText(viewModel.title)
     }
 }

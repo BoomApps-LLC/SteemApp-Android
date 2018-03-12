@@ -84,6 +84,10 @@ class SteemWorker() {
             }
 
             steemJ = SteemJ()
+            var result = steemJ?.lookupAccounts(nickname, 1)
+            if(result == null || result.size == 0 || result[0].toLowerCase() != nickname.toLowerCase()){
+                return SteemWorkerResponse(false, SteemErrorCodes.INCORRECT_USER_DATA_ERROR)
+            }
         } catch (sce: SteemConnectionException) {
             Log.d(LOG_TAG, "Login Error : ${sce.localizedMessage}")
             sce.printStackTrace()
@@ -136,7 +140,7 @@ class SteemWorker() {
     }
 
 
-    fun post(title: String, content: String, tags: Array<String>, postingKey: String, rewardsPercent: Short, upvote: Boolean): Boolean {
+    fun post(title: String, content: String, tags: Array<String>, postingKey: String, rewardsPercent: Short, upvote: Boolean): PostingResult {
         try {
             steemJConfig?.privateKeyStorage
             if (steemJConfig?.privateKeyStorage?.privateKeysPerAccounts == null || steemJConfig?.privateKeyStorage?.privateKeysPerAccounts?.size == 0) {
@@ -148,36 +152,35 @@ class SteemWorker() {
                         Log.d("SteemWorker", "post answer >> ${metadata?.toString()}")
                     }
                 } else {
-                    return false
+                    return PostingResult("Posting key is empty.", false)
                 }
             } else {
-                val commentOperation = steemJ?.createPost(title, content, tags, rewardsPercent)
+                val commentOperation = steemJ?.createPostSynchronous(title, content, tags, rewardsPercent)
                 if (!upvote) {
-                    return true
+                    return PostingResult()
                 }
                 if (commentOperation != null) {
                     val permlink = commentOperation.permlink.link
-                    steemJ?.vote(steemJConfig?.apiUsername, Permlink(permlink),
-                            100.toShort())
-                    return true
+                    steemJ?.vote(steemJConfig?.defaultAccount, Permlink(permlink), 100.toShort())
+                    return PostingResult()
                 } else {
-                    return false
+                    return PostingResult("No comment operation.", false)
                 }
             }
         } catch (communicationException: SteemCommunicationException) {
-            Log.d("SteemWorker", "post error SteemCommunicationException >> ${communicationException.localizedMessage}")
-            return false
+            Log.e("SteemWorker", "post error SteemCommunicationException >> ${communicationException.localizedMessage}", communicationException)
+            return PostingResult(communicationException.localizedMessage, false)
         } catch (responseException: SteemResponseException) {
-            Log.d("SteemWorker", "post error SteemResponseException >>${responseException.localizedMessage} ")
-            return false
+            Log.e("SteemWorker", "post error SteemResponseException >>${responseException.localizedMessage}", responseException)
+            return PostingResult(responseException.localizedMessage, false)
         } catch (transactionException: SteemInvalidTransactionException) {
-            Log.d("SteemWorker", "post error SteemInvalidTransactionException >> ${transactionException.localizedMessage}")
-            return false
+            Log.e("SteemWorker", "post error SteemInvalidTransactionException >> ${transactionException.localizedMessage}", transactionException)
+            return PostingResult(transactionException.localizedMessage, false)
         } catch (parameterException: InvalidParameterException) {
-            Log.d("SteemWorker", "post error InvalidParameterException >> ${parameterException.localizedMessage}")
-            return false
+            Log.e("SteemWorker", "post error InvalidParameterException >> ${parameterException.localizedMessage}", parameterException)
+            return PostingResult(parameterException.localizedMessage, false)
         }
-        return true
+        return PostingResult()
     }
 
     fun uploadImage(uri: Uri): URL {
@@ -328,5 +331,6 @@ class SteemWorker() {
 
     }
 
+    data class PostingResult(var result: String = "Posting was successful", var success: Boolean = true)
 
 }

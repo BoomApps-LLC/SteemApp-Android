@@ -131,7 +131,7 @@ public class SteemJConfig {
         this.privateKeyStorage = new PrivateKeyStorage();
         this.addressPrefix = AddressPrefixType.STM;
         this.chainId = "0000000000000000000000000000000000000000000000000000000000000000";
-        this.steemJWeight = 300;
+        this.steemJWeight = 0;//300;
         this.validationLevel = ValidationType.ALL;
         this.synchronizationLevel = SynchronizationType.FULL;
         this.dollarSymbol = AssetSymbolType.SBD;

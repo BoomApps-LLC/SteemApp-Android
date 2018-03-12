@@ -78,10 +78,10 @@ class NetworkRepository {
         }.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext {
-                    if (it) {
+                    if (it.success) {
                         callback.onSuccessRequestFinish()
                     } else {
-                        callback.onFailureRequestFinish(Throwable("Publishing story error"))
+                        callback.onFailureRequestFinish(Throwable(it.result))
                     }
                     Log.d("postStory", "doOnNext")
                 }
@@ -91,7 +91,6 @@ class NetworkRepository {
                 .doOnError {
                     Log.d("postStory", "doOnError")
                     callback.onFailureRequestFinish(it)
-
                 }
                 .subscribe()
     }
