@@ -1,0 +1,15 @@
+*.iml
+.gradle
+/local.properties
+/.idea/workspace.xml
+/.idea/libraries
+.DS_Store
+/build
+/app/build
+/richeditor/build
+/steemj-core/build
+/captures
+.externalNativeBuild
+.idea/vcs.xml
+.idea/
+app/release/
