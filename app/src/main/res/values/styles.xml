@@ -1,0 +1,83 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <!-- Apply default style for dialogs -->
+        <item name="android:dialogTheme">@style/AppDialogTheme.Custom</item>
+        <!-- Apply default style for alert dialogs -->
+        <item name="android:alertDialogTheme">@style/AppDialogTheme</item>
+    </style>
+
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.Splash" parent="Theme.AppCompat.Dialog">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+
+
+    <style name="DialogButton" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">36dp</item>
+        <item name="android:minWidth">64dp</item>
+        <item name="android:textColor">@color/colorAccent</item>
+        <item name="android:background">@drawable/selector_button_dialog</item>
+    </style>
+
+    <style name="SteemButton" parent="@android:style/Widget.Button">
+        <item name="android:layout_height">@dimen/button_height</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:textSize">@dimen/button_text_size</item>
+        <item name="android:paddingLeft">16dp</item>
+        <item name="android:paddingRight">16dp</item>
+    </style>
+
+    <style name="SteemButton.White">
+        <item name="android:textColor">@color/green_filled</item>
+        <item name="android:background">@drawable/btn_login_selector</item>
+    </style>
+
+    <style name="SteemButton.VioletDark">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:background">@drawable/selector_btn_signup</item>
+    </style>
+
+    <style name="Text">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:lineSpacingExtra">10sp</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="Text.Grey">
+        <item name="android:textColor">@color/selector_grey_violet</item>
+    </style>
+
+    <style name="Custom.Widget.SwitchCompat" parent="Widget.AppCompat.CompoundButton.Switch">
+        <item name="colorControlActivated">@color/green_filled</item>
+        <item name="colorSwitchThumbNormal">@color/green_active</item>
+    </style>
+
+
+    <!-- Theme for dialogs based on AlertDialog-->
+    <style name="AppDialogTheme" parent="Theme.AppCompat.Light.Dialog">
+        <!--buttons color-->
+        <item name="colorAccent">@color/colorPrimary</item>
+        <!--title and message color-->
+        <item name="android:textColorPrimary">@color/textInput</item>
+    </style>
+
+    <!-- Theme for Dialogs based on DialogFragment-->
+    <style name="AppDialogTheme.Custom">
+        <!-- enable title -->
+        <item name="android:windowNoTitle">false</item>
+    </style>
+</resources>

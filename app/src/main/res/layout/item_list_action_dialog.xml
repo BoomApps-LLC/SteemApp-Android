@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/value_root"
+    android:layout_width="match_parent"
+    android:layout_height="?android:attr/listPreferredItemHeightSmall"
+    android:background="@drawable/selector_transparent">
+
+    <TextView
+        android:id="@+id/value_title"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
+        android:textColor="@color/blackLight"
+        android:gravity="left|center_vertical"
+        android:layout_alignParentLeft="true"/>
+
+</RelativeLayout>

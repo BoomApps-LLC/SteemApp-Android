@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@android:color/white"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/hashtagInputTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/a_editor_hashtag_input_title"
+        android:textColor="@color/textGray"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <EditText
+        android:id="@+id/hashtagInput"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="@color/white"
+        android:inputType="textAutoComplete|textAutoCorrect"
+        android:lines="1"
+        android:maxLength="24"
+        android:maxLines="1"
+        tools:imeOptions="actionDone"
+        android:paddingBottom="4dp"
+        android:paddingLeft="36dp"
+        android:paddingRight="16dp"
+        android:paddingTop="4dp"
+        android:textColor="@color/textInput"
+        android:textCursorDrawable="@drawable/cursor_violet_drawable"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/hashtagInputTitle" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
+        android:gravity="center_vertical"
+        android:paddingLeft="16dp"
+        android:text="#"
+        android:focusable="false"
+        android:textColor="@color/textInput"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@id/hashtagInput"
+        app:layout_constraintEnd_toEndOf="@id/hashtagInput"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@id/hashtagInput" />
+
+    <View
+        android:id="@+id/inputBottomLine"
+        android:layout_width="0dp"
+        android:layout_height="2dp"
+        android:layout_marginTop="4dp"
+        android:background="@color/violet"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/hashtagInput" />
+
+    <TextView
+        android:id="@+id/addCategoryButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:layout_marginTop="4dp"
+        android:padding="4dp"
+        android:text="ADD"
+        android:focusable="false"
+        android:textSize="16sp"
+        android:textColor="@color/selector_violet_green"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/inputBottomLine" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/chipsList"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="0dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="16dp"
+        android:focusable="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/addCategoryButton" />
+
+</android.support.constraint.ConstraintLayout>

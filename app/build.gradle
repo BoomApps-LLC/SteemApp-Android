@@ -1,0 +1,106 @@
+apply plugin: 'com.android.application'
+
+apply plugin: 'kotlin-android'
+
+apply plugin: 'kotlin-android-extensions'
+
+apply plugin: 'kotlin-kapt'
+
+android {
+    compileSdkVersion 27
+    defaultConfig {
+        applicationId 'com.boomapps.steemapp'
+        minSdkVersion 21
+        targetSdkVersion 27
+        versionCode 2
+        versionName "0.1"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        // Enabling multidex support.
+        multiDexEnabled true
+    }
+    dexOptions {
+        javaMaxHeapSize "2048M"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+    buildToolsVersion '27.0.3'
+    productFlavors {
+    }
+}
+
+configurations {
+    all {
+        exclude module: 'httpclient'
+        exclude module: 'commons-logging'
+    }
+}
+
+apply from: '../versions.gradle'
+
+
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    implementation "com.android.support:support-v4:$supportVersion"
+    implementation "com.android.support:design:$supportVersion"
+    implementation "com.android.support:appcompat-v7:$supportVersion"
+    implementation "com.android.support:customtabs:$supportVersion"
+    implementation 'com.android.support.constraint:constraint-layout:1.1.0-beta5'
+    implementation "com.android.support:design:$supportVersion"
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+
+    // QR reader
+    compile 'com.dlazaro66.qrcodereaderview:qrcodereaderview:2.0.3'
+
+    // SteemJ libs
+    implementation 'eu.bittrade.libs:steemj-image-upload:1.0.0'
+    implementation 'com.android.support:multidex:1.0.3'
+
+    // colorpicker
+    implementation 'com.jaredrummler:colorpicker:1.0.1'
+
+    // FlowLayoutManager for categories list
+    implementation 'com.xiaofeng.android:flowlayoutmanager:1.2.3.2'
+
+    //GSON
+    implementation 'com.google.code.gson:gson:2.8.0'
+
+    // GLIDE
+    implementation 'com.github.bumptech.glide:glide:4.5.0'
+    kapt 'com.github.bumptech.glide:compiler:4.5.0'
+    implementation 'jp.wasabeef:glide-transformations:3.1.0'
+
+    //    RX
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    implementation 'io.reactivex.rxjava2:rxkotlin:2.2.0'
+
+    //  Retrofit
+    implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofitVersion"
+
+    //    OkHTTP
+    implementation "com.squareup.okhttp3:okhttp:$okhttpVersion"
+    implementation "com.squareup.okhttp3:logging-interceptor:$okhttpVersion"
+
+    // ViewModel and LiveData
+    implementation "android.arch.lifecycle:extensions:$architectureComponents"
+    annotationProcessor "android.arch.lifecycle:compiler:$architectureComponents"
+    kapt "android.arch.lifecycle:compiler:$architectureComponents"
+    compile project(path: ':richeditor')
+    compile project(path: ':steemj-core')
+    configurations.all {
+        resolutionStrategy.force 'com.google.code.findbugs:jsr305:1.3.9'
+    }
+}

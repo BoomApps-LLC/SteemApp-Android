@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:application="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/fragmentEditRootView"
+    android:background="@android:color/white">
+
+    <ImageView
+        android:id="@+id/fragmentEditButtonTopLeft"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_margin="8dp"
+        android:padding="4dp"
+        android:src="@drawable/ic_clear_black_24dp"
+        application:layout_constraintStart_toStartOf="parent"
+        application:layout_constraintTop_toTopOf="parent"
+        android:tint="@color/textGray"/>
+
+    <TextView
+        android:id="@+id/fragmentEditButtonTopLeftTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/a_editor_action_left_t_story"
+        android:textSize="16sp"
+        android:textColor="@color/violet"
+        android:visibility="invisible"
+        application:layout_constraintBottom_toBottomOf="@+id/fragmentEditButtonTopLeft"
+        application:layout_constraintStart_toEndOf="@+id/fragmentEditButtonTopLeft"
+        application:layout_constraintTop_toTopOf="@+id/fragmentEditButtonTopLeft" />
+
+    <TextView
+        android:id="@+id/fragmentEditButtonTopRight"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:layout_margin="8dp"
+        android:gravity="center_vertical"
+        android:text="@string/a_editor_action_right_text"
+        android:textColor="@color/textGray"
+        android:textSize="16sp"
+        application:layout_constraintEnd_toEndOf="parent"
+        application:layout_constraintTop_toTopOf="parent" />
+
+
+    <View
+        android:id="@+id/fragmentEditTopIndicator_2"
+        android:layout_width="0dp"
+        android:layout_height="4dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/drawable_indicator_empty"
+        application:layout_constraintEnd_toStartOf="@+id/fragmentEditTopIndicator_3"
+        application:layout_constraintHorizontal_bias="0.5"
+        application:layout_constraintStart_toEndOf="@+id/fragmentEditTopIndicator_1"
+        application:layout_constraintTop_toBottomOf="@id/fragmentEditButtonTopLeft" />
+
+    <View
+        android:id="@+id/fragmentEditTopIndicator_1"
+        android:layout_width="0dp"
+        android:layout_height="4dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/drawable_indicator_active"
+        application:layout_constraintEnd_toStartOf="@+id/fragmentEditTopIndicator_2"
+        application:layout_constraintHorizontal_bias="0.5"
+        application:layout_constraintStart_toStartOf="parent"
+        application:layout_constraintTop_toBottomOf="@id/fragmentEditButtonTopLeft" />
+
+    <View
+        android:id="@+id/fragmentEditTopIndicator_3"
+        android:layout_width="0dp"
+        android:layout_height="4dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/drawable_indicator_empty"
+        application:layout_constraintEnd_toEndOf="parent"
+        application:layout_constraintHorizontal_bias="0.5"
+        application:layout_constraintStart_toEndOf="@+id/fragmentEditTopIndicator_2"
+        application:layout_constraintTop_toBottomOf="@id/fragmentEditButtonTopLeft" />
+
+
+    <com.boomapps.steemapp.controls.NoSwipableViewPager
+        android:id="@+id/fragmentEditViewPager"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        application:layout_constraintBottom_toBottomOf="parent"
+        application:layout_constraintLeft_toLeftOf="parent"
+        application:layout_constraintRight_toRightOf="parent"
+        application:layout_constraintTop_toBottomOf="@id/fragmentEditTopIndicator_3">
+
+    </com.boomapps.steemapp.controls.NoSwipableViewPager>
+
+
+</android.support.constraint.ConstraintLayout>

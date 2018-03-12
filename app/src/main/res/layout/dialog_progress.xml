@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="horizontal"
+    android:padding="16dp">
+
+
+    <ProgressBar
+        android:id="@+id/progressView"
+        style="@style/Base.Widget.AppCompat.ProgressBar"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:progressTint="@color/violet"
+        android:layout_gravity="center_vertical"
+        android:layout_margin="8dp" />
+
+    <TextView
+        android:id="@+id/progressMessage"
+        style="@style/Text.Grey"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:textColor="@color/violet"
+        android:text="Please wait ..." />
+
+</LinearLayout>

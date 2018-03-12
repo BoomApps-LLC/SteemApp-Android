@@ -1,0 +1,63 @@
+<resources>
+    <string name="app_name">SteemApp</string>
+
+    <string name="a_editor_action_right_text">Next</string>
+    <string name="a_editor_action_left_t_title">Title</string>
+    <string name="a_editor_action_left_t_story">Story</string>
+    <string name="a_editor_action_left_t_tags">Add Tags</string>
+    <string name="a_editor_action_left_t_post">Post</string>
+    <string name="a_editor_story_title_hint">Title</string>
+    <string name="a_editor_story_text_hint">Your Story</string>
+    <string name="a_editor_hashtag_input_title">Add your favorite categories</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_wallet">Wallet</string>
+    <string name="title_edit">Create Post</string>
+    <string name="title_profile">Profile</string>
+
+    <string name="button_ok">OK</string>
+    <string name="button_cancel">Cancel</string>
+    <string name="button_confirm">Confirm</string>
+
+    <string name="reward_type_post">Reward type for your post</string>
+
+    <string name="dialog_title_text_color">Select a Text Color</string>
+    <string name="dialog_title_text_back_color">Select a Text Background Color</string>
+
+    <string name="dialog_positive_button">@string/button_confirm</string>
+    <string name="dialog_negative_button">@string/button_cancel</string>
+
+    <!-- Insert Link -->
+    <string name="title_insert_link">Insert Link</string>
+    <string name="hint_text_to_display">Text to display</string>
+    <string name="hint_link_to">Link to</string>
+
+    <string name="take_a_photo_action">Take a Photo</string>
+    <string name="choose_from_library_action">Choose from Library</string>
+    <string name="picture_choose_dialog_title" translatable="false">Picture Source</string>
+
+    <!-- COMMON WARNIN DIALOGS -->
+    <string name="dialog_common_ok_button">@string/button_ok</string>
+    <string name="dialog_common_cancel_button">@string/button_cancel</string>
+
+    <!-- ERROR DIALOG -->
+    <string name="dialog_error_retry_button">try again</string>
+    <string name="dialog_error_positive_button">@string/button_ok</string>
+    <string name="dialog_error_negative_button">@string/button_cancel</string>
+
+    <!-- LOGIN -->
+    <string name="error_title_login_error">Login Error</string>
+    <string name="error_message_bad_user_data">Your nickname or active posting key is incorrect. Please correct them and try again.</string>
+    <string name="error_message_network_connection_fault">Oops!!. Connection to server is fault.</string>
+
+    <!-- WALLET -->
+    <string name="balance_template">%1$s %2$s.%3$s</string>
+
+    <!-- PROFILE -->
+    <string name="signout_confirm_dialog_msg">Are you sure you want to Sing Out?</string>
+
+    <!-- EDITOR -->
+    <string name="warning_category_lenght">Category name\'s length can\'t be empty</string>
+    <string name="warning_categories_number">Please use only 5 tags</string>
+    <string name="warning_one_category_at_least">Please use at least one tag</string>
+
+</resources>

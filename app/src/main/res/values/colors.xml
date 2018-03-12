@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="violet">#894DEB</color>
+    <color name="violetDark">#57388B</color>
+    <color name="violetLight">#f5efff</color>
+
+    <color name="colorPrimary">@color/violet</color>
+    <color name="colorPrimaryDark">#7944D0</color>
+    <color name="colorAccent">@color/green_active</color>
+    <color name="colorAccentPressed">@color/green_filled</color>
+
+    <color name="grey_primary">#9a979f</color>
+    <color name="grey_secondary">#eaeeec</color>
+    <color name="grey_third">#33ffffff</color>
+    <color name="green_active">#51EDBB</color>
+    <color name="white">#ffffff</color>
+
+
+    <color name="blackLight">#414946</color>
+
+
+    <color name="violetText">#C4A6F5</color>
+
+    <color name="plantGray">#F4F4F4</color>
+    <color name="textGray">#A2A5A4</color>
+    <color name="greyInput">#F0F0F0</color>
+    <color name="textInput">#3F3B45</color>
+    <color name="dividerBackgound">@color/plantGray</color>
+    <color name="sectionBackground">@color/plantGray</color>
+    <color name="redText">#F6475E</color>
+
+    <color name="green_filled">#B9F7E3</color>
+
+
+
+
+</resources>
