@@ -67,11 +67,7 @@ class EditorActivity : BaseActivity() {
                 ViewState.FAULT_RESULT -> {
                     dismissProgress()
                     if (viewModel.stringError.isNotEmpty()) {
-                        val dialog = AlertDialog.Builder(this@EditorActivity).create()
-                        dialog.setTitle("Error on posting")
-                        dialog.setMessage("Posting was saved, but not published due to error. " + viewModel.stringError + ".")
-                        dialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(android.R.string.ok), {_, _ -> })
-                        dialog.show()
+                        showPostingErrorDialog(viewModel.stringError)
                     }
                 }
                 ViewState.SUCCESS_RESULT -> {
@@ -213,6 +209,33 @@ class EditorActivity : BaseActivity() {
         if (viewModel.ifReadyForUploadingPhoto()) {
             viewModel.uploadPreparedPhoto()
         }
+    }
+
+    fun showPostingErrorDialog(errorMessage: String) {
+        var title = "Error on posting"
+        var message = ""
+        var repost = false
+        if (errorMessage.contains("private posting key")) {
+            // show a dialog with a suggestion to enter a new key
+            message = "Posting was saved, but not published due to INVALID PRIVATE POSTING KEY error. \n Do you want to enter correct key and try to post again?"
+            repost = true
+        } else {
+            message = "Posting was saved, but not published due to error. " + viewModel.stringError + "."
+        }
+
+        val dialog = AlertDialog.Builder(this@EditorActivity).create()
+        dialog.setTitle(title)
+        dialog.setMessage(message)
+        dialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(android.R.string.ok), { _, _ ->
+            if (repost) {
+                showScreenForEnterNewPostingKey()
+            }
+        })
+        dialog.show()
+    }
+
+    fun showScreenForEnterNewPostingKey() {
+        // TODO show special screen
     }
 
     override fun onRequestPermissionsResult(requestCode: Int,

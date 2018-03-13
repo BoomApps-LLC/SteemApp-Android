@@ -157,6 +157,7 @@ class EditorViewModel : BaseViewModel() {
                 Log.d("EditorActivity", "can't post story >> " + throwable.localizedMessage)
                 stringError = throwable.localizedMessage
                 state.value = ViewState.FAULT_RESULT
+                saveStoryData()
             }
         })
     }
