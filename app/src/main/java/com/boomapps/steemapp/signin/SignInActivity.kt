@@ -44,7 +44,7 @@ class SignInActivity : BaseActivity() {
                         dismissProgress()
                     }
                     ViewState.PROGRESS -> {
-                        showProgress("Sing In ...")
+                        showProgress("Sign In ...")
                     }
 
                     ViewState.SUCCESS_RESULT -> {
