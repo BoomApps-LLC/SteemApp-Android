@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/violet">>
+
+
+    <EditText
+        android:id="@+id/aNewKey_signInInputPostingKey"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="30dp"
+        android:backgroundTint="@color/white"
+        android:ems="10"
+        android:hint="@string/hint_input_posting_key"
+        android:inputType="textPersonName"
+        android:paddingBottom="8dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="24dp"
+        android:paddingTop="4dp"
+        android:textColor="@color/white"
+        android:textColorHint="@color/grey_third"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/aNewKey_qreaderStartButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+
+    <ImageView
+        android:id="@+id/aNewKey_qreaderStartButton"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="8dp"
+        android:clickable="true"
+        android:src="@drawable/ic_photo_camera_white_24dp"
+        app:layout_constraintBottom_toBottomOf="@+id/aNewKey_signInInputPostingKey"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/aNewKey_signInInputPostingKey" />
+
+
+
+    <com.dlazaro66.qrcodereaderview.QRCodeReaderView
+        android:id="@+id/aNewKey_qrdecoderview"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="32dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@id/aNewKey_buttonReturnResult"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/aNewKey_signInInputPostingKey"/>
+
+    <com.boomapps.steemapp.barcode.PointsOverlayView
+        android:id="@+id/aNewKey_points_overlay_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="32dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@id/aNewKey_buttonReturnResult"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/aNewKey_signInInputPostingKey"/>
+
+    <Button
+        android:id="@+id/aNewKey_buttonReturnResult"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:background="@drawable/post_selector_inactive"
+        android:text="Return Result"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+</android.support.constraint.ConstraintLayout>

@@ -29,7 +29,7 @@ class BarcodeReadActivity : AppCompatActivity(), QRCodeReaderView.OnQRCodeReadLi
         pointsOverlayView = findViewById<PointsOverlayView>(R.id.points_overlay_view)
         resultTextView = findViewById<TextView>(R.id.qrReadResult)
         qrCodeReaderView = findViewById<QRCodeReaderView>(R.id.qrdecoderview);
-        qrCodeReaderView?.setOnQRCodeReadListener(this);
+        qrCodeReaderView?.setOnQRCodeReadListener(this)
 
         // Use this function to enable/disable decoding
         qrCodeReaderView?.setQRDecodingEnabled(true);

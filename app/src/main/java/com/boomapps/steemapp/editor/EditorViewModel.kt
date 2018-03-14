@@ -3,10 +3,7 @@ package com.boomapps.steemapp.editor
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
-import com.boomapps.steemapp.BaseViewModel
-import com.boomapps.steemapp.RxUtils
-import com.boomapps.steemapp.SteemApplication
-import com.boomapps.steemapp.ViewState
+import com.boomapps.steemapp.*
 import com.boomapps.steemapp.editor.tabs.CategoryItem
 import com.boomapps.steemapp.repository.NetworkRepository
 import com.boomapps.steemapp.repository.SharedRepository
@@ -134,7 +131,30 @@ class EditorViewModel : BaseViewModel() {
         })
     }
 
+    fun saveNewPostingKey(data: Intent?): Boolean {
+        if (data == null) {
+            return false
+        }
+        if (!data.hasExtra("POSTING_KEY")) {
+            return false
+        }
+        val repo = SharedRepository()
+        val uData = repo.loadUserData()
+        val newUserData = UserData(uData.nickname, uData.userName, uData.photoUrl, data.getStringExtra("posting_key"))
+        repo.saveUserData(newUserData)
+        return true
+    }
+
+//    var testAttempt = 0
+
     fun publishStory() {
+//        if (testAttempt == 0) {
+//            testAttempt = 1
+//            stringError = "private posting key"
+//            state.value = ViewState.FAULT_RESULT
+//            saveStoryData()
+//            return
+//        }
         state.value = ViewState.PROGRESS
         val rewardsPercent: Short =
                 when (rewardPosition) {

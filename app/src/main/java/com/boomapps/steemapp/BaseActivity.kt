@@ -2,6 +2,7 @@ package com.boomapps.steemapp
 
 import android.content.Context
 import android.support.v7.app.AppCompatActivity
+import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import com.boomapps.steemapp.controls.WarningDialog
@@ -64,4 +65,9 @@ open class BaseActivity : AppCompatActivity() {
 fun EditText.showKeyboard(context: Context) {
     val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
+}
+
+fun View.hideKeyboard(context : Context){
+    val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    imm.hideSoftInputFromWindow(this.getWindowToken(), 0)
 }

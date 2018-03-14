@@ -22,12 +22,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
-import com.boomapps.steemapp.BaseActivity
-import com.boomapps.steemapp.R
-import com.boomapps.steemapp.Utils
-import com.boomapps.steemapp.ViewState
+import com.boomapps.steemapp.*
 import com.boomapps.steemapp.controls.ListActionsDialog
 import com.boomapps.steemapp.controls.WarningDialog
+import com.boomapps.steemapp.editor.inputpostingkey.InputNewPostingKeyActivity
 import com.boomapps.steemapp.editor.tabs.*
 import kotlinx.android.synthetic.main.activity_editor.*
 
@@ -47,6 +45,7 @@ class EditorActivity : BaseActivity() {
     val REQUEST_TAKE_PHOTO = 101
     val CHOOSE_PHOTO = 102
     private val PERMISSION_REQUEST_CAMERA = 3546
+    private val INPUT_NEW_KEY_ACTIVITY_CODE = 12
 
 
     var pagerHeigh = 0
@@ -200,6 +199,17 @@ class EditorActivity : BaseActivity() {
             when (requestCode) {
                 REQUEST_TAKE_PHOTO -> viewModel.prepareTakenPhotoForUploading(data, tempImageUris!!)
                 CHOOSE_PHOTO -> viewModel.prepareForUploadingPickedPhoto(data, Utils.get().getNewTempUri())
+                INPUT_NEW_KEY_ACTIVITY_CODE -> {
+                    if (viewModel.saveNewPostingKey(data)) {
+                        viewModel.publishStory()
+                    } else {
+                        showInvalidReEnterPostingKeyDialog()
+                    }
+                }
+            }
+        } else {
+            if (requestCode == INPUT_NEW_KEY_ACTIVITY_CODE) {
+                showInvalidReEnterPostingKeyDialog()
             }
         }
     }
@@ -211,31 +221,51 @@ class EditorActivity : BaseActivity() {
         }
     }
 
+    fun showInvalidReEnterPostingKeyDialog() {
+        showExtendWarning(
+                "New Posting Key",
+                "Oops!! Your new posting key is empty. Do you want to try input new one again?",
+                "OK",
+                "Cancel",
+                object : WarningDialog.OnPositiveClickListener {
+                    override fun onClick() {
+                        showScreenForEnterNewPostingKey()
+                    }
+                })
+    }
+
     fun showPostingErrorDialog(errorMessage: String) {
         var title = "Error on posting"
         var message = ""
-        var repost = false
-        if (errorMessage.contains("private posting key")) {
+        if (errorMessage.toLowerCase().contains("private posting key")) {
             // show a dialog with a suggestion to enter a new key
-            message = "Posting was saved, but not published due to INVALID PRIVATE POSTING KEY error. \n Do you want to enter correct key and try to post again?"
-            repost = true
+            message = "Posting was saved, but not published due to INVALID PRIVATE POSTING KEY error. \nDo you want to enter correct key and try to post again?"
+            showExtendWarning(
+                    title,
+                    message,
+                    "OK",
+                    "Cancel",
+                    object : WarningDialog.OnPositiveClickListener {
+                        override fun onClick() {
+                            showScreenForEnterNewPostingKey()
+                        }
+                    })
         } else {
             message = "Posting was saved, but not published due to error. " + viewModel.stringError + "."
+            val dialog = AlertDialog.Builder(this@EditorActivity).create()
+            dialog.setTitle(title)
+            dialog.setMessage(message)
+            dialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(android.R.string.ok), { _, _ ->
+            })
+            dialog.show()
         }
 
-        val dialog = AlertDialog.Builder(this@EditorActivity).create()
-        dialog.setTitle(title)
-        dialog.setMessage(message)
-        dialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(android.R.string.ok), { _, _ ->
-            if (repost) {
-                showScreenForEnterNewPostingKey()
-            }
-        })
-        dialog.show()
+
     }
 
     fun showScreenForEnterNewPostingKey() {
-        // TODO show special screen
+        val intent = Intent(this, InputNewPostingKeyActivity::class.java)
+        startActivityForResult(intent, INPUT_NEW_KEY_ACTIVITY_CODE)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int,
@@ -417,6 +447,9 @@ class EditorActivity : BaseActivity() {
     var postingTab: PostingTab? = null
 
     fun setUIfor3rdTab() {
+        val focusedView = this.currentFocus
+        focusedView.hideKeyboard(this)
+
         Log.d("EditorActivity", "setUIfor3rdTab")
         topIndicator_1.setBackgroundResource(R.drawable.drawable_indicator_filled)
         topIndicator_2.setBackgroundResource(R.drawable.drawable_indicator_filled)

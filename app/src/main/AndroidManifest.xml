@@ -41,7 +41,8 @@
         <activity
             android:name=".barcode.BarcodeReadActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-
+        <activity android:name=".editor.inputpostingkey.InputNewPostingKeyActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
 
         <provider
             android:name="android.support.v4.content.FileProvider"
