@@ -15,6 +15,7 @@
     <string name="title_profile">Profile</string>
 
     <string name="button_ok">OK</string>
+    <string name="button_yes">yes</string>
     <string name="button_cancel">Cancel</string>
     <string name="button_confirm">Confirm</string>
 
@@ -60,5 +61,10 @@
     <string name="warning_category_lenght">Category name\'s length can\'t be empty</string>
     <string name="warning_categories_number">Please use only 5 tags</string>
     <string name="warning_one_category_at_least">Please use at least one tag</string>
+    <string name="warning_wrong_posting_key_title">Error on posting</string>
+    <string name="warning_wrong_new_posting_key_title">New Posting Key</string>
+    <string name="warning_new_empty_posting_key_message">Oops!! Your new posting key is empty. Do you want to try to try again?</string>
+    <string name="warning_wrong_postingKey_message">Posting was saved, but not published due to INVALID PRIVATE POSTING KEY error.
+Do you want to enter correct key and try to post again?</string>
 
 </resources>

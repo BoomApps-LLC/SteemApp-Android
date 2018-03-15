@@ -223,10 +223,10 @@ class EditorActivity : BaseActivity() {
 
     fun showInvalidReEnterPostingKeyDialog() {
         showExtendWarning(
-                "New Posting Key",
-                "Oops!! Your new posting key is empty. Do you want to try input new one again?",
-                "OK",
-                "Cancel",
+                getString(R.string.warning_wrong_new_posting_key_title),
+                getString(R.string.warning_new_empty_posting_key_message),
+                getString(R.string.button_yes),
+                getString(R.string.button_cancel),
                 object : WarningDialog.OnPositiveClickListener {
                     override fun onClick() {
                         showScreenForEnterNewPostingKey()
@@ -235,16 +235,16 @@ class EditorActivity : BaseActivity() {
     }
 
     fun showPostingErrorDialog(errorMessage: String) {
-        var title = "Error on posting"
+        var title = getString(R.string.warning_wrong_posting_key_title)
         var message = ""
         if (errorMessage.toLowerCase().contains("private posting key")) {
             // show a dialog with a suggestion to enter a new key
-            message = "Posting was saved, but not published due to INVALID PRIVATE POSTING KEY error. \nDo you want to enter correct key and try to post again?"
+            message = getString(R.string.warning_wrong_postingKey_message)
             showExtendWarning(
                     title,
                     message,
-                    "OK",
-                    "Cancel",
+                    getString(R.string.button_yes),
+                    getString(R.string.button_cancel),
                     object : WarningDialog.OnPositiveClickListener {
                         override fun onClick() {
                             showScreenForEnterNewPostingKey()
