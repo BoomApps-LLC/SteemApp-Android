@@ -31,6 +31,7 @@ class EditorViewModel : BaseViewModel() {
     var uploadPickedPhoto = false
     var sourceUriPickedPhoto: Uri? = null
     var destinationUriPickedPhoto: Uri? = null
+    var uploadPhotoUri: Uri? = null
 
 
     companion object {
@@ -89,8 +90,25 @@ class EditorViewModel : BaseViewModel() {
         }
     }
 
+    fun reUploadPhoto() {
+        if (uploadPhotoUri != null) {
+            state.value = ViewState.PROGRESS
+            uploadNewPhoto(uploadPhotoUri)
+        }
+    }
+
     fun uploadNewPhoto(uri: Uri?) {
         if (uri != null) {
+            uploadPhotoUri = uri
+            val uData = SharedRepository().loadUserData()
+            if (uData.postKey == null || uData.postKey.length < 40) {
+                uploadTakenPhoto = false
+                uploadPickedPhoto = false
+                stringError = "photo_upload_empty_key"
+                state.value = ViewState.FAULT_RESULT
+                saveStoryData()
+                return
+            }
             NetworkRepository.get().uploadNewPhoto(
                     uri,
                     object : NetworkRepository.OnRequestFinishCallback {
@@ -140,7 +158,7 @@ class EditorViewModel : BaseViewModel() {
         }
         val repo = SharedRepository()
         val uData = repo.loadUserData()
-        val newUserData = UserData(uData.nickname, uData.userName, uData.photoUrl, data.getStringExtra("posting_key"))
+        val newUserData = UserData(uData.nickname, uData.userName, uData.photoUrl, data.getStringExtra("POSTING_KEY"))
         repo.saveUserData(newUserData)
         return true
     }

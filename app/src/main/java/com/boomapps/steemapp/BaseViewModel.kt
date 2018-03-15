@@ -12,4 +12,7 @@ open class BaseViewModel : ViewModel() {
     var stringError: String = ""
     var stringSuccess: String = ""
 
+    fun viewStateProceeded(){
+        state.value = ViewState.COMMON
+    }
 }

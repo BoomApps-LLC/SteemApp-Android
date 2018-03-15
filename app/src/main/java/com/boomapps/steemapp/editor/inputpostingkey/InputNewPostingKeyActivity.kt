@@ -37,7 +37,7 @@ class InputNewPostingKeyActivity : BaseActivity(), QRCodeReaderView.OnQRCodeRead
         aNewKey_qrdecoderview.setAutofocusInterval(2000L);
 
         // Use this function to enable/disable Torch
-        aNewKey_qrdecoderview.setTorchEnabled(true);
+        aNewKey_qrdecoderview.setTorchEnabled(false);
 
         // Use this function to set front camera preview
 //        qrCodeReaderView?.setFrontCamera();

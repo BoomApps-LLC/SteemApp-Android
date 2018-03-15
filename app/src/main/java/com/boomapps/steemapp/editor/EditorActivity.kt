@@ -45,7 +45,8 @@ class EditorActivity : BaseActivity() {
     val REQUEST_TAKE_PHOTO = 101
     val CHOOSE_PHOTO = 102
     private val PERMISSION_REQUEST_CAMERA = 3546
-    private val INPUT_NEW_KEY_ACTIVITY_CODE = 12
+    private val INPUT_NEW_KEY_POST_ACTIVITY_CODE = 12
+    private val INPUT_NEW_KEY_PHOTO_ACTIVITY_CODE = 21
 
 
     var pagerHeigh = 0
@@ -64,6 +65,7 @@ class EditorActivity : BaseActivity() {
                     showProgress("Processing ...")
                 }
                 ViewState.FAULT_RESULT -> {
+                    viewModel.viewStateProceeded()
                     dismissProgress()
                     if (viewModel.stringError.isNotEmpty()) {
                         showPostingErrorDialog(viewModel.stringError)
@@ -199,17 +201,26 @@ class EditorActivity : BaseActivity() {
             when (requestCode) {
                 REQUEST_TAKE_PHOTO -> viewModel.prepareTakenPhotoForUploading(data, tempImageUris!!)
                 CHOOSE_PHOTO -> viewModel.prepareForUploadingPickedPhoto(data, Utils.get().getNewTempUri())
-                INPUT_NEW_KEY_ACTIVITY_CODE -> {
+                INPUT_NEW_KEY_POST_ACTIVITY_CODE -> {
                     if (viewModel.saveNewPostingKey(data)) {
                         viewModel.publishStory()
                     } else {
-                        showInvalidReEnterPostingKeyDialog()
+                        showInvalidReEnterPostingKeyDialog(INPUT_NEW_KEY_POST_ACTIVITY_CODE)
+                    }
+                }
+                INPUT_NEW_KEY_PHOTO_ACTIVITY_CODE -> {
+                    if (viewModel.saveNewPostingKey(data)) {
+                        viewModel.reUploadPhoto()
+                    } else {
+                        showInvalidReEnterPostingKeyDialog(INPUT_NEW_KEY_PHOTO_ACTIVITY_CODE)
                     }
                 }
             }
         } else {
-            if (requestCode == INPUT_NEW_KEY_ACTIVITY_CODE) {
-                showInvalidReEnterPostingKeyDialog()
+            if (requestCode == INPUT_NEW_KEY_POST_ACTIVITY_CODE) {
+                showInvalidReEnterPostingKeyDialog(INPUT_NEW_KEY_POST_ACTIVITY_CODE)
+            } else if (requestCode == INPUT_NEW_KEY_PHOTO_ACTIVITY_CODE) {
+                showInvalidReEnterPostingKeyDialog(INPUT_NEW_KEY_PHOTO_ACTIVITY_CODE)
             }
         }
     }
@@ -221,7 +232,7 @@ class EditorActivity : BaseActivity() {
         }
     }
 
-    fun showInvalidReEnterPostingKeyDialog() {
+    fun showInvalidReEnterPostingKeyDialog(requestCode: Int) {
         showExtendWarning(
                 getString(R.string.warning_wrong_new_posting_key_title),
                 getString(R.string.warning_new_empty_posting_key_message),
@@ -229,7 +240,7 @@ class EditorActivity : BaseActivity() {
                 getString(R.string.button_cancel),
                 object : WarningDialog.OnPositiveClickListener {
                     override fun onClick() {
-                        showScreenForEnterNewPostingKey()
+                        showScreenForEnterNewPostingKey(requestCode)
                     }
                 })
     }
@@ -247,9 +258,11 @@ class EditorActivity : BaseActivity() {
                     getString(R.string.button_cancel),
                     object : WarningDialog.OnPositiveClickListener {
                         override fun onClick() {
-                            showScreenForEnterNewPostingKey()
+                            showScreenForEnterNewPostingKey(INPUT_NEW_KEY_POST_ACTIVITY_CODE)
                         }
                     })
+        } else if (viewModel.stringError.toLowerCase().contains("photo_upload_empty_key")) {
+            showInvalidReEnterPostingKeyDialog(INPUT_NEW_KEY_PHOTO_ACTIVITY_CODE)
         } else {
             message = "Posting was saved, but not published due to error. " + viewModel.stringError + "."
             val dialog = AlertDialog.Builder(this@EditorActivity).create()
@@ -263,9 +276,9 @@ class EditorActivity : BaseActivity() {
 
     }
 
-    fun showScreenForEnterNewPostingKey() {
+    fun showScreenForEnterNewPostingKey(requestCode: Int) {
         val intent = Intent(this, InputNewPostingKeyActivity::class.java)
-        startActivityForResult(intent, INPUT_NEW_KEY_ACTIVITY_CODE)
+        startActivityForResult(intent, requestCode)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int,
