@@ -152,4 +152,15 @@ class SharedRepository {
         }
         return StoryInstance(title, story, aList)
     }
+
+    fun saveLastTimePosting(currentTimeMillis: Long) {
+        val editor = getSharedPreferencesEditor()
+        editor.putLong("last_posting_time", currentTimeMillis)
+        editor.apply()
+    }
+
+    fun loadLastTimePosting(): Long {
+        val prefs = getReadableSharedPreferences()
+        return prefs.getLong("last_posting_time", 0L)
+    }
 }

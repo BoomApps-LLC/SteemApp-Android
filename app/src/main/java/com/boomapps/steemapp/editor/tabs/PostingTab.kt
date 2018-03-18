@@ -1,5 +1,6 @@
 package com.boomapps.steemapp.editor.tabs
 
+import android.os.CountDownTimer
 import android.support.constraint.ConstraintLayout
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.SwitchCompat
@@ -8,6 +9,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.boomapps.steemapp.R
 import com.boomapps.steemapp.controls.SquareLinearLayout
+import com.boomapps.steemapp.controls.WarningDialog
 import com.boomapps.steemapp.editor.EditorViewModel
 
 /**
@@ -42,13 +44,36 @@ class PostingTab(view: View, tabListener: TabListener, viewModel: EditorViewMode
         postButton = view.findViewById(R.id.postButton)
         postButton.setOnClickListener({
             viewModel.publishStory()
+            if (viewModel.postingDelay <= 0) {
+                viewModel.publishStory()
+            } else {
+                showPostingDelayDialog()
+            }
         })
+
 
         voteSwitcher = view.findViewById(R.id.upvoteSwitcher)
         voteSwitcher.isChecked = viewModel.upvoteState
         voteSwitcher.setOnCheckedChangeListener({ _, isChecked ->
             viewModel.upvoteState = isChecked
         })
+    }
+
+    override fun onShow() {
+        Log.d("PostingTab", "onShow")
+//        postButton.postDelayed({
+//            startTimer(viewModel.postingDelay)
+//        }, 300)
+//        if (viewModel.postingDelay > 0) {
+
+//        }
+    }
+
+    override fun onHide() {
+        Log.d("PostingTab", "onHide")
+        if (timer != null) {
+            stopTimer()
+        }
     }
 
     private fun setRewardsControlState(selectedPosition: Int) {
@@ -82,4 +107,51 @@ class PostingTab(view: View, tabListener: TabListener, viewModel: EditorViewMode
             }
         }
     }
+
+
+    private fun showPostingDelayDialog() {
+        WarningDialog.getInstance().showSpecial(
+                postButton.context,
+                title = null,
+                message = "User can publish only one story in 5 minutes",
+                positive = "OK",
+                negative = null,
+                listener = null)
+    }
+
+
+    private fun startTimer(startDelay: Long) {
+        Log.d("PostingTab", "startTimer >> $startDelay")
+//        timer = object : CountDownTimer(startDelay, 1000L) {
+//
+//            override fun onFinish() {
+//                setPostButtonReady()
+//                timer = null
+//            }
+//
+//            override fun onTick(millisUntilFinished: Long) {
+//                val secs = (millisUntilFinished / 1000).toInt()
+//                val mins: Int = secs / 60
+//                val restSecs = secs - mins * 60
+//                setPostButtonUnready(postButton.context.getString(R.string.btn_posting_timer, mins, restSecs))
+//            }
+//        }
+//        timer?.start()
+    }
+
+    private fun stopTimer() {
+        Log.d("PostingTab", "stopTimer")
+//        timer?.cancel()
+//        timer = null
+    }
+
+    private fun setPostButtonReady() {
+        postButton.setText(R.string.btn_posting_default)
+    }
+
+    private fun setPostButtonUnready(timerValue: String) {
+        postButton.setText(timerValue)
+    }
+
+    var timer: CountDownTimer? = null
 }

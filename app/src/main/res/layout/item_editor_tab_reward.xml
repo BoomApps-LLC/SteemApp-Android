@@ -198,7 +198,7 @@
             android:clickable="true"
             android:gravity="center"
             android:padding="8dp"
-            android:text="POST"
+            android:text="@string/btn_posting_default"
             android:textColor="@color/white"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"

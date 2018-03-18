@@ -32,6 +32,8 @@ class EditorViewModel : BaseViewModel() {
     var sourceUriPickedPhoto: Uri? = null
     var destinationUriPickedPhoto: Uri? = null
     var uploadPhotoUri: Uri? = null
+    var lastPostingTime: Long = 0L
+    var postingDelay: Long = 0L
 
 
     companion object {
@@ -189,6 +191,8 @@ class EditorViewModel : BaseViewModel() {
                 story = ""
                 categories.clear()
                 saveStoryData()
+                lastPostingTime = System.currentTimeMillis()
+                SharedRepository().saveLastTimePosting(lastPostingTime)
             }
 
             override fun onFailureRequestFinish(throwable: Throwable) {
@@ -212,6 +216,14 @@ class EditorViewModel : BaseViewModel() {
             categories.clear()
             categories.addAll(storyData.categories)
         }
+        lastPostingTime = SharedRepository().loadLastTimePosting()
+        postingDelay = if (lastPostingTime == 0L) {
+            0L
+        } else {
+            Math.max(0L, System.currentTimeMillis() - lastPostingTime)
+        }
+        postingDelay = 300000
     }
+
 
 }
