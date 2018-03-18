@@ -84,6 +84,14 @@ class CategoriesTab(view: View, tabListener: TabListener, viewModel: EditorViewM
         })
     }
 
+    override fun onShow() {
+
+    }
+
+    override fun onHide() {
+
+    }
+
     fun notifyDataChanged() {
         dataListener.onDataChange(
                 categoriesList.adapter.itemCount > 0

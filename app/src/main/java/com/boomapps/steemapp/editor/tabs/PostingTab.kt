@@ -4,6 +4,7 @@ import android.os.CountDownTimer
 import android.support.constraint.ConstraintLayout
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.SwitchCompat
+import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -35,15 +36,14 @@ class PostingTab(view: View, tabListener: TabListener, viewModel: EditorViewMode
         rewardButtonsContainer = view.findViewById<LinearLayout>(R.id.rewardButtonsContainer)
         setRewardsControlState(viewModel.rewardPosition)
         reward_100 = rewardButtonsContainer.findViewById(R.id.rewardItem1)
-        reward_100.setOnClickListener({setRewardsControlState(0)})
+        reward_100.setOnClickListener({ setRewardsControlState(0) })
         reward_50 = rewardButtonsContainer.findViewById(R.id.rewardItem3)
-        reward_50.setOnClickListener({setRewardsControlState(1)})
+        reward_50.setOnClickListener({ setRewardsControlState(1) })
         reward_0 = rewardButtonsContainer.findViewById(R.id.rewardItem2)
-        reward_0.setOnClickListener({setRewardsControlState(2)})
+        reward_0.setOnClickListener({ setRewardsControlState(2) })
 
         postButton = view.findViewById(R.id.postButton)
         postButton.setOnClickListener({
-            viewModel.publishStory()
             if (viewModel.postingDelay <= 0) {
                 viewModel.publishStory()
             } else {

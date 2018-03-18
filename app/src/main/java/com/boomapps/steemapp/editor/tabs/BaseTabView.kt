@@ -19,4 +19,8 @@ abstract class BaseTabView(var view: View, var dataListener: TabListener, var vi
 
     abstract fun initComponents()
 
+    abstract fun onShow()
+
+    abstract fun onHide()
+
 }

@@ -26,6 +26,14 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
         processFullDataChange()
     }
 
+    override fun onShow() {
+
+    }
+
+    override fun onHide() {
+
+    }
+
     private fun processFullDataChange(storyLength: Int = -1) {
         val sLength = if (storyLength < 0) {
             viewModel.story.length

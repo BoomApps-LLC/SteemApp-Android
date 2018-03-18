@@ -39,4 +39,13 @@ class TitleTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
         })
         storyTitle.setText(viewModel.title)
     }
+
+
+    override fun onShow() {
+
+    }
+
+    override fun onHide() {
+
+    }
 }

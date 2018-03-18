@@ -95,6 +95,7 @@ class EditorActivity : BaseActivity() {
         viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
 
             var curState = SCROLL_STATE_IDLE
+            var page = 0
 
             override fun onPageScrollStateChanged(state: Int) {
                 curState = state
@@ -106,10 +107,30 @@ class EditorActivity : BaseActivity() {
                 if (curState == SCROLL_STATE_IDLE) {
                     onPageSelected(position)
                 }
+                if (position != page && positionOffset == 0.0f) {
+                    page = position
+                    Log.d("onPageChangeLoader", "onPageScrolled >> setShowedPage($page)")
+//                    viewModel.activeTab = page
+//                    when (position) {
+//                        0 -> {
+//                            setUIforTitleTab()
+//                        }
+//                        1 -> {
+//                            setUIforStoryTab()
+//                        }
+//                        2 -> {
+//                            setUIforTagsTab()
+//                        }
+//                        3 -> {
+//                            setUIfor3rdTab()
+//                        }
+//                    }
+                    notifyPagesAboutVisibilityChange(page)
+                }
             }
 
             override fun onPageSelected(position: Int) {
-//            if (position != 0 && viewModel.activeTab == position) return
+            if (position != 0 && viewModel.activeTab == position) return
                 viewModel.activeTab = position
                 Log.d("onPageChangeLoader", "onPageSelected(${position})")
                 when (position) {
@@ -155,6 +176,29 @@ class EditorActivity : BaseActivity() {
                 }
             }
         })
+    }
+
+    private fun notifyPagesAboutVisibilityChange(visiblePos: Int) {
+        when (visiblePos) {
+            0 -> {
+                titleTab?.onShow()
+                storyTab?.onHide()
+            }
+            1 -> {
+                titleTab?.onHide()
+                storyTab?.onShow()
+                categoriesTab?.onHide()
+            }
+            2 -> {
+                storyTab?.onHide()
+                categoriesTab?.onShow()
+                postingTab?.onHide()
+            }
+            3 -> {
+                categoriesTab?.onHide()
+                postingTab?.onShow()
+            }
+        }
     }
 
     override fun onBackPressed() {
@@ -322,7 +366,7 @@ class EditorActivity : BaseActivity() {
         actionButtonTopRight.visibility = View.VISIBLE
         actionButtonTopLeftTitle.setText(R.string.a_editor_action_left_t_title)
         val view = adapter.getViewAtPosition(0)
-        if (view != null) {
+        if (view != null && titleTab == null) {
             titleTab = TitleTab(view, tabsListener, viewModel)
         }
     }
@@ -346,7 +390,7 @@ class EditorActivity : BaseActivity() {
         actionButtonTopRight.visibility = View.VISIBLE
         actionButtonTopLeftTitle.setText(R.string.a_editor_action_left_t_story)
         val view = adapter.getViewAtPosition(1)
-        if (view != null) {
+        if (view != null && storyTab == null) {
             storyTab = StoryTab(view, tabsListener, viewModel)
         }
     }
@@ -449,7 +493,7 @@ class EditorActivity : BaseActivity() {
         actionButtonTopRight.visibility = View.VISIBLE
         actionButtonTopLeftTitle.setText(R.string.a_editor_action_left_t_tags)
         val view = adapter.getViewAtPosition(2)
-        if (view != null) {
+        if (view != null && categoriesTab == null) {
             categoriesTab = CategoriesTab(view, tabsListener, viewModel)
         }
     }
@@ -461,7 +505,9 @@ class EditorActivity : BaseActivity() {
 
     fun setUIfor3rdTab() {
         val focusedView = this.currentFocus
-        focusedView.hideKeyboard(this)
+        focusedView?.postDelayed({
+            focusedView.hideKeyboard(this)
+        }, 300)
 
         Log.d("EditorActivity", "setUIfor3rdTab")
         topIndicator_1.setBackgroundResource(R.drawable.drawable_indicator_filled)
@@ -472,7 +518,7 @@ class EditorActivity : BaseActivity() {
         actionButtonTopRight.visibility = View.INVISIBLE
         actionButtonTopLeftTitle.setText(R.string.a_editor_action_left_t_posing)
         val view = adapter.getViewAtPosition(3)
-        if (view != null) {
+        if (view != null && postingTab == null) {
             postingTab = PostingTab(view, tabsListener, viewModel)
         }
     }
