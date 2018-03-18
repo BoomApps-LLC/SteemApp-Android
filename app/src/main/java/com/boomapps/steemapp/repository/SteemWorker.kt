@@ -26,6 +26,7 @@ import eu.bittrade.libs.steemj.exceptions.SteemResponseException
 import eu.bittrade.libs.steemj.image.upload.SteemJImageUpload
 import eu.bittrade.libs.steemj.image.upload.config.SteemJImageUploadConfig
 import org.apache.commons.lang3.tuple.ImmutablePair
+import timber.log.Timber
 import java.io.File
 import java.net.URL
 import java.security.InvalidParameterException
@@ -59,9 +60,8 @@ class SteemWorker() {
         return steemJ != null && steemJConfig != null
     }
 
-
     fun login(nickname: String, postingKey: String?, activeKey: String?): SteemWorkerResponse {
-        Log.d(LOG_TAG, "login(${nickname}, ${postingKey}")
+        Timber.log(Log.INFO, "login($nickname, $postingKey")
         steemJConfig = SteemJConfig.getInstance()
         steemJConfig?.setAppName("SteemApp")
         steemJConfig?.setAppVersion(BuildConfig.VERSION_NAME)
@@ -89,19 +89,19 @@ class SteemWorker() {
                 return SteemWorkerResponse(false, SteemErrorCodes.INCORRECT_USER_DATA_ERROR)
             }
         } catch (sce: SteemConnectionException) {
-            Log.d(LOG_TAG, "Login Error : ${sce.localizedMessage}")
+            Timber.e(sce)
             sce.printStackTrace()
             return SteemWorkerResponse(false, SteemErrorCodes.CONNECTION_ERROR)
         } catch (sre: SteemResponseException) {
-            Log.d(LOG_TAG, "Login Error : ${sre.localizedMessage}")
+            Timber.e(sre)
             sre.printStackTrace()
             return SteemWorkerResponse(false, SteemErrorCodes.TIMEOUT_ERROR)
         } catch (afe: AddressFormatException) {
-            Log.d(LOG_TAG, "Login Error : key is not valid >> ${afe.localizedMessage}")
+            Timber.e(afe)
             afe.printStackTrace()
             return SteemWorkerResponse(false, SteemErrorCodes.INCORRECT_USER_DATA_ERROR)
         } catch (ex: Exception) {
-            Log.d(LOG_TAG, "Login Error : global catcher >> ${ex.localizedMessage}")
+            Timber.e(ex)
             ex.printStackTrace()
             return SteemWorkerResponse(false, SteemErrorCodes.UNDEFINED_ERROR)
         }
@@ -139,7 +139,6 @@ class SteemWorker() {
         steemJ = null
     }
 
-
     fun post(title: String, content: String, tags: Array<String>, postingKey: String, rewardsPercent: Short, upvote: Boolean): PostingResult {
         try {
             steemJConfig?.privateKeyStorage
@@ -149,7 +148,7 @@ class SteemWorker() {
                     val commentOperation: CommentOperation? = steemJ?.createPost(title, content, tags, rewardsPercent)
                     if (commentOperation != null) {
                         val metadata = commentOperation.jsonMetadata
-                        Log.d("SteemWorker", "post answer >> ${metadata?.toString()}")
+                        Timber.d("post answer >> ${metadata?.toString()}")
                     }
                 } else {
                     return PostingResult("Posting key is empty.", false)
@@ -168,16 +167,16 @@ class SteemWorker() {
                 }
             }
         } catch (communicationException: SteemCommunicationException) {
-            Log.e("SteemWorker", "post error SteemCommunicationException >> ${communicationException.localizedMessage}", communicationException)
+            Timber.e(communicationException)
             return PostingResult(communicationException.localizedMessage, false)
         } catch (responseException: SteemResponseException) {
-            Log.e("SteemWorker", "post error SteemResponseException >>${responseException.localizedMessage}", responseException)
+            Timber.e(responseException)
             return PostingResult(responseException.localizedMessage, false)
         } catch (transactionException: SteemInvalidTransactionException) {
-            Log.e("SteemWorker", "post error SteemInvalidTransactionException >> ${transactionException.localizedMessage}", transactionException)
+            Timber.e(transactionException)
             return PostingResult(transactionException.localizedMessage, false)
         } catch (parameterException: InvalidParameterException) {
-            Log.e("SteemWorker", "post error InvalidParameterException >> ${parameterException.localizedMessage}", parameterException)
+            Timber.e(parameterException)
             return PostingResult(parameterException.localizedMessage, false)
         }
         return PostingResult()

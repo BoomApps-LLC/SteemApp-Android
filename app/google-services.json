@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "503168905005",
+    "firebase_url": "https://steemapp-215f9.firebaseio.com",
+    "project_id": "steemapp-215f9",
+    "storage_bucket": "steemapp-215f9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:503168905005:android:50dc2ff904ec22ef",
+        "android_client_info": {
+          "package_name": "com.boomapps.steemapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "503168905005-vpee31bge46r3s7hivo6cq2nve491r0v.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.boomapps.steemapp",
+            "certificate_hash": "49facd96bc1160fa007e603a9b4a4230e7b8207f"
+          }
+        },
+        {
+          "client_id": "503168905005-9v2iich3qd4r1tcumkq5cl9k22birvkg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6X6u4xSKXx3twn1x5pjCRiUVdg1d6DlY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "503168905005-9v2iich3qd4r1tcumkq5cl9k22birvkg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
