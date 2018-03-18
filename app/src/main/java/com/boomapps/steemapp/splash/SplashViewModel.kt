@@ -30,7 +30,7 @@ class SplashViewModel : BaseViewModel() {
     }
 
     fun getLoginState(): LiveData<LoginState> {
-        loginState.value = if (SharedRepository().loadUserData().nickname.isNullOrEmpty() || !SteemWorker().isLogged()) {
+        loginState.value = if (SharedRepository().isUserLogged() || !SteemWorker().isLogged()) {
             LoginState.NOT_LOGGED
         } else {
             LoginState.LOGGED
