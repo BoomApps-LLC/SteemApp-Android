@@ -21,9 +21,9 @@ import android.support.v4.view.ViewPager.SCROLL_STATE_IDLE
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.Toast
 import com.boomapps.steemapp.*
 import com.boomapps.steemapp.controls.ListActionsDialog
+import com.boomapps.steemapp.controls.PostingSuccessDialog
 import com.boomapps.steemapp.controls.WarningDialog
 import com.boomapps.steemapp.editor.inputpostingkey.InputNewPostingKeyActivity
 import com.boomapps.steemapp.editor.tabs.*
@@ -35,7 +35,7 @@ import kotlinx.android.synthetic.main.activity_editor.*
  */
 class EditorActivity : BaseActivity() {
 
-    lateinit var adapter: EditorTabsAdapter
+    private lateinit var adapter: EditorTabsAdapter
 
     lateinit var viewModel: EditorViewModel
 
@@ -49,7 +49,7 @@ class EditorActivity : BaseActivity() {
     private val INPUT_NEW_KEY_PHOTO_ACTIVITY_CODE = 21
 
 
-    var pagerHeigh = 0
+    var pagerHeight = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,8 +80,7 @@ class EditorActivity : BaseActivity() {
                             }
                         }
                         EditorViewModel.SUCCESS_STORY_UPLOAD -> {
-                            Toast.makeText(this@EditorActivity, "Posting is successful.", Toast.LENGTH_SHORT).show()
-                            this@EditorActivity.finish()
+                            showPublishSuccessDialog()
                         }
                     }
                 }
@@ -110,27 +109,12 @@ class EditorActivity : BaseActivity() {
                 if (position != page && positionOffset == 0.0f) {
                     page = position
                     Log.d("onPageChangeLoader", "onPageScrolled >> setShowedPage($page)")
-//                    viewModel.activeTab = page
-//                    when (position) {
-//                        0 -> {
-//                            setUIforTitleTab()
-//                        }
-//                        1 -> {
-//                            setUIforStoryTab()
-//                        }
-//                        2 -> {
-//                            setUIforTagsTab()
-//                        }
-//                        3 -> {
-//                            setUIfor3rdTab()
-//                        }
-//                    }
                     notifyPagesAboutVisibilityChange(page)
                 }
             }
 
             override fun onPageSelected(position: Int) {
-            if (position != 0 && viewModel.activeTab == position) return
+                if (position != 0 && viewModel.activeTab == position) return
                 viewModel.activeTab = position
                 Log.d("onPageChangeLoader", "onPageSelected(${position})")
                 when (position) {
@@ -171,12 +155,13 @@ class EditorActivity : BaseActivity() {
         viewPager.addOnLayoutChangeListener(object : View.OnLayoutChangeListener {
             override fun onLayoutChange(v: View?, left: Int, top: Int, right: Int, bottom: Int, oldLeft: Int, oldTop: Int, oldRight: Int, oldBottom: Int) {
                 if (bottom - top > 0) {
-                    pagerHeigh = bottom - top
+                    pagerHeight = bottom - top
                     viewPager.removeOnLayoutChangeListener(this)
                 }
             }
         })
     }
+
 
     private fun notifyPagesAboutVisibilityChange(visiblePos: Int) {
         when (visiblePos) {
@@ -276,7 +261,7 @@ class EditorActivity : BaseActivity() {
         }
     }
 
-    fun showInvalidReEnterPostingKeyDialog(requestCode: Int) {
+    private fun showInvalidReEnterPostingKeyDialog(requestCode: Int) {
         showExtendWarning(
                 getString(R.string.warning_wrong_new_posting_key_title),
                 getString(R.string.warning_new_empty_posting_key_message),
@@ -342,7 +327,7 @@ class EditorActivity : BaseActivity() {
     }
 
 
-    val tabsListener: TabListener = object : TabListener {
+    private val tabsListener: TabListener = object : TabListener {
 
         override fun onDataChange(ready: Boolean) {
             setNextControlState(ready)
@@ -375,10 +360,6 @@ class EditorActivity : BaseActivity() {
 //    --------------------------- STORY TAB --------------------------------
 
     var storyTab: StoryTab? = null
-//    var fullHeight = 0
-//    var scrollableContentContainer: ScrollView? = null
-
-//    var editor: RichEditor? = null
 
     private fun setUIforStoryTab() {
         Log.d("EditorActivity", "setUIforStoryTab")
@@ -521,6 +502,17 @@ class EditorActivity : BaseActivity() {
         if (view != null && postingTab == null) {
             postingTab = PostingTab(view, tabsListener, viewModel)
         }
+    }
+
+    private fun showPublishSuccessDialog() {
+        val dialog = PostingSuccessDialog()
+        dialog.setOnDismissListener(object : PostingSuccessDialog.OnDialogDismissListener {
+            override fun onDismiss() {
+                finish()
+            }
+        })
+        val fragmentManager = fragmentManager
+        dialog.show(fragmentManager, "success_dialog")
     }
 
 

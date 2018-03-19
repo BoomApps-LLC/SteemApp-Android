@@ -61,11 +61,11 @@ class PostingTab(view: View, tabListener: TabListener, viewModel: EditorViewMode
 
     override fun onShow() {
         Log.d("PostingTab", "onShow")
-//        postButton.postDelayed({
-//            startTimer(viewModel.postingDelay)
-//        }, 300)
+        postButton.postDelayed({
+            startTimer(viewModel.postingDelay)
+        }, 500)
 //        if (viewModel.postingDelay > 0) {
-
+//
 //        }
     }
 
@@ -122,27 +122,27 @@ class PostingTab(view: View, tabListener: TabListener, viewModel: EditorViewMode
 
     private fun startTimer(startDelay: Long) {
         Log.d("PostingTab", "startTimer >> $startDelay")
-//        timer = object : CountDownTimer(startDelay, 1000L) {
-//
-//            override fun onFinish() {
-//                setPostButtonReady()
-//                timer = null
-//            }
-//
-//            override fun onTick(millisUntilFinished: Long) {
-//                val secs = (millisUntilFinished / 1000).toInt()
-//                val mins: Int = secs / 60
-//                val restSecs = secs - mins * 60
-//                setPostButtonUnready(postButton.context.getString(R.string.btn_posting_timer, mins, restSecs))
-//            }
-//        }
-//        timer?.start()
+        timer = object : CountDownTimer(startDelay, 1000L) {
+
+            override fun onFinish() {
+                setPostButtonReady()
+                timer = null
+            }
+
+            override fun onTick(millisUntilFinished: Long) {
+                val secs = (millisUntilFinished / 1000).toInt()
+                val mins: Int = secs / 60
+                val restSecs = secs - mins * 60
+                setPostButtonUnready(postButton.context.getString(R.string.btn_posting_timer, mins, restSecs))
+            }
+        }
+        timer?.start()
     }
 
     private fun stopTimer() {
         Log.d("PostingTab", "stopTimer")
-//        timer?.cancel()
-//        timer = null
+        timer?.cancel()
+        timer = null
     }
 
     private fun setPostButtonReady() {
