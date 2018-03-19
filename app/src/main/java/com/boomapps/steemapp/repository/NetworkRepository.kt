@@ -11,6 +11,8 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.functions.Consumer
 import io.reactivex.rxkotlin.Flowables
 import io.reactivex.schedulers.Schedulers
 import okhttp3.*
@@ -40,7 +42,7 @@ class NetworkRepository {
         var extendedProfileResponse: ProfileResponse? = null
         var coinmarketcapCurrency: CoinmarketcapCurrency? = null
         var instance: NetworkRepository = NetworkRepository()
-        lateinit var httpClientBuilder: OkHttpClient.Builder
+        lateinit var httpClient: OkHttpClient
         fun get(): NetworkRepository {
             return instance
         }
@@ -51,7 +53,7 @@ class NetworkRepository {
     init {
         val logging = HttpLoggingInterceptor()
         logging.level = HttpLoggingInterceptor.Level.BODY
-        httpClientBuilder = OkHttpClient.Builder()
+        val httpClientBuilder = OkHttpClient.Builder()
         httpClientBuilder.addInterceptor(logging)  // <-- this is the important line!
         httpClientBuilder.cookieJar(object : CookieJar {
             private var cookieStore: HashMap<HttpUrl, List<Cookie>> = hashMapOf();
@@ -69,6 +71,7 @@ class NetworkRepository {
                 };
             }
         })
+        httpClient = httpClientBuilder.build()
     }
 
 
@@ -163,7 +166,7 @@ class NetworkRepository {
         val balanceVestFlowable: Flowable<Array<Double>> = getBalanceVetstFlowable()//.onErrorResumeNext { s: Subscriber<in BigDecimal>? -> Log.d("NetworkRepository", "balanceVests error loading") }
         val exUserData: Flowable<ProfileResponse> = getRequestsApi("https://steemit.com/", null).loadProfileExtendedData(nick)
 
-        Flowables.combineLatest(
+        val disposable: Disposable = Flowables.combineLatest(
                 coinmarketcapToUsdFloawable,
                 coinmarketcapDollarToUsdFlowable,
                 exUserData,
@@ -191,9 +194,11 @@ class NetworkRepository {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnComplete {
+                    Log.d("NetworkRepository", "loadFullStartData >> doOnComplete")
                     callback.onSuccessRequestFinish()
                 }
                 .doOnError {
+                    Log.d("NetworkRepository", "loadFullStartData >> doOnError")
                     callback.onFailureRequestFinish(it)
                 }
                 .subscribe()
@@ -225,13 +230,15 @@ class NetworkRepository {
     }
 
     private fun getRequestsApi(basePoint: String, headers: Map<String, String>?): RequestsApi {
-        val localBuilder: OkHttpClient.Builder = httpClientBuilder
+        val localBuilder: OkHttpClient.Builder = httpClient.newBuilder()
         if (headers != null) {
             localBuilder.addNetworkInterceptor(HeadersInterceptor(headers))
         }
-        localBuilder.connectTimeout(30, TimeUnit.SECONDS)
-        localBuilder.readTimeout(30, TimeUnit.SECONDS)
-        localBuilder.retryOnConnectionFailure(true)
+
+
+        localBuilder.connectTimeout(10, TimeUnit.SECONDS)
+        localBuilder.readTimeout(10, TimeUnit.SECONDS)
+        localBuilder.retryOnConnectionFailure(false)
         val gson = GsonBuilder()
                 .registerTypeAdapter(UserDataEntity::class.java, ProfileMetadataDeserializer())
                 .create()

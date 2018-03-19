@@ -28,7 +28,7 @@ import eu.bittrade.libs.steemj.exceptions.SteemTransformationException;
 
 /**
  * This class handles the communication to the Steem web socket API.
- * 
+ *
  * @author <a href="http://steemit.com/@dez1337">dez1337</a>
  */
 public class CommunicationHandler {
@@ -39,16 +39,19 @@ public class CommunicationHandler {
      * objects.
      */
     private static ObjectMapper mapper = getObjectMapper();
-    /** A counter for failed connection tries. */
+    /**
+     * A counter for failed connection tries.
+     */
     private int numberOfConnectionTries = 0;
-    /** The client used to send requests. */
+    /**
+     * The client used to send requests.
+     */
     private AbstractClient client;
 
     /**
      * Initialize the Connection Handler.
-     * 
-     * @throws SteemCommunicationException
-     *             If no connection to the Steem Node could be established.
+     *
+     * @throws SteemCommunicationException If no connection to the Steem Node could be established.
      */
     public CommunicationHandler() throws SteemCommunicationException {
         // Create a new connection
@@ -58,10 +61,9 @@ public class CommunicationHandler {
     /**
      * Initialize a new <code>client</code> by selecting one of the configured
      * endpoints.
-     * 
-     * @throws SteemCommunicationException
-     *             If no {@link AbstractClient} implementation for the given
-     *             schema is available.
+     *
+     * @throws SteemCommunicationException If no {@link AbstractClient} implementation for the given
+     *                                     schema is available.
      */
     public void initializeNewClient() throws SteemCommunicationException {
         if (client != null) {
@@ -84,29 +86,24 @@ public class CommunicationHandler {
         }
     }
 
+    private volatile int tries = 0;
+
     /**
      * Perform a request to the web socket API whose response will automatically
      * get transformed into the given object.
-     * 
-     * @param requestObject
-     *            A request object that contains all needed parameters.
-     * @param targetClass
-     *            The type the response should be transformed to.
-     * @param <T>
-     *            The type that should be returned.
+     *
+     * @param requestObject A request object that contains all needed parameters.
+     * @param targetClass   The type the response should be transformed to.
+     * @param <T>           The type that should be returned.
      * @return The server response transformed into a list of given objects.
-     * @throws SteemTimeoutException
-     *             If the server was not able to answer the request in the given
-     *             time (@see
-     *             {@link eu.bittrade.libs.steemj.configuration.SteemJConfig#setResponseTimeout(int)
-     *             setResponseTimeout()})
-     * @throws SteemCommunicationException
-     *             If there is a connection problem.
-     * @throws SteemTransformationException
-     *             If the SteemJ is unable to transform the JSON response into a
-     *             Java object.
-     * @throws SteemResponseException
-     *             If the Server returned an error object.
+     * @throws SteemTimeoutException        If the server was not able to answer the request in the given
+     *                                      time (@see
+     *                                      {@link eu.bittrade.libs.steemj.configuration.SteemJConfig#setResponseTimeout(int)
+     *                                      setResponseTimeout()})
+     * @throws SteemCommunicationException  If there is a connection problem.
+     * @throws SteemTransformationException If the SteemJ is unable to transform the JSON response into a
+     *                                      Java object.
+     * @throws SteemResponseException       If the Server returned an error object.
      */
     public <T> List<T> performRequest(JsonRPCRequest requestObject, Class<T> targetClass)
             throws SteemCommunicationException, SteemResponseException {
@@ -126,14 +123,19 @@ public class CommunicationHandler {
         } catch (SteemCommunicationException e) {
             LOGGER.warn("The connection has been closed. Switching the endpoint and reconnecting.");
             LOGGER.debug("For the following reason: ", e);
+            if (tries++ < 3) {
+                return performRequest(requestObject, targetClass);
+            } else {
+                tries = 0;
+                throw e;
+            }
 
-            return performRequest(requestObject, targetClass);
         }
     }
 
     /**
      * Get a preconfigured Jackson Object Mapper instance.
-     * 
+     *
      * @return The object mapper.
      */
     public static ObjectMapper getObjectMapper() {

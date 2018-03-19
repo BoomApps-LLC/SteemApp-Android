@@ -85,9 +85,13 @@ class SteemWorker() {
 
             steemJ = SteemJ()
             var result = steemJ?.lookupAccounts(nickname, 1)
-            if(result == null || result.size == 0 || result[0].toLowerCase() != nickname.toLowerCase()){
+            if (result == null || result.size == 0 || result[0].toLowerCase() != nickname.toLowerCase()) {
                 return SteemWorkerResponse(false, SteemErrorCodes.INCORRECT_USER_DATA_ERROR)
             }
+        } catch (sce: SteemCommunicationException) {
+            Log.d(LOG_TAG, "Login Error : ${sce.localizedMessage}")
+            sce.printStackTrace()
+            return SteemWorkerResponse(false, SteemErrorCodes.CONNECTION_ERROR)
         } catch (sce: SteemConnectionException) {
             Log.d(LOG_TAG, "Login Error : ${sce.localizedMessage}")
             sce.printStackTrace()
