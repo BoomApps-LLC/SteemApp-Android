@@ -18,7 +18,8 @@ import com.boomapps.steemapp.utils.SettingsRepository
 class SharedRepository {
 
     companion object {
-        @JvmStatic private val crypto = Crypto()
+        @JvmStatic
+        private val crypto = Crypto()
     }
 
     private fun getReadableSharedPreferences(): SharedPreferences {
@@ -169,5 +170,16 @@ class SharedRepository {
     fun loadLastTimePosting(): Long {
         val prefs = getReadableSharedPreferences()
         return prefs.getLong("last_posting_time", 0L)
+    }
+
+    fun isFirstLaunch(): Boolean {
+        val prefs = getReadableSharedPreferences()
+        return prefs.getBoolean("first_launch", true)
+    }
+
+    fun setFirstLaunchState(isFirst : Boolean) {
+        val editor = getSharedPreferencesEditor()
+        editor.putBoolean("first_launch", isFirst)
+        editor.apply()
     }
 }

@@ -5,6 +5,7 @@ import android.app.Activity
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
@@ -19,7 +20,9 @@ import com.boomapps.steemapp.R
 import com.boomapps.steemapp.ViewState
 import com.boomapps.steemapp.barcode.BarcodeReadActivity
 import com.boomapps.steemapp.controls.WarningDialog
+import com.boomapps.steemapp.help.HelpActivity
 import com.boomapps.steemapp.main.MainActivity
+import com.boomapps.steemapp.repository.SharedRepository
 import kotlinx.android.synthetic.main.activity_signin.*
 
 /**
@@ -32,6 +35,7 @@ class SignInActivity : BaseActivity() {
     private val BARCODE_READER_ACTIVITY = 5646
 
     private val PERMISSION_REQUEST_CAMERA = 3546
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -122,16 +126,26 @@ class SignInActivity : BaseActivity() {
         })
 
         qreaderStartButton.setOnClickListener({
-            openBarCodeReadScreen()
+            val sr = SharedRepository()
+            if (sr.isFirstLaunch()) {
+                openLocalHelpScreen()
+                sr.setFirstLaunchState(false)
+            }else{
+                openBarCodeReadScreen()
+            }
         })
     }
 
-    fun openBarCodeReadScreen() {
+    private fun openBarCodeReadScreen() {
         if (!hasCameraPermissions()) {
             requestCameraPermission()
             return
         }
         startActivityForResult(Intent(this, BarcodeReadActivity::class.java), BARCODE_READER_ACTIVITY)
+    }
+
+    private fun openLocalHelpScreen() {
+        startActivity(Intent(this, HelpActivity::class.java))
     }
 
     private fun hasCameraPermissions(): Boolean {
@@ -167,6 +181,7 @@ class SignInActivity : BaseActivity() {
                 (signInInputPostingKey as EditText).setText(result)
             }
         }
+
     }
 
     override fun onResume() {

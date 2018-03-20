@@ -32,6 +32,10 @@
     <color name="green_filled">#B9F7E3</color>
 
 
+    <color name="onboarding_dot_active">#FFFFFFFF</color>
+    <color name="onboarding_dot_color_inactive">#FFA5A5A5</color>
+
+
 
 
 </resources>

@@ -15,4 +15,9 @@
     <dimen name="dialog_content_horizontal_padding">24dp</dimen>
     <dimen name="dialog_content_top_padding">20dp</dimen>
     <dimen name="dialog_content_bottom_padding">24dp</dimen>
+
+
+    <dimen name="onboarding_dot_size">8dp</dimen>
+    <dimen name="onboarding_dot_margin">4dp</dimen>
+
 </resources>

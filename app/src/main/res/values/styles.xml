@@ -24,7 +24,6 @@
     </style>
 
 
-
     <style name="DialogButton" parent="Widget.AppCompat.Button.Borderless">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">36dp</item>
@@ -80,4 +79,18 @@
         <!-- enable title -->
         <item name="android:windowNoTitle">false</item>
     </style>
+
+    <style name="DotRadioButton" parent="@android:style/Widget.CompoundButton.RadioButton">
+        <item name="android:button">@null</item>
+        <item name="android:text">@null</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <!-- Login: transparent toolbar -->
+    <!-- Chats List -->
+    <style name="DotRadioButton.ActiveWhite">
+        <item name="android:background">@drawable/selector_dots_in_onboarding</item>
+    </style>
+
+
 </resources>

@@ -70,4 +70,14 @@ Do you want to enter correct key and try to post again?</string>
     <string name="btn_posting_timer">POST available after    %1$d:%2$d</string>
     <string name="d_publish_success_message">Your article was successfully\npublished</string>
 
+    <!--  ONBOARDING -->
+    <string name="onboarding_title">A Quick Guide to Log In</string>
+    <string name="onboarding_message_1">Go to the Tab of <strong>My Wallet</strong></string>
+    <string name="onboarding_message_2">Then Select Tab <strong>Permissions</strong></string>
+    <string name="onboarding_message_3">Tap <strong>Show Private Key</strong></string>
+    <string name="onboarding_message_4">The posting key must begin with <strong>5</strong></string>
+    <string name="onboarding_btn_skip">Skip</string>
+    <string name="onboarding_btn_next">Next</string>
+    <string name="onboarding_btn_done">Done</string>
+
 </resources>

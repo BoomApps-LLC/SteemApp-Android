@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="onboarding_title" format="reference" />
+    <attr name="onboarding_message" format="reference" />
+    <attr name="_onboardingscr" format="reference" />
+</resources>
