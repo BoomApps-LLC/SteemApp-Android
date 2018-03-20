@@ -9,8 +9,7 @@ import com.boomapps.steemapp.UserData
 import com.boomapps.steemapp.editor.tabs.CategoryItem
 import com.boomapps.steemapp.getMatColor
 import com.boomapps.steemapp.main.Balance
-import com.boomapps.steemapp.utils.DeCryptor
-import com.boomapps.steemapp.utils.EnCryptor
+import com.boomapps.steemapp.utils.Crypto
 import com.boomapps.steemapp.utils.SettingsRepository
 
 /**
@@ -18,8 +17,9 @@ import com.boomapps.steemapp.utils.SettingsRepository
  */
 class SharedRepository {
 
-    private val enCryptor = EnCryptor()
-    private val deCryptor = DeCryptor()
+    companion object {
+        @JvmStatic private val crypto = Crypto()
+    }
 
     private fun getReadableSharedPreferences(): SharedPreferences {
         return SteemApplication.instance.getSharedPreferences("steem_shares", Context.MODE_PRIVATE)
@@ -46,9 +46,10 @@ class SharedRepository {
             putString("photo_url", userData.photoUrl)
         }.apply()
         if (userData.postKey != null) {
-            val bytes = enCryptor.encryptText(userData.postKey)
+            val bytes = crypto.encrypt(userData.postKey)
             val encryptedPostingKey = Base64.encodeToString(bytes, Base64.DEFAULT)
-            SettingsRepository.setProperty("posting_key", encryptedPostingKey, enCryptor.iv!!, SteemApplication.instance)
+            SettingsRepository.setProperty(
+                    "posting_key", encryptedPostingKey, crypto.getIvFromEncryptor(), SteemApplication.instance)
         } else {
             SettingsRepository.clearAllProperties(SteemApplication.instance)
         }
@@ -76,17 +77,23 @@ class SharedRepository {
     }
 
     fun loadUserData(): UserData {
+        if (!isUserSaved()) return UserData(null, null, null, null)
         val prefs = getReadableSharedPreferences()
         val nick = prefs.getString("nickname", "")
         val username = prefs.getString("username", "")
         val photoUrl = prefs.getString("photo_url", "")
         val encryptedDataInfo = SettingsRepository.getProperty("posting_key", SteemApplication.instance)
-        val postingKey = if (encryptedDataInfo.iv == null) {
-            ""
-        } else {
-            deCryptor.decryptData(Base64.decode(encryptedDataInfo.data, Base64.DEFAULT), encryptedDataInfo.iv!!)
-        }
+        crypto.setIvForDecryptor(encryptedDataInfo.iv)
+        val postingKey = crypto.decrypt(Base64.decode(encryptedDataInfo.data, Base64.DEFAULT))
         return UserData(nick, username, photoUrl, postingKey)
+    }
+
+    fun isUserSaved(): Boolean {
+        return getReadableSharedPreferences().getString("nickname", "") != ""
+    }
+
+    fun isUserLogged(): Boolean {
+        return getReadableSharedPreferences().getString("nickname", "") != ""
     }
 
     fun saveBalanceData(balance: Balance?) {

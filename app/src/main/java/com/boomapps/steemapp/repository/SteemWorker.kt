@@ -3,7 +3,6 @@ package com.boomapps.steemapp.repository
 import android.net.Uri
 import android.util.Log
 import com.boomapps.steemapp.BuildConfig
-import com.boomapps.steemapp.SteemApplication
 import com.boomapps.steemapp.UserData
 import com.boomapps.steemapp.repository.entity.profile.ProfileMetadata
 import com.google.gson.Gson
@@ -31,13 +30,14 @@ import java.net.URL
 import java.security.InvalidParameterException
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeoutException
 
 
 /**
  * Created by vgrechikha on 22.01.2018.
  */
 
-class SteemWorker() {
+class SteemWorker {
 
     private var steemJ: SteemJ? = null
     private var steemJConfig: SteemJConfig? = null
@@ -68,7 +68,7 @@ class SteemWorker() {
 
 //        steemJConfig?.addEndpointURI(URI.create("https://api.steemit.com"))
         steemJConfig?.defaultAccount = AccountName(nickname)
-        steemJConfig?.responseTimeout = 10000;
+        steemJConfig?.responseTimeout = 10000
         try {
             val privateKeys = arrayListOf<ImmutablePair<PrivateKeyType, String>>()
             if (postingKey != null && postingKey.isNotEmpty()) {
@@ -93,21 +93,25 @@ class SteemWorker() {
             sce.printStackTrace()
             return SteemWorkerResponse(false, SteemErrorCodes.CONNECTION_ERROR)
         } catch (sce: SteemConnectionException) {
-            Log.d(LOG_TAG, "Login Error : ${sce.localizedMessage}")
+            Log.e(LOG_TAG, "Login Error : ${sce.localizedMessage}", sce)
             sce.printStackTrace()
             return SteemWorkerResponse(false, SteemErrorCodes.CONNECTION_ERROR)
         } catch (sre: SteemResponseException) {
-            Log.d(LOG_TAG, "Login Error : ${sre.localizedMessage}")
+            Log.e(LOG_TAG, "Login Error : ${sre.localizedMessage}", sre)
             sre.printStackTrace()
             return SteemWorkerResponse(false, SteemErrorCodes.TIMEOUT_ERROR)
         } catch (afe: AddressFormatException) {
-            Log.d(LOG_TAG, "Login Error : key is not valid >> ${afe.localizedMessage}")
+            Log.e(LOG_TAG, "Login Error : key is not valid >> ${afe.localizedMessage}", afe)
             afe.printStackTrace()
             return SteemWorkerResponse(false, SteemErrorCodes.INCORRECT_USER_DATA_ERROR)
         } catch (ex: Exception) {
-            Log.d(LOG_TAG, "Login Error : global catcher >> ${ex.localizedMessage}")
+            Log.e(LOG_TAG, "Login Error : global catcher >> ${ex.localizedMessage}", ex)
             ex.printStackTrace()
             return SteemWorkerResponse(false, SteemErrorCodes.UNDEFINED_ERROR)
+        } catch (timeoutException: TimeoutException) {
+            Log.e(LOG_TAG, "Login Error : global catcher >> ${timeoutException.localizedMessage}", timeoutException)
+            timeoutException.printStackTrace()
+            return SteemWorkerResponse(false, SteemErrorCodes.TIMEOUT_ERROR)
         }
         return SteemWorkerResponse(true, SteemErrorCodes.EMPTY_ERROR)
     }
