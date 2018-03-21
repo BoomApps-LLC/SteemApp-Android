@@ -44,10 +44,10 @@ class HelpActivity : AppCompatActivity() {
         })
         adapter = HelpTabsAdapter(
                 getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater,
-                intArrayOf(R.layout.view_onboarding_1, R.layout.view_onboarding_2, R.layout.view_onboarding_3, R.layout.view_onboarding_4))
+                intArrayOf(R.layout.view_onboarding_1, R.layout.view_onboarding_2, R.layout.view_onboarding_3, R.layout.view_onboarding_4, R.layout.view_onboarding_5))
         pager.adapter = adapter
         aOnboarding_btnNext.setOnClickListener({
-            if (pager.currentItem < 3) {
+            if (pager.currentItem < 4) {
                 ++pager.currentItem
             } else {
                 finish()
@@ -60,13 +60,13 @@ class HelpActivity : AppCompatActivity() {
     }
 
     private fun setButtonsState(page: Int) {
-        val resId = if (page == 3) {
+        val resId = if (page == 4) {
             R.string.onboarding_btn_done
         } else {
             R.string.onboarding_btn_next
         }
         setNextButtonText(resId)
-        aOnboarding_btnSkip.visibility = if (page == 3) {
+        aOnboarding_btnSkip.visibility = if (page == 4) {
             View.INVISIBLE
         } else {
             View.VISIBLE

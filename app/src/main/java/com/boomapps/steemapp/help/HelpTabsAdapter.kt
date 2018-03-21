@@ -10,13 +10,14 @@ import android.view.ViewGroup
  */
 class HelpTabsAdapter constructor(private val layoutInflater: LayoutInflater, private val viewIds: IntArray) : PagerAdapter() {
 
-    val views: ArrayList<View?> = arrayListOf(null, null, null, null)
+    lateinit var views: Array<View?>
 
     override fun isViewFromObject(view: View, `object`: Any): Boolean {
         return view == `object`
     }
 
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
+        views = arrayOfNulls<View>(viewIds.size)
         val view = layoutInflater.inflate(viewIds[position], container, false)
         views[position] = view
         container.addView(view)
