@@ -1,13 +1,10 @@
 package eu.bittrade.libs.steemj.base.models.operations;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 import eu.bittrade.crypto.core.CryptoUtils;
 import eu.bittrade.crypto.core.Sha256Hash;
@@ -17,9 +14,12 @@ import eu.bittrade.libs.steemj.base.models.SignedTransaction;
 import eu.bittrade.libs.steemj.base.models.TimePointSec;
 import eu.bittrade.libs.steemj.exceptions.SteemInvalidTransactionException;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsEqual.equalTo;
+
 /**
  * Test the transformation of the {@link CustomOperation}.
- * 
+ *
  * @author <a href="http://steemit.com/@dez1337">dez1337</a>
  */
 public class CustomOperationTest extends BaseTransactionalUT {
@@ -32,9 +32,8 @@ public class CustomOperationTest extends BaseTransactionalUT {
 
     /**
      * Prepare the environment for this specific test.
-     * 
-     * @throws Exception
-     *             If something went wrong.
+     *
+     * @throws Exception If something went wrong.
      */
     @BeforeClass()
     public static void prepareTestClass() throws Exception {
