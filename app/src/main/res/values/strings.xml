@@ -50,6 +50,7 @@
     <string name="error_message_bad_user_data">Your nickname or active posting key is incorrect. Please correct them and try again.</string>
     <string name="error_message_network_connection_fault">Oops!!. Connection to server is fault.</string>
     <string name="hint_input_posting_key">Input private POSTING key</string>
+    <string name="hint_input_username">Steemit Username</string>
 
     <!-- WALLET -->
     <string name="balance_template">%1$s %2$s.%3$s</string>
