@@ -5,7 +5,6 @@ import android.app.Activity
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
@@ -130,9 +129,14 @@ class SignInActivity : BaseActivity() {
             if (sr.isFirstLaunch()) {
                 openLocalHelpScreen()
                 sr.setFirstLaunchState(false)
-            }else{
+            } else {
                 openBarCodeReadScreen()
             }
+        })
+
+        signInInfo.setOnClickListener({
+            openLocalHelpScreen()
+            SharedRepository().setFirstLaunchState(false)
         })
     }
 
