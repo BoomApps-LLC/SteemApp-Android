@@ -31,7 +31,7 @@ class Storage {
 
     fun getShortUserData(): UserData {
         if (shortUserInfo == null) {
-            shortUserInfo = SharedRepository().loadUserData()
+            shortUserInfo = RepositoryProvider.instance.getSharedRepository().loadUserData()
         }
         return shortUserInfo!!
     }
@@ -116,8 +116,9 @@ class Storage {
     fun clearAllData() {
         extUserData = null
         shortUserInfo = null
-        SharedRepository().saveUserData(UserData(null, null, null, null))
-        SharedRepository().saveBalanceData(Balance())
+        val repo = RepositoryProvider.instance.getSharedRepository()
+        repo.saveUserData(UserData(null, null, null, null))
+        repo.saveBalanceData(Balance())
     }
 
 

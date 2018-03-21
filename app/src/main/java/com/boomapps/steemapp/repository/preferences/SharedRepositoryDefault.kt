@@ -1,4 +1,4 @@
-package com.boomapps.steemapp.repository
+package com.boomapps.steemapp.repository.preferences
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -9,13 +9,14 @@ import com.boomapps.steemapp.UserData
 import com.boomapps.steemapp.editor.tabs.CategoryItem
 import com.boomapps.steemapp.getMatColor
 import com.boomapps.steemapp.main.Balance
+import com.boomapps.steemapp.repository.StoryInstance
 import com.boomapps.steemapp.utils.Crypto
 import com.boomapps.steemapp.utils.SettingsRepository
 
 /**
  * Created by Vitali Grechikha on 28.01.2018.
  */
-class SharedRepository {
+class SharedRepositoryDefault : SharedRepository {
 
     companion object {
         @JvmStatic
@@ -39,7 +40,7 @@ class SharedRepository {
     }
 
 
-    fun saveUserData(userData: UserData) {
+    override fun saveUserData(userData: UserData) {
         val editor = getSharedPreferencesEditor()
         editor.apply {
             putString("nickname", userData.nickname)
@@ -56,7 +57,7 @@ class SharedRepository {
         }
     }
 
-    fun updateUserData(userData: UserData) {
+    override fun updateUserData(userData: UserData) {
         val old = loadUserData()
         var nickname = old.nickname
         var username = old.userName
@@ -77,7 +78,7 @@ class SharedRepository {
         saveUserData(UserData(nickname, username, photoUrl, postKey))
     }
 
-    fun loadUserData(): UserData {
+    override fun loadUserData(): UserData {
         if (!isUserSaved()) return UserData(null, null, null, null)
         val prefs = getReadableSharedPreferences()
         val nick = prefs.getString("nickname", "")
@@ -89,15 +90,15 @@ class SharedRepository {
         return UserData(nick, username, photoUrl, postingKey)
     }
 
-    fun isUserSaved(): Boolean {
+    private fun isUserSaved(): Boolean {
         return getReadableSharedPreferences().getString("nickname", "") != ""
     }
 
-    fun isUserLogged(): Boolean {
+    override fun isUserLogged(): Boolean {
         return getReadableSharedPreferences().getString("nickname", "") != ""
     }
 
-    fun saveBalanceData(balance: Balance?) {
+    override fun saveBalanceData(balance: Balance?) {
         if (balance != null) {
             val editor = getSharedPreferencesEditor()
             editor.apply {
@@ -113,7 +114,7 @@ class SharedRepository {
         }
     }
 
-    fun loadBalance(): Balance {
+    override fun loadBalance(): Balance {
         val prefs = getReadableSharedPreferences()
         val sb = prefs.getFloat("steemBalance", 0f)
         val ssb = prefs.getFloat("steemSavingBalance", 0f)
@@ -132,7 +133,7 @@ class SharedRepository {
                 updateTime)
     }
 
-    fun saveStoryData(storyInstance: StoryInstance) {
+    override fun saveStoryData(storyInstance: StoryInstance) {
         val editor = getStorySharedPreferencesEditor()
         val cSet: MutableSet<String> = mutableSetOf()
         for (i in storyInstance.categories.indices) {
@@ -140,15 +141,15 @@ class SharedRepository {
         }
         editor.apply {
             putString("title", storyInstance.title)
-            putString("story", storyInstance.story)
+//            putString("story", storyInstance.story)
             putStringSet("categories", cSet)
         }.apply()
     }
 
-    fun loadStoryData(): StoryInstance {
+    override fun loadStoryData(): StoryInstance {
         val prefs = getStoryReadableSharedPreferences()
         val title = prefs.getString("title", "")
-        val story = prefs.getString("story", "")
+//        val story = prefs.getString("story", "")
         val cSet: Set<String> = prefs.getStringSet("categories", setOf())
         val aList: ArrayList<CategoryItem> = arrayListOf()
         if (cSet.isNotEmpty()) {
@@ -158,26 +159,26 @@ class SharedRepository {
                 aList.add(CategoryItem(cat, context.resources.getMatColor(MDCOLOR_TYPE)))
             }
         }
-        return StoryInstance(title, story, aList)
+        return StoryInstance(title, "", aList)
     }
 
-    fun saveLastTimePosting(currentTimeMillis: Long) {
+    override fun saveLastTimePosting(currentTimeMillis: Long) {
         val editor = getSharedPreferencesEditor()
         editor.putLong("last_posting_time", currentTimeMillis)
         editor.apply()
     }
 
-    fun loadLastTimePosting(): Long {
+    override fun loadLastTimePosting(): Long {
         val prefs = getReadableSharedPreferences()
         return prefs.getLong("last_posting_time", 0L)
     }
 
-    fun isFirstLaunch(): Boolean {
+    override fun isFirstLaunch(): Boolean {
         val prefs = getReadableSharedPreferences()
         return prefs.getBoolean("first_launch", true)
     }
 
-    fun setFirstLaunchState(isFirst : Boolean) {
+    override fun setFirstLaunchState(isFirst: Boolean) {
         val editor = getSharedPreferencesEditor()
         editor.putBoolean("first_launch", isFirst)
         editor.apply()

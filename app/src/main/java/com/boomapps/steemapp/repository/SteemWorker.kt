@@ -135,7 +135,7 @@ class SteemWorker {
                         "")
             }
         }
-        return SharedRepository().loadUserData()
+        return RepositoryProvider.instance.getSharedRepository().loadUserData()
     }
 
     fun uploadPhoto() {
@@ -199,7 +199,7 @@ class SteemWorker {
         val config = SteemJImageUploadConfig.getInstance()
         config.connectTimeout = 3000
         config.readTimeout = 3000
-        val uData = SharedRepository().loadUserData()
+        val uData = RepositoryProvider.instance.getSharedRepository().loadUserData()
         return SteemJImageUpload.uploadImage(
                 eu.bittrade.libs.steemj.image.upload.models.AccountName(uData.nickname),
                 uData.postKey,

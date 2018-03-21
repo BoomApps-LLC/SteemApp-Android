@@ -1,7 +1,11 @@
-package com.boomapps.steemapp.repository
+package com.boomapps.steemapp.repository.network
 
 import android.net.Uri
 import android.util.Log
+import com.boomapps.steemapp.repository.HeadersInterceptor
+import com.boomapps.steemapp.repository.RequestsApi
+import com.boomapps.steemapp.repository.SteemWorker
+import com.boomapps.steemapp.repository.Storage
 import com.boomapps.steemapp.repository.currency.CoinmarketcapCurrency
 import com.boomapps.steemapp.repository.entity.UserDataEntity
 import com.boomapps.steemapp.repository.entity.profile.ProfileMetadataDeserializer
@@ -12,7 +16,6 @@ import com.google.gson.GsonBuilder
 import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
-import io.reactivex.functions.Consumer
 import io.reactivex.rxkotlin.Flowables
 import io.reactivex.schedulers.Schedulers
 import okhttp3.*
@@ -28,27 +31,20 @@ import java.util.concurrent.TimeUnit
 /**
  * Created by Vitali Grechikha on 03.02.2018.
  */
-class NetworkRepository {
+class NetworkRepositoryDefault(
+        override var extendedProfileResponse: ProfileResponse? = null,
+        override var coinmarketcapCurrency: CoinmarketcapCurrency? = null,
+        override var lastUploadedPhotoUrl: URL? = null) : NetworkRepository {
 
-    interface OnRequestFinishCallback {
-
-        fun onSuccessRequestFinish()
-
-        fun onFailureRequestFinish(throwable: Throwable)
-
-    }
 
     companion object {
-        var extendedProfileResponse: ProfileResponse? = null
-        var coinmarketcapCurrency: CoinmarketcapCurrency? = null
-        var instance: NetworkRepository = NetworkRepository()
+        var instance: NetworkRepositoryDefault = NetworkRepositoryDefault()
         lateinit var httpClient: OkHttpClient
-        fun get(): NetworkRepository {
+        fun get(): NetworkRepositoryDefault {
             return instance
         }
     }
 
-    var lastUploadedPhotoUrl: URL? = null
 
     init {
         val logging = HttpLoggingInterceptor()
@@ -75,7 +71,7 @@ class NetworkRepository {
     }
 
 
-    fun postStory(title: String, content: String, tags: Array<String>, postingKey: String, rewardsPercent: Short, upvote: Boolean, callback: OnRequestFinishCallback) {
+    override fun postStory(title: String, content: String, tags: Array<String>, postingKey: String, rewardsPercent: Short, upvote: Boolean, callback: NetworkRepository.OnRequestFinishCallback) {
         Flowable.fromCallable {
             return@fromCallable SteemWorker.get().post(title, content, tags, postingKey, rewardsPercent, upvote)
         }.subscribeOn(Schedulers.io())
@@ -98,7 +94,7 @@ class NetworkRepository {
                 .subscribe()
     }
 
-    fun uploadNewPhoto(uri: Uri, callback: OnRequestFinishCallback) {
+    override fun uploadNewPhoto(uri: Uri, callback: NetworkRepository.OnRequestFinishCallback) {
 //        val file = Utils().getFileFromUri(uri)
 //        if (file == null) {
 //            Log.d("uploadNewPhoto", "file is absent")
@@ -137,7 +133,7 @@ class NetworkRepository {
     }
 
 
-    fun loadExtendedUserProfile(nick: String, callback: OnRequestFinishCallback) {
+    override fun loadExtendedUserProfile(nick: String, callback: NetworkRepository.OnRequestFinishCallback) {
         if (extendedProfileResponse != null) {
             callback.onSuccessRequestFinish()
             return
@@ -160,10 +156,10 @@ class NetworkRepository {
     }
 
 
-    fun loadFullStartData(nick: String, callback: OnRequestFinishCallback) {
-        val coinmarketcapToUsdFloawable: Flowable<Array<CoinmarketcapCurrency>> = getFlowableForCurrency("steem")//.onErrorResumeNext { s: Subscriber<in Array<CoinmarketcapCurrency>>? -> Log.d("NetworkRepository", "steemToUsd error loading") }
-        val coinmarketcapDollarToUsdFlowable: Flowable<Array<CoinmarketcapCurrency>> = getFlowableForCurrency("steem-dollars")//.onErrorResumeNext { s: Subscriber<in Array<SteemDollarCurrency>>? -> Log.d("NetworkRepository", "steemDollarToUsd error loading") }
-        val balanceVestFlowable: Flowable<Array<Double>> = getBalanceVetstFlowable()//.onErrorResumeNext { s: Subscriber<in BigDecimal>? -> Log.d("NetworkRepository", "balanceVests error loading") }
+    override fun loadFullStartData(nick: String, callback: NetworkRepository.OnRequestFinishCallback) {
+        val coinmarketcapToUsdFloawable: Flowable<Array<CoinmarketcapCurrency>> = getFlowableForCurrency("steem")//.onErrorResumeNext { s: Subscriber<in Array<CoinmarketcapCurrency>>? -> Log.d("NetworkRepositoryDefault", "steemToUsd error loading") }
+        val coinmarketcapDollarToUsdFlowable: Flowable<Array<CoinmarketcapCurrency>> = getFlowableForCurrency("steem-dollars")//.onErrorResumeNext { s: Subscriber<in Array<SteemDollarCurrency>>? -> Log.d("NetworkRepositoryDefault", "steemDollarToUsd error loading") }
+        val balanceVestFlowable: Flowable<Array<Double>> = getBalanceVetstFlowable()//.onErrorResumeNext { s: Subscriber<in BigDecimal>? -> Log.d("NetworkRepositoryDefault", "balanceVests error loading") }
         val exUserData: Flowable<ProfileResponse> = getRequestsApi("https://steemit.com/", null).loadProfileExtendedData(nick)
 
         val disposable: Disposable = Flowables.combineLatest(
