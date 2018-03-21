@@ -5,10 +5,10 @@ import com.boomapps.steemapp.BaseViewModel
 import com.boomapps.steemapp.SteemApplication
 import com.boomapps.steemapp.UserData
 import com.boomapps.steemapp.ViewState
-import com.boomapps.steemapp.repository.NetworkRepository
-import com.boomapps.steemapp.repository.SharedRepository
+import com.boomapps.steemapp.repository.RepositoryProvider
 import com.boomapps.steemapp.repository.SteemErrorCodes
 import com.boomapps.steemapp.repository.SteemWorker
+import com.boomapps.steemapp.repository.network.NetworkRepository
 import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -66,7 +66,7 @@ class SignInViewModel : BaseViewModel() {
                 .doOnComplete {
                     Log.d("SignInViewModel", "doOnComplete")
                     if (loginResult == LOGIN_SUCCESS) {
-                        SharedRepository().saveUserData(UserData(nickname, null, null, postingKey))
+                        RepositoryProvider.instance.getSharedRepository().saveUserData(UserData(nickname, null, null, postingKey))
                         loadFullAdditionalData(nickname)
                     } else {
                         state.value = ViewState.FAULT_RESULT
@@ -83,7 +83,7 @@ class SignInViewModel : BaseViewModel() {
     }
 
     private fun loadFullAdditionalData(nick: String) {
-        NetworkRepository.get().loadFullStartData(nick, object : NetworkRepository.OnRequestFinishCallback {
+        RepositoryProvider.instance.getNetworkRepository().loadFullStartData(nick, object : NetworkRepository.OnRequestFinishCallback {
 
             override fun onSuccessRequestFinish() {
                 state.value = ViewState.SUCCESS_RESULT

@@ -5,9 +5,10 @@ import android.net.Uri
 import android.util.Log
 import com.boomapps.steemapp.*
 import com.boomapps.steemapp.editor.tabs.CategoryItem
-import com.boomapps.steemapp.repository.NetworkRepository
-import com.boomapps.steemapp.repository.SharedRepository
+import com.boomapps.steemapp.repository.RepositoryProvider
 import com.boomapps.steemapp.repository.StoryInstance
+import com.boomapps.steemapp.repository.files.FilesRepository
+import com.boomapps.steemapp.repository.network.NetworkRepository
 import java.net.URL
 
 /**
@@ -102,7 +103,7 @@ class EditorViewModel : BaseViewModel() {
     fun uploadNewPhoto(uri: Uri?) {
         if (uri != null) {
             uploadPhotoUri = uri
-            val uData = SharedRepository().loadUserData()
+            val uData = RepositoryProvider.instance.getSharedRepository().loadUserData()
             if (uData.postKey == null || uData.postKey.length < 40) {
                 uploadTakenPhoto = false
                 uploadPickedPhoto = false
@@ -111,13 +112,13 @@ class EditorViewModel : BaseViewModel() {
                 saveStoryData()
                 return
             }
-            NetworkRepository.get().uploadNewPhoto(
+            RepositoryProvider.instance.getNetworkRepository().uploadNewPhoto(
                     uri,
                     object : NetworkRepository.OnRequestFinishCallback {
 
                         override fun onSuccessRequestFinish() {
                             successCode = SUCCESS_IMAGE_UPLOAD
-                            uploadedImageUrl = NetworkRepository.get().lastUploadedPhotoUrl
+                            uploadedImageUrl = RepositoryProvider.instance.getNetworkRepository().lastUploadedPhotoUrl
                             state.value = ViewState.SUCCESS_RESULT
                             uploadTakenPhoto = false
                             uploadPickedPhoto = false
@@ -158,7 +159,7 @@ class EditorViewModel : BaseViewModel() {
         if (!data.hasExtra("POSTING_KEY")) {
             return false
         }
-        val repo = SharedRepository()
+        val repo = RepositoryProvider.instance.getSharedRepository()
         val uData = repo.loadUserData()
         val newUserData = UserData(uData.nickname, uData.userName, uData.photoUrl, data.getStringExtra("POSTING_KEY"))
         repo.saveUserData(newUserData)
@@ -183,7 +184,7 @@ class EditorViewModel : BaseViewModel() {
                     2 -> 0
                     else -> 30000
                 }
-        NetworkRepository.get().postStory(title, story, getCategoriesName(), "", rewardsPercent, upvoteState, object : NetworkRepository.OnRequestFinishCallback {
+        RepositoryProvider.instance.getNetworkRepository().postStory(title, story, getCategoriesName(), "", rewardsPercent, upvoteState, object : NetworkRepository.OnRequestFinishCallback {
             override fun onSuccessRequestFinish() {
                 successCode = SUCCESS_STORY_UPLOAD
                 state.value = ViewState.SUCCESS_RESULT
@@ -192,7 +193,7 @@ class EditorViewModel : BaseViewModel() {
                 categories.clear()
                 saveStoryData()
                 lastPostingTime = System.currentTimeMillis()
-                SharedRepository().saveLastTimePosting(lastPostingTime)
+                RepositoryProvider.instance.getSharedRepository().saveLastTimePosting(lastPostingTime)
             }
 
             override fun onFailureRequestFinish(throwable: Throwable) {
@@ -204,19 +205,39 @@ class EditorViewModel : BaseViewModel() {
         })
     }
 
-    private fun saveStoryData() {
-        SharedRepository().saveStoryData(StoryInstance(title, story, categories))
+
+
+    fun saveStoryData() {
+        RepositoryProvider.instance.getSharedRepository().saveStoryData(StoryInstance(title, story, categories))
+        RepositoryProvider.instance.getFileRepository().saveStory(story, null)
     }
 
     fun loadStoryData() {
         if (title.isEmpty() && story.isEmpty() && categories.size == 0) {
-            val storyData = SharedRepository().loadStoryData()
+            val storyData = RepositoryProvider.instance.getSharedRepository().loadStoryData()
+            RepositoryProvider.instance.getFileRepository().loadStory(object : FilesRepository.StoryCallback {
+                override fun onSaveStory() {
+
+                }
+
+                override fun onError() {
+                    Log.d("EditorViewModel", "OnError loading story")
+                }
+
+                override fun onClearStory() {
+
+                }
+
+                override fun onLoadStory(loadedStory: String) {
+                    story = loadedStory
+                }
+            })
             title = storyData.title
             story = storyData.story
             categories.clear()
             categories.addAll(storyData.categories)
         }
-        lastPostingTime = SharedRepository().loadLastTimePosting()
+        lastPostingTime = RepositoryProvider.instance.getSharedRepository().loadLastTimePosting()
         postingDelay = if (lastPostingTime == 0L) {
             0L
         } else {

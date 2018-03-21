@@ -5,11 +5,10 @@ import android.util.Log
 import com.boomapps.steemapp.BaseViewModel
 import com.boomapps.steemapp.UserData
 import com.boomapps.steemapp.ViewState
-import com.boomapps.steemapp.repository.NetworkRepository
-import com.boomapps.steemapp.repository.SharedRepository
+import com.boomapps.steemapp.repository.RepositoryProvider
 import com.boomapps.steemapp.repository.SteemWorker
 import com.boomapps.steemapp.repository.Storage
-import com.boomapps.steemapp.repository.entity.profile.UserExtended
+import com.boomapps.steemapp.repository.network.NetworkRepository
 
 /**
  * Created by vgrechikha on 25.01.2018.
@@ -47,7 +46,7 @@ class MainViewModel : BaseViewModel() {
 
     fun loadUserProfile() {
         if (userData.value?.nickname.isNullOrEmpty()) {
-            userData.value = SharedRepository().loadUserData()
+            userData.value = RepositoryProvider.instance.getSharedRepository().loadUserData()
         }
         if (!userData.value?.userName.isNullOrEmpty()) {
             state.value = ViewState.COMMON
@@ -60,15 +59,15 @@ class MainViewModel : BaseViewModel() {
             return
         } else {
             state.value = ViewState.PROGRESS
-            NetworkRepository.get().loadExtendedUserProfile(nickName!!, object : NetworkRepository.OnRequestFinishCallback {
+            RepositoryProvider.instance.getNetworkRepository().loadExtendedUserProfile(nickName!!, object : NetworkRepository.OnRequestFinishCallback {
 
                 override fun onSuccessRequestFinish() {
                     Log.d("MainViewModel", "onSuccessRequestFinish")
-                    val exUserData = NetworkRepository.extendedProfileResponse?.userExtended
+                    val exUserData = RepositoryProvider.instance.getNetworkRepository().extendedProfileResponse?.userExtended
                     if (exUserData != null) {
                         val newUserData = UserData(nickName, exUserData.profileMetadata.userName, exUserData.profileMetadata.photoUrl, userData.value?.postKey)
                         userData.value = newUserData
-                        SharedRepository().updateUserData(newUserData)
+                        RepositoryProvider.instance.getSharedRepository().updateUserData(newUserData)
                     }
                     if (userData.value?.userName.isNullOrEmpty()) {
                         stringError = "UserExtended profile loading error."
@@ -103,14 +102,14 @@ class MainViewModel : BaseViewModel() {
             balanceData.value = newBalance
             return
         }
-        balanceData.value = SharedRepository().loadBalance()
+        balanceData.value = RepositoryProvider.instance.getSharedRepository().loadBalance()
         val time: Long = balanceData.value!!.updateTime
         if (time > 0 || time - System.currentTimeMillis() > (1000 * 3600 * 24)) {
             return
         }
         state.value = ViewState.PROGRESS
         if (userData.value?.nickname.isNullOrEmpty()) {
-            userData.value = SharedRepository().loadUserData()
+            userData.value = RepositoryProvider.instance.getSharedRepository().loadUserData()
         }
         val nickName = userData.value?.nickname
         if (nickName.isNullOrEmpty()) {
@@ -119,7 +118,7 @@ class MainViewModel : BaseViewModel() {
             state.value = ViewState.FAULT_RESULT
             return
         } else {
-            NetworkRepository.get().loadFullStartData(userData.value?.nickname!!, object : NetworkRepository.OnRequestFinishCallback {
+            RepositoryProvider.instance.getNetworkRepository().loadFullStartData(userData.value?.nickname!!, object : NetworkRepository.OnRequestFinishCallback {
 
                 override fun onSuccessRequestFinish() {
                     val newBalance = calculateBalance()

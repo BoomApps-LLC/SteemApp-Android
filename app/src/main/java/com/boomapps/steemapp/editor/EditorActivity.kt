@@ -189,8 +189,7 @@ class EditorActivity : BaseActivity() {
     override fun onBackPressed() {
         when (viewPager.currentItem) {
             0 -> {
-                // TODO save data
-//                viewModel.saveStoryData()
+                viewModel.saveStoryData()
                 finish()
             }
             1, 2, 3 -> viewPager.setCurrentItem(--viewPager.currentItem, true)

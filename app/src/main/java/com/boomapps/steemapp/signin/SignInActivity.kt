@@ -21,7 +21,7 @@ import com.boomapps.steemapp.barcode.BarcodeReadActivity
 import com.boomapps.steemapp.controls.WarningDialog
 import com.boomapps.steemapp.help.HelpActivity
 import com.boomapps.steemapp.main.MainActivity
-import com.boomapps.steemapp.repository.SharedRepository
+import com.boomapps.steemapp.repository.RepositoryProvider
 import kotlinx.android.synthetic.main.activity_signin.*
 
 /**
@@ -125,7 +125,7 @@ class SignInActivity : BaseActivity() {
         })
 
         qreaderStartButton.setOnClickListener({
-            val sr = SharedRepository()
+            val sr = RepositoryProvider.instance.getSharedRepository()
             if (sr.isFirstLaunch()) {
                 openLocalHelpScreen()
                 sr.setFirstLaunchState(false)
@@ -136,7 +136,7 @@ class SignInActivity : BaseActivity() {
 
         signInInfo.setOnClickListener({
             openLocalHelpScreen()
-            SharedRepository().setFirstLaunchState(false)
+            RepositoryProvider.instance.getSharedRepository().setFirstLaunchState(false)
         })
     }
 
