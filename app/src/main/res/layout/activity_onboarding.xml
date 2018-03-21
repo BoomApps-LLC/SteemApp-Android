@@ -5,6 +5,26 @@
     android:layout_height="match_parent"
     android:background="@color/violet">
 
+
+    <TextView
+        android:id="@+id/aOnboarding_tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="32dp"
+        android:gravity="center_horizontal"
+        android:text="@string/onboarding_title"
+        android:textColor="@color/violetLight"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
     <TextView
         android:id="@+id/aOnboarding_btnSkip"
         android:layout_width="wrap_content"
@@ -13,6 +33,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
         android:text="@string/onboarding_btn_skip"
         android:textColor="@color/white"
         android:textSize="18sp"
@@ -20,6 +41,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
+        android:clickable="true"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0" />
 
@@ -31,7 +53,9 @@
         android:layout_marginEnd="16dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
         android:text="@string/onboarding_btn_next"
+        android:clickable="true"
         android:textColor="@color/white"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -64,7 +88,14 @@
             android:layout_width="@dimen/onboarding_dot_size"
             android:layout_height="@dimen/onboarding_dot_size"
             android:layout_marginLeft="@dimen/onboarding_dot_margin"
-            android:layout_marginRight="@dimen/onboarding_dot_margin"/>
+            android:layout_marginRight="@dimen/onboarding_dot_margin" />
+
+        <RadioButton
+            style="@style/DotRadioButton.ActiveWhite"
+            android:layout_width="@dimen/onboarding_dot_size"
+            android:layout_height="@dimen/onboarding_dot_size"
+            android:layout_marginLeft="@dimen/onboarding_dot_margin"
+            android:layout_marginRight="@dimen/onboarding_dot_margin" />
 
         <RadioButton
             style="@style/DotRadioButton.ActiveWhite"
@@ -99,6 +130,6 @@
         app:layout_constraintBottom_toTopOf="@id/aOnboarding_btnSkip"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/aOnboarding_tvTitle" />
 
 </android.support.constraint.ConstraintLayout>
