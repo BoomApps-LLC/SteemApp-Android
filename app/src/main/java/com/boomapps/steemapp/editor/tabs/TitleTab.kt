@@ -42,7 +42,7 @@ class TitleTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
 
 
     override fun onShow() {
-
+        storyTitle.setText(viewModel.title)
     }
 
     override fun onHide() {

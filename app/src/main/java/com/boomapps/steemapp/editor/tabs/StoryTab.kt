@@ -27,7 +27,7 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
     }
 
     override fun onShow() {
-
+        editor.html = viewModel.story
     }
 
     override fun onHide() {

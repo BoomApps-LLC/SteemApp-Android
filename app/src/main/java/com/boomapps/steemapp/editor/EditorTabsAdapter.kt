@@ -1,6 +1,7 @@
 package com.boomapps.steemapp.editor
 
 import android.support.v4.view.PagerAdapter
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,7 +9,13 @@ import android.view.ViewGroup
 /**
  * Created by Vitali Grechikha on 20.01.2018.
  */
-class EditorTabsAdapter constructor(private val layoutInflater: LayoutInflater, private val viewIds: IntArray) : PagerAdapter() {
+class EditorTabsAdapter constructor(private val layoutInflater: LayoutInflater, private val viewIds: IntArray, val onViewDestroyListener: OnViewDestroyListener) : PagerAdapter() {
+
+    interface OnViewDestroyListener{
+
+        fun onDestroy(position: Int)
+
+    }
 
     val views: ArrayList<View?> = arrayListOf(null, null, null, null)
 
@@ -20,6 +27,7 @@ class EditorTabsAdapter constructor(private val layoutInflater: LayoutInflater, 
         val view = layoutInflater.inflate(viewIds[position], container, false)
         views[position] = view
         container.addView(view)
+                Log.d("EditorTabsAdapter", "instantiateItem($position)")
         return view
     }
 
@@ -32,7 +40,8 @@ class EditorTabsAdapter constructor(private val layoutInflater: LayoutInflater, 
         val view = `object` as View
         container.removeView(view)
         views[position] = null
-//        Log.d("EditorTabsAdapter", "destroyItem(${position})")
+        onViewDestroyListener.onDestroy(position)
+        Log.d("EditorTabsAdapter", "destroyItem(${position})")
     }
 
     fun getViewAtPosition(pos: Int): View? {

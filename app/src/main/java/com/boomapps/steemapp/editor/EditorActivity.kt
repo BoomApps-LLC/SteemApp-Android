@@ -88,7 +88,17 @@ class EditorActivity : BaseActivity() {
         })
         adapter = EditorTabsAdapter(
                 getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater,
-                intArrayOf(R.layout.item_editor_tab_title, R.layout.item_editor_tab_story, R.layout.item_editor_tab_categories, R.layout.item_editor_tab_reward))
+                intArrayOf(R.layout.item_editor_tab_title, R.layout.item_editor_tab_story, R.layout.item_editor_tab_categories, R.layout.item_editor_tab_reward),
+                object : EditorTabsAdapter.OnViewDestroyListener {
+                    override fun onDestroy(position: Int) {
+                        when (position) {
+                            0 -> titleTab = null
+                            1 -> storyTab = null
+                            2 -> categoriesTab = null
+                            3 -> postingTab = null
+                        }
+                    }
+                })
         val viewPager = findViewById<ViewPager>(R.id.viewPager)
         viewPager.adapter = adapter
         viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
