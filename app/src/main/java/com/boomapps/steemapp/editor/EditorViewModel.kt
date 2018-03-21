@@ -243,7 +243,6 @@ class EditorViewModel : BaseViewModel() {
         } else {
             Math.max(0L, System.currentTimeMillis() - lastPostingTime)
         }
-        postingDelay = 300000
     }
 
 
