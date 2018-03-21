@@ -110,7 +110,7 @@ class CategoriesTab(view: View, tabListener: TabListener, viewModel: EditorViewM
             return
         }
         val text = inputTag.text
-        if (null != text && text.length > 2) {
+        if (null != text && text.isNotEmpty()) {
             val tag = text.toString().trim().toLowerCase()
             val item = CategoryItem(tag, getMatColor(MDCOLOR_TYPE))
             viewModel.addNewCategory(item)
