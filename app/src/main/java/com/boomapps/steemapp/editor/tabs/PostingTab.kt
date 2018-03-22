@@ -61,12 +61,11 @@ class PostingTab(view: View, tabListener: TabListener, viewModel: EditorViewMode
 
     override fun onShow() {
         Log.d("PostingTab", "onShow")
-        postButton.postDelayed({
-            startTimer(viewModel.postingDelay)
-        }, 500)
-//        if (viewModel.postingDelay > 0) {
-//
-//        }
+        if (viewModel.postingDelay > 0) {
+            postButton.postDelayed({
+                startTimer(viewModel.postingDelay)
+            }, 500)
+        }
     }
 
     override fun onHide() {

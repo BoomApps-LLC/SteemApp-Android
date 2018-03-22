@@ -128,7 +128,7 @@ class NetworkRepositoryDefault(
     }
 
 
-    fun getFlowableForCurrency(currencyName: String): Flowable<Array<CoinmarketcapCurrency>> {
+    private fun getFlowableForCurrency(currencyName: String): Flowable<Array<CoinmarketcapCurrency>> {
         return getRequestsApi("https://api.coinmarketcap.com/v1/ticker/", null).loadCurrencyFor(currencyName)
     }
 
@@ -162,7 +162,7 @@ class NetworkRepositoryDefault(
         val balanceVestFlowable: Flowable<Array<Double>> = getBalanceVetstFlowable()//.onErrorResumeNext { s: Subscriber<in BigDecimal>? -> Log.d("NetworkRepositoryDefault", "balanceVests error loading") }
         val exUserData: Flowable<ProfileResponse> = getRequestsApi("https://steemit.com/", null).loadProfileExtendedData(nick)
 
-        val disposable: Disposable = Flowables.combineLatest(
+        Flowables.combineLatest(
                 coinmarketcapToUsdFloawable,
                 coinmarketcapDollarToUsdFlowable,
                 exUserData,

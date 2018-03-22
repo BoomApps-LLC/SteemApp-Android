@@ -20,6 +20,7 @@
 
 
     <color name="violetText">#C4A6F5</color>
+    <color name="hintColor">#BB9AF3</color>
 
     <color name="plantGray">#F4F4F4</color>
     <color name="textGray">#A2A5A4</color>
@@ -34,6 +35,8 @@
 
     <color name="onboarding_dot_active">#FFFFFFFF</color>
     <color name="onboarding_dot_color_inactive">#FFA5A5A5</color>
+
+    <color name="bckg_btn_login_enable">#51EDBB</color>
 
 
 
