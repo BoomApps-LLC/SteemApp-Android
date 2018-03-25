@@ -1,16 +1,18 @@
 package com.boomapps.steemapp.editor.tabs
 
+import android.content.Context
+import android.graphics.Rect
 import android.support.v7.app.AppCompatActivity
-import android.text.Editable
-import android.text.TextWatcher
-import android.view.KeyEvent
+import android.util.Log
 import android.view.View
-import android.widget.EditText
 import android.widget.HorizontalScrollView
+import android.widget.ImageView
 import com.boomapps.steemapp.R
 import com.boomapps.steemapp.controls.InsertLinkDialogFragment
 import com.boomapps.steemapp.editor.EditorViewModel
 import jp.wasabeef.richeditor.RichEditor
+import android.view.inputmethod.InputMethodManager
+
 
 /**
  * Created by vgrechikha on 21.02.2018.
@@ -19,6 +21,9 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
 
     lateinit var editor: RichEditor
     lateinit var actionsPanel: HorizontalScrollView
+    lateinit var keyboardButton: ImageView
+
+    private var isKeyboardOpened = true
 
     override fun initComponents() {
         initActions()
@@ -54,7 +59,6 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
                 val value = editor.html
                 viewModel.story = value
                 processFullDataChange(storyLength = value.length)
-
             })
             editor.html = viewModel.story
             editor.focusEditor()
@@ -87,10 +91,46 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
         }
         actionsPanel.findViewById<View>(R.id.actionAddImage)?.setOnClickListener { dataListener.onAddPictureClick() }
         actionsPanel.findViewById<View>(R.id.actionClearAll)?.setOnClickListener { editor.html = "" }
+
+        keyboardButton = view.findViewById(R.id.keyboard_button)
+        keyboardButton.setOnClickListener({
+            if (isKeyboardOpened) {
+                val imm = editor.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(editor.windowToken, 0)
+            } else {
+                val imm = editor.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.showSoftInput(editor, InputMethodManager.SHOW_IMPLICIT)
+            }
+        })
+        initKeyboardStateListener()
     }
 
     fun insertUploadedImage(url: String, alt: String) {
         editor.insertImage(url, alt)
+    }
+
+    private fun initKeyboardStateListener() {
+        try {
+            view.viewTreeObserver.addOnGlobalLayoutListener({
+                val r = Rect()
+                view.getWindowVisibleDisplayFrame(r)
+
+                val heightDiff = view.rootView.height - (r.bottom - r.top)
+                if (heightDiff > 300) {
+                    isKeyboardOpened = true
+                    // kEYBOARD IS OPEN
+                    keyboardButton.setImageResource(R.drawable.ic_keyboard_arrow_down)
+                } else {
+                    if (isKeyboardOpened) {
+                        isKeyboardOpened = false
+                        keyboardButton.setImageResource(R.drawable.ic_keyboard_arrow_up)
+                    }
+                    // kEYBOARD IS HIDDEN
+                }
+            })
+        } catch (e: Throwable) {
+            Log.e("SteemApp", "error with keyboard hiding/showing", e)
+        }
     }
 
     private val onInsertLinkClickListener = object : InsertLinkDialogFragment.OnInsertClickListener {

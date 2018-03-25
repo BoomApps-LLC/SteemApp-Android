@@ -20,13 +20,13 @@
 
     <HorizontalScrollView
         android:id="@+id/editor_toolbar_sv"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:scrollbarStyle="outsideOverlay"
         android:scrollbars="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/keyboard_button"
         app:layout_constraintStart_toStartOf="parent">
 
         <LinearLayout
@@ -38,7 +38,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
-
 
             <ImageButton
                 android:id="@+id/actionUndo"
@@ -304,6 +303,25 @@
         </LinearLayout>
     </HorizontalScrollView>
 
+    <View
+        android:id="@+id/shadow_list"
+        android:layout_width="24dp"
+        android:layout_height="0dp"
+        android:background="@drawable/bg_shadow"
+        app:layout_constraintBottom_toBottomOf="@+id/editor_toolbar_sv"
+        app:layout_constraintEnd_toStartOf="@+id/keyboard_button"
+        app:layout_constraintTop_toTopOf="@+id/toolbar_line" />
+
+    <ImageButton
+        android:id="@+id/keyboard_button"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:contentDescription="@null"
+        android:padding="@dimen/toolbar_item_padding"
+        android:src="@drawable/ic_keyboard_arrow_down"
+        app:layout_constraintBottom_toBottomOf="@+id/editor_toolbar_sv"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <jp.wasabeef.richeditor.RichEditor
         android:id="@+id/editor"
@@ -315,6 +333,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
 
 </android.support.constraint.ConstraintLayout>
