@@ -13,6 +13,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
+import android.os.PersistableBundle
 import android.provider.MediaStore
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
@@ -48,12 +49,26 @@ class EditorActivity : BaseActivity() {
     private val INPUT_NEW_KEY_POST_ACTIVITY_CODE = 12
     private val INPUT_NEW_KEY_PHOTO_ACTIVITY_CODE = 21
 
+    private val keyStateSavingTempUris = "saved_temp_uris"
+
+    var tempImageUris: Array<Uri?>? = null
+
 
     var pagerHeight = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_editor)
+        Log.d("EditorActivity", "onCreate")
+        if (savedInstanceState != null) {
+            val sURIs = savedInstanceState.getStringArray(keyStateSavingTempUris)
+            if (sURIs != null && sURIs.size == 2) {
+                tempImageUris = arrayOf(
+                        Uri.parse(sURIs[0]),
+                        Uri.parse(sURIs[1])
+                )
+            }
+        }
         viewModel = ViewModelProviders.of(this).get(EditorViewModel::class.java)
         viewModel.loadStoryData()
         viewModel.state.observe(this, Observer<ViewState> { t ->
@@ -200,7 +215,7 @@ class EditorActivity : BaseActivity() {
         when (viewPager.currentItem) {
             0 -> {
                 viewModel.saveStoryData()
-                finish()
+                super.onBackPressed()
             }
             1, 2, 3 -> viewPager.setCurrentItem(--viewPager.currentItem, true)
         }
@@ -219,10 +234,22 @@ class EditorActivity : BaseActivity() {
         super.onDestroy()
     }
 
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+        val immutURIs = tempImageUris
+        if (immutURIs != null) {
+            val sArray: Array<String> = arrayOf(
+                    immutURIs[0].toString(),
+                    immutURIs[1].toString()
+            )
+            outState?.putStringArray(keyStateSavingTempUris, sArray)
+        }
+    }
+
+
     private var allowNext = false
 
     private fun setNextControlState(isActive: Boolean) {
-        Log.d("EditorActivity", "setNextControlState(${isActive})")
         allowNext = isActive
         if (isActive) {
             actionButtonTopRight.isClickable = true
@@ -265,6 +292,7 @@ class EditorActivity : BaseActivity() {
 
     override fun onPostResume() {
         super.onPostResume()
+        Log.d("EditorActivity", "onPostResume")
         if (viewModel.ifReadyForUploadingPhoto()) {
             viewModel.uploadPreparedPhoto()
         }
@@ -385,8 +413,6 @@ class EditorActivity : BaseActivity() {
         }
     }
 
-
-    var tempImageUris: Array<Uri?>? = null
 
     private fun showAddNewPictureSourceDialog() {
         //get string resources and show dialog

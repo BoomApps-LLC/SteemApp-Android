@@ -37,6 +37,7 @@ class EditorViewModel : BaseViewModel() {
     var postingDelay: Long = 0L
 
 
+
     companion object {
         val SUCCESS_IMAGE_UPLOAD = 1111
         val SUCCESS_STORY_UPLOAD = 2222
@@ -46,6 +47,8 @@ class EditorViewModel : BaseViewModel() {
         saveStoryData()
         super.onCleared()
     }
+
+
 
     fun addNewCategory(category: CategoryItem) {
         categories.add(category)

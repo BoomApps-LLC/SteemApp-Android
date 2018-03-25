@@ -95,13 +95,6 @@ class NetworkRepositoryDefault(
     }
 
     override fun uploadNewPhoto(uri: Uri, callback: NetworkRepository.OnRequestFinishCallback) {
-//        val file = Utils().getFileFromUri(uri)
-//        if (file == null) {
-//            Log.d("uploadNewPhoto", "file is absent")
-//            return
-//        } else {
-//            Log.d("uploadNewPhoto", "file is ${file.absolutePath}")
-//        }
         Flowable.fromCallable {
             return@fromCallable SteemWorker.get().uploadImage(uri)
         }.subscribeOn(Schedulers.io())
@@ -138,6 +131,7 @@ class NetworkRepositoryDefault(
             callback.onSuccessRequestFinish()
             return
         }
+        var exNumber = 0
         // update current currencies
         getRequestsApi("https://steemit.com/", null).loadProfileExtendedData(nick)
                 .timeout(30, TimeUnit.SECONDS)
@@ -150,7 +144,11 @@ class NetworkRepositoryDefault(
 
                         },
                         { throwable ->
-                            callback.onFailureRequestFinish(throwable)
+                            if (++exNumber <= 1) {
+                                callback.onFailureRequestFinish(throwable)
+                            } else {
+                                Log.d("NetworkRepoDef", "next throwable: ${throwable.message}")
+                            }
                         }
                 )
     }
@@ -161,7 +159,7 @@ class NetworkRepositoryDefault(
         val coinmarketcapDollarToUsdFlowable: Flowable<Array<CoinmarketcapCurrency>> = getFlowableForCurrency("steem-dollars")//.onErrorResumeNext { s: Subscriber<in Array<SteemDollarCurrency>>? -> Log.d("NetworkRepositoryDefault", "steemDollarToUsd error loading") }
         val balanceVestFlowable: Flowable<Array<Double>> = getBalanceVetstFlowable()//.onErrorResumeNext { s: Subscriber<in BigDecimal>? -> Log.d("NetworkRepositoryDefault", "balanceVests error loading") }
         val exUserData: Flowable<ProfileResponse> = getRequestsApi("https://steemit.com/", null).loadProfileExtendedData(nick)
-
+        var exNumber = 0
         Flowables.combineLatest(
                 coinmarketcapToUsdFloawable,
                 coinmarketcapDollarToUsdFlowable,
@@ -195,7 +193,12 @@ class NetworkRepositoryDefault(
                 }
                 .doOnError {
                     Log.d("NetworkRepository", "loadFullStartData >> doOnError")
-                    callback.onFailureRequestFinish(it)
+                    if (++exNumber <= 1) {
+                        callback.onFailureRequestFinish(it)
+                    } else {
+                        Log.d("NetworkRepoDef", "next throwable: ${it.message}")
+                    }
+
                 }
                 .subscribe()
     }
