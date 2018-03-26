@@ -3,6 +3,11 @@ package com.boomapps.steemapp
 import android.app.Application
 import android.content.Context
 import com.boomapps.steemapp.repository.SteemWorker
+import com.boomapps.steemapp.logging.CrashReportingTree
+import timber.log.Timber
+import timber.log.Timber.DebugTree
+
+
 
 /**
  * Created by vgrechikha on 22.01.2018.
@@ -22,6 +27,13 @@ class SteemApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
+
+        if (BuildConfig.DEBUG) {
+            Timber.plant(DebugTree())
+        } else {
+            Timber.plant(CrashReportingTree())
+        }
+
         val preferences = getSharedPreferences("steem_shares", Context.MODE_PRIVATE)
         logged = preferences.getBoolean("login_state", false)
     }

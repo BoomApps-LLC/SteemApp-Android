@@ -3,6 +3,7 @@ package com.boomapps.steemapp.repository
 import android.net.Uri
 import android.util.Log
 import com.boomapps.steemapp.BuildConfig
+import com.boomapps.steemapp.SteemApplication
 import com.boomapps.steemapp.UserData
 import com.boomapps.steemapp.repository.entity.profile.ProfileMetadata
 import com.google.gson.Gson
@@ -25,19 +26,19 @@ import eu.bittrade.libs.steemj.exceptions.SteemResponseException
 import eu.bittrade.libs.steemj.image.upload.SteemJImageUpload
 import eu.bittrade.libs.steemj.image.upload.config.SteemJImageUploadConfig
 import org.apache.commons.lang3.tuple.ImmutablePair
+import timber.log.Timber
 import java.io.File
 import java.net.URL
 import java.security.InvalidParameterException
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.TimeoutException
 
 
 /**
  * Created by vgrechikha on 22.01.2018.
  */
 
-class SteemWorker {
+class SteemWorker() {
 
     private var steemJ: SteemJ? = null
     private var steemJConfig: SteemJConfig? = null
@@ -59,16 +60,15 @@ class SteemWorker {
         return steemJ != null && steemJConfig != null
     }
 
-
     fun login(nickname: String, postingKey: String?, activeKey: String?): SteemWorkerResponse {
-        Log.d(LOG_TAG, "login(${nickname}, ${postingKey}")
+        Timber.log(Log.INFO, "login($nickname, $postingKey")
         steemJConfig = SteemJConfig.getInstance()
         steemJConfig?.setAppName("SteemApp")
         steemJConfig?.setAppVersion(BuildConfig.VERSION_NAME)
 
 //        steemJConfig?.addEndpointURI(URI.create("https://api.steemit.com"))
         steemJConfig?.defaultAccount = AccountName(nickname)
-//        steemJConfig?.responseTimeout = 10000
+        steemJConfig?.responseTimeout = 10000;
         try {
             val privateKeys = arrayListOf<ImmutablePair<PrivateKeyType, String>>()
             if (postingKey != null && postingKey.isNotEmpty()) {
@@ -85,33 +85,25 @@ class SteemWorker {
 
             steemJ = SteemJ()
             var result = steemJ?.lookupAccounts(nickname, 1)
-            if (result == null || result.size == 0 || result[0].toLowerCase() != nickname.toLowerCase()) {
+            if(result == null || result.size == 0 || result[0].toLowerCase() != nickname.toLowerCase()){
                 return SteemWorkerResponse(false, SteemErrorCodes.INCORRECT_USER_DATA_ERROR)
             }
-        } catch (sce: SteemCommunicationException) {
-            Log.d(LOG_TAG, "Login Error : ${sce.localizedMessage}")
-            sce.printStackTrace()
-            return SteemWorkerResponse(false, SteemErrorCodes.CONNECTION_ERROR)
         } catch (sce: SteemConnectionException) {
-            Log.e(LOG_TAG, "Login Error : ${sce.localizedMessage}", sce)
+            Timber.e(sce)
             sce.printStackTrace()
             return SteemWorkerResponse(false, SteemErrorCodes.CONNECTION_ERROR)
         } catch (sre: SteemResponseException) {
-            Log.e(LOG_TAG, "Login Error : ${sre.localizedMessage}", sre)
+            Timber.e(sre)
             sre.printStackTrace()
             return SteemWorkerResponse(false, SteemErrorCodes.TIMEOUT_ERROR)
         } catch (afe: AddressFormatException) {
-            Log.e(LOG_TAG, "Login Error : key is not valid >> ${afe.localizedMessage}", afe)
+            Timber.e(afe)
             afe.printStackTrace()
             return SteemWorkerResponse(false, SteemErrorCodes.INCORRECT_USER_DATA_ERROR)
         } catch (ex: Exception) {
-            Log.e(LOG_TAG, "Login Error : global catcher >> ${ex.localizedMessage}", ex)
+            Timber.e(ex)
             ex.printStackTrace()
             return SteemWorkerResponse(false, SteemErrorCodes.UNDEFINED_ERROR)
-        } catch (timeoutException: TimeoutException) {
-            Log.e(LOG_TAG, "Login Error : global catcher >> ${timeoutException.localizedMessage}", timeoutException)
-            timeoutException.printStackTrace()
-            return SteemWorkerResponse(false, SteemErrorCodes.TIMEOUT_ERROR)
         }
         return SteemWorkerResponse(true, SteemErrorCodes.EMPTY_ERROR)
     }
@@ -135,7 +127,7 @@ class SteemWorker {
                         "")
             }
         }
-        return RepositoryProvider.instance.getSharedRepository().loadUserData()
+        return SharedRepository().loadUserData()
     }
 
     fun uploadPhoto() {
@@ -147,7 +139,6 @@ class SteemWorker {
         steemJ = null
     }
 
-
     fun post(title: String, content: String, tags: Array<String>, postingKey: String, rewardsPercent: Short, upvote: Boolean): PostingResult {
         try {
             steemJConfig?.privateKeyStorage
@@ -157,7 +148,7 @@ class SteemWorker {
                     val commentOperation: CommentOperation? = steemJ?.createPost(title, content, tags, rewardsPercent)
                     if (commentOperation != null) {
                         val metadata = commentOperation.jsonMetadata
-                        Log.d("SteemWorker", "post answer >> ${metadata?.toString()}")
+                        Timber.d("post answer >> ${metadata?.toString()}")
                     }
                 } else {
                     return PostingResult("Posting key is empty.", false)
@@ -176,19 +167,17 @@ class SteemWorker {
                 }
             }
         } catch (communicationException: SteemCommunicationException) {
-            Log.e("SteemWorker", "post error SteemCommunicationException >> ${communicationException.localizedMessage}", communicationException)
+            Timber.e(communicationException)
             return PostingResult(communicationException.localizedMessage, false)
         } catch (responseException: SteemResponseException) {
-            Log.e("SteemWorker", "post error SteemResponseException >>${responseException.localizedMessage}", responseException)
+            Timber.e(responseException)
             return PostingResult(responseException.localizedMessage, false)
         } catch (transactionException: SteemInvalidTransactionException) {
-            Log.e("SteemWorker", "post error SteemInvalidTransactionException >> ${transactionException.localizedMessage}", transactionException)
+            Timber.e(transactionException)
             return PostingResult(transactionException.localizedMessage, false)
         } catch (parameterException: InvalidParameterException) {
-            Log.e("SteemWorker", "post error InvalidParameterException >> ${parameterException.localizedMessage}", parameterException)
+            Timber.e(parameterException)
             return PostingResult(parameterException.localizedMessage, false)
-        }catch (e : Exception){
-            return PostingResult("Something was broken", false)
         }
         return PostingResult()
     }
@@ -201,7 +190,7 @@ class SteemWorker {
         val config = SteemJImageUploadConfig.getInstance()
         config.connectTimeout = 3000
         config.readTimeout = 3000
-        val uData = RepositoryProvider.instance.getSharedRepository().loadUserData()
+        val uData = SharedRepository().loadUserData()
         return SteemJImageUpload.uploadImage(
                 eu.bittrade.libs.steemj.image.upload.models.AccountName(uData.nickname),
                 uData.postKey,
