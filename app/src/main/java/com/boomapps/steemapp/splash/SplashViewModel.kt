@@ -56,12 +56,19 @@ class SplashViewModel : BaseViewModel() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext {
                     Log.d("SplashViewModel", "doOnNext")
+                    if (!it.result) {
+                        loginState.value = LoginState.NO_EXT_DATA
+
+                    }
+                    Log.d("SignInViewModel", "doOnNext")
                 }
                 .doOnComplete {
                     Log.d("SplashViewModel", "doOnComplete")
 //                    loginState.value = LoginState.LOGGED
                     // TODO uncomment
-                    loadFullAdditionalData(userData.nickname!!)
+                    if (loginState.value != LoginState.NO_EXT_DATA) {
+                        loadFullAdditionalData(userData.nickname!!)
+                    }
                 }
                 .doOnError {
                     Log.d("SplashViewModel", "doOnError")
@@ -82,7 +89,7 @@ class SplashViewModel : BaseViewModel() {
                 stringError = if (throwable.localizedMessage != null) {
                     throwable.localizedMessage
                 } else {
-                    throwable.message?: "empty error"
+                    throwable.message ?: "empty error"
                 }
                 loginState.value = LoginState.NO_EXT_DATA
             }

@@ -35,7 +35,7 @@ class SplashActivity : AppCompatActivity() {
                     showNetworkErrorMessage()
                 }
                 else -> {
-                    // to do nothing
+
                 }
             }
         })

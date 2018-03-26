@@ -68,7 +68,7 @@ class SteemWorker {
 
 //        steemJConfig?.addEndpointURI(URI.create("https://api.steemit.com"))
         steemJConfig?.defaultAccount = AccountName(nickname)
-        steemJConfig?.responseTimeout = 10000
+//        steemJConfig?.responseTimeout = 10000
         try {
             val privateKeys = arrayListOf<ImmutablePair<PrivateKeyType, String>>()
             if (postingKey != null && postingKey.isNotEmpty()) {
@@ -187,6 +187,8 @@ class SteemWorker {
         } catch (parameterException: InvalidParameterException) {
             Log.e("SteemWorker", "post error InvalidParameterException >> ${parameterException.localizedMessage}", parameterException)
             return PostingResult(parameterException.localizedMessage, false)
+        }catch (e : Exception){
+            return PostingResult("Something was broken", false)
         }
         return PostingResult()
     }

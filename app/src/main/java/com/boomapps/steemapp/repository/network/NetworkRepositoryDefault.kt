@@ -11,11 +11,9 @@ import com.boomapps.steemapp.repository.entity.UserDataEntity
 import com.boomapps.steemapp.repository.entity.profile.ProfileMetadataDeserializer
 import com.boomapps.steemapp.repository.entity.profile.ProfileResponse
 import com.boomapps.steemapp.repository.entity.profile.UserExtended
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.Flowables
 import io.reactivex.schedulers.Schedulers
 import okhttp3.*
@@ -23,9 +21,9 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
-import java.io.InputStreamReader
-import java.net.URL
+import java.net.*
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 
 
 /**
@@ -144,22 +142,17 @@ class NetworkRepositoryDefault(
 
                         },
                         { throwable ->
-                            if (++exNumber <= 1) {
-                                callback.onFailureRequestFinish(throwable)
-                            } else {
-                                Log.d("NetworkRepoDef", "next throwable: ${throwable.message}")
-                            }
+                            callback.onFailureRequestFinish(throwable)
                         }
                 )
     }
 
 
     override fun loadFullStartData(nick: String, callback: NetworkRepository.OnRequestFinishCallback) {
-        val coinmarketcapToUsdFloawable: Flowable<Array<CoinmarketcapCurrency>> = getFlowableForCurrency("steem")//.onErrorResumeNext { s: Subscriber<in Array<CoinmarketcapCurrency>>? -> Log.d("NetworkRepositoryDefault", "steemToUsd error loading") }
-        val coinmarketcapDollarToUsdFlowable: Flowable<Array<CoinmarketcapCurrency>> = getFlowableForCurrency("steem-dollars")//.onErrorResumeNext { s: Subscriber<in Array<SteemDollarCurrency>>? -> Log.d("NetworkRepositoryDefault", "steemDollarToUsd error loading") }
-        val balanceVestFlowable: Flowable<Array<Double>> = getBalanceVetstFlowable()//.onErrorResumeNext { s: Subscriber<in BigDecimal>? -> Log.d("NetworkRepositoryDefault", "balanceVests error loading") }
+        val coinmarketcapToUsdFloawable: Flowable<Array<CoinmarketcapCurrency>> = getFlowableForCurrency("steem")//.onErrorResumeNext { s: Subscriber<in Array<CoinmarketcapCurrency>>? -> Log.d("NetworkRepoDef", "steemToUsd error loading") }
+        val coinmarketcapDollarToUsdFlowable: Flowable<Array<CoinmarketcapCurrency>> = getFlowableForCurrency("steem-dollars")//.onErrorResumeNext { s: Subscriber<in Array<CoinmarketcapCurrency>>? -> Log.d("NetworkRepoDef", "steemDollarToUsd error loading") }
+        val balanceVestFlowable: Flowable<Array<Double>> = getBalanceVetstFlowable()//.onErrorResumeNext { s: Subscriber<in Array<Double>>? -> Log.d("NetworkRepoDef", "balanceVests error loading") }
         val exUserData: Flowable<ProfileResponse> = getRequestsApi("https://steemit.com/", null).loadProfileExtendedData(nick)
-        var exNumber = 0
         Flowables.combineLatest(
                 coinmarketcapToUsdFloawable,
                 coinmarketcapDollarToUsdFlowable,
@@ -176,29 +169,33 @@ class NetworkRepositoryDefault(
                         Storage.get().setUserExtended(pr.userExtended as UserExtended)
                     }
                     Storage.get().setSBDCurrency(sdu[0])
-                    Log.d("NetworkRepository", "doTest:: combineFunction >> su = ${su[0].usdPrice}")
-                    Log.d("NetworkRepository", "doTest:: combineFunction >> sdu = ${sdu[0].usdPrice}")
+                    Log.d("NetworkRepoDef", "loadFullStartData:: combineFunction >> su = ${su[0].usdPrice}")
+                    Log.d("NetworkRepoDef", "loadFullStartData:: combineFunction >> sdu = ${sdu[0].usdPrice}")
                     if (bv.size == 2) {
-                        Log.d("NetworkRepository", "doTest:: combineFunction >> bv[0] = ${bv[0]}")
-                        Log.d("NetworkRepository", "doTest:: combineFunction >> bv[1] = ${bv[1]}")
+                        Log.d("NetworkRepoDef", "loadFullStartData:: combineFunction >> bv[0] = ${bv[0]}")
+                        Log.d("NetworkRepository", "loadFullStartData:: combineFunction >> bv[1] = ${bv[1]}")
                         Storage.get().setTotalVestingData(bv)
                     }
                 }
         ).timeout(30, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(FullDataLoadSubscriber(callback))
                 .doOnComplete {
                     Log.d("NetworkRepository", "loadFullStartData >> doOnComplete")
                     callback.onSuccessRequestFinish()
                 }
+                .onExceptionResumeNext({
+                    if (it is TimeoutException || it is UnknownHostException || it is ConnectException || it is SocketException || it is SocketTimeoutException) {
+                        Log.d("NetworkRepository", "loadFullStartData >> onExceptionResumeNext : ${it.onNext(null)}")
+                    }
+                })
                 .doOnError {
                     Log.d("NetworkRepository", "loadFullStartData >> doOnError")
-                    if (++exNumber <= 1) {
-                        callback.onFailureRequestFinish(it)
-                    } else {
-                        Log.d("NetworkRepoDef", "next throwable: ${it.message}")
-                    }
-
+                    callback.onFailureRequestFinish(it)
+                    return@doOnError
+                }.doOnNext {
+                    Log.d("NetworkRepository", "loadFullStartData >> doOnNext")
                 }
                 .subscribe()
     }
@@ -208,24 +205,6 @@ class NetworkRepositoryDefault(
         return Flowable.fromCallable {
             return@fromCallable SteemWorker.get().getVestingShares()
         }
-    }
-
-// TODO use one method and entity for currency of steem dollar and steem
-
-    fun getSteemCurrencyFlowable(): Flowable<Array<CoinmarketcapCurrency>> {
-        return Flowable.fromCallable {
-            return@fromCallable requestSteemCurrency()
-        }
-    }
-
-
-    private fun requestSteemCurrency(): Array<CoinmarketcapCurrency> {
-        val gson = Gson()
-        val url = URL("https://api.coinmarketcap.com/v1/ticker/steem/")
-        val reader = InputStreamReader(url.openStream())
-        val currencyArray = gson.fromJson(reader, Array<CoinmarketcapCurrency>::class.java)
-        reader.close()
-        return currencyArray
     }
 
     private fun getRequestsApi(basePoint: String, headers: Map<String, String>?): RequestsApi {
