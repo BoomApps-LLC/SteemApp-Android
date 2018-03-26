@@ -33,7 +33,7 @@ class CategoriesAdapter(val context: Context, val onRemoveItemListener: OnRemove
     }
 
     override fun onBindViewHolder(holder: CategoryHolder, position: Int) {
-        holder?.setValue(dataset[position], onRemoveClickListener)
+        holder.setValue(dataset[position], onRemoveClickListener)
     }
 
     override fun getItemCount(): Int {

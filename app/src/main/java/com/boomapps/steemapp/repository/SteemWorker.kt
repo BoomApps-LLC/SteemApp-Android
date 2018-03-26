@@ -3,7 +3,6 @@ package com.boomapps.steemapp.repository
 import android.net.Uri
 import android.util.Log
 import com.boomapps.steemapp.BuildConfig
-import com.boomapps.steemapp.SteemApplication
 import com.boomapps.steemapp.UserData
 import com.boomapps.steemapp.repository.entity.profile.ProfileMetadata
 import com.google.gson.Gson
@@ -85,7 +84,7 @@ class SteemWorker() {
 
             steemJ = SteemJ()
             var result = steemJ?.lookupAccounts(nickname, 1)
-            if(result == null || result.size == 0 || result[0].toLowerCase() != nickname.toLowerCase()){
+            if (result == null || result.size == 0 || result[0].toLowerCase() != nickname.toLowerCase()) {
                 return SteemWorkerResponse(false, SteemErrorCodes.INCORRECT_USER_DATA_ERROR)
             }
         } catch (sce: SteemConnectionException) {
@@ -127,7 +126,7 @@ class SteemWorker() {
                         "")
             }
         }
-        return SharedRepository().loadUserData()
+        return RepositoryProvider.instance.getSharedRepository().loadUserData()
     }
 
     fun uploadPhoto() {
@@ -190,7 +189,7 @@ class SteemWorker() {
         val config = SteemJImageUploadConfig.getInstance()
         config.connectTimeout = 3000
         config.readTimeout = 3000
-        val uData = SharedRepository().loadUserData()
+        val uData = RepositoryProvider.instance.getSharedRepository().loadUserData()
         return SteemJImageUpload.uploadImage(
                 eu.bittrade.libs.steemj.image.upload.models.AccountName(uData.nickname),
                 uData.postKey,

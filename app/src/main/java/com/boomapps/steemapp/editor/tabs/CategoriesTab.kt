@@ -25,11 +25,6 @@ class CategoriesTab(view: View, tabListener: TabListener, viewModel: EditorViewM
 
     override fun initComponents() {
         inputTag = view.findViewById(R.id.hashtagInput)
-        if (inputTag == null) {
-            // wrong view
-            // TODO process this wrong state of views
-            return
-        }
         addButton = view.findViewById(R.id.addCategoryButton)
         addButton.setOnClickListener(View.OnClickListener {
             createTag()

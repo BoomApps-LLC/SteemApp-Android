@@ -129,7 +129,6 @@ class NetworkRepositoryDefault(
             callback.onSuccessRequestFinish()
             return
         }
-        var exNumber = 0
         // update current currencies
         getRequestsApi("https://steemit.com/", null).loadProfileExtendedData(nick)
                 .timeout(30, TimeUnit.SECONDS)

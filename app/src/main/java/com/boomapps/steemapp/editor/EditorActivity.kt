@@ -312,31 +312,32 @@ class EditorActivity : BaseActivity() {
     }
 
     fun showPostingErrorDialog(errorMessage: String) {
-        var title = getString(R.string.warning_wrong_posting_key_title)
-        var message = ""
-        if (errorMessage.toLowerCase().contains("private posting key")) {
-            // show a dialog with a suggestion to enter a new key
-            message = getString(R.string.warning_wrong_postingKey_message)
-            showExtendWarning(
-                    title,
-                    message,
-                    getString(R.string.button_yes),
-                    getString(R.string.button_cancel),
-                    object : WarningDialog.OnPositiveClickListener {
-                        override fun onClick() {
-                            showScreenForEnterNewPostingKey(INPUT_NEW_KEY_POST_ACTIVITY_CODE)
-                        }
-                    })
-        } else if (viewModel.stringError.toLowerCase().contains("photo_upload_empty_key")) {
-            showInvalidReEnterPostingKeyDialog(INPUT_NEW_KEY_PHOTO_ACTIVITY_CODE)
-        } else {
-            message = "Posting was saved, but not published due to error. " + viewModel.stringError + "."
-            val dialog = AlertDialog.Builder(this@EditorActivity).create()
-            dialog.setTitle(title)
-            dialog.setMessage(message)
-            dialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(android.R.string.ok), { _, _ ->
-            })
-            dialog.show()
+        val title = getString(R.string.warning_wrong_posting_key_title)
+        when {
+            errorMessage.toLowerCase().contains("private posting key") -> {
+                // show a dialog with a suggestion to enter a new key
+                val message = getString(R.string.warning_wrong_postingKey_message)
+                showExtendWarning(
+                        title,
+                        message,
+                        getString(R.string.button_yes),
+                        getString(R.string.button_cancel),
+                        object : WarningDialog.OnPositiveClickListener {
+                            override fun onClick() {
+                                showScreenForEnterNewPostingKey(INPUT_NEW_KEY_POST_ACTIVITY_CODE)
+                            }
+                        })
+            }
+            viewModel.stringError.toLowerCase().contains("photo_upload_empty_key") -> showInvalidReEnterPostingKeyDialog(INPUT_NEW_KEY_PHOTO_ACTIVITY_CODE)
+            else -> {
+                val message = "Posting was saved, but not published due to error. " + viewModel.stringError + "."
+                val dialog = AlertDialog.Builder(this@EditorActivity).create()
+                dialog.setTitle(title)
+                dialog.setMessage(message)
+                dialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(android.R.string.ok), { _, _ ->
+                })
+                dialog.show()
+            }
         }
 
 

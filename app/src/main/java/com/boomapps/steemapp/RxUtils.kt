@@ -22,7 +22,7 @@ class RxUtils {
     }
 
 
-    fun copyFile(sourceUri: Uri, destUri: Uri, context: Context, listener: OnCopyFileResultListener) {
+    fun copyFile(sourceUri: Uri, destUri: Uri, listener: OnCopyFileResultListener) {
 
         Observable
                 .fromCallable({

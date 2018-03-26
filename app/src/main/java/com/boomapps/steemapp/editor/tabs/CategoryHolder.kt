@@ -15,7 +15,7 @@ import com.boomapps.steemapp.R
 
 class CategoryHolder(view: View, val onRemoveClickListener: OnRemoveClickListener) : RecyclerView.ViewHolder(view) {
 
-    open interface OnRemoveClickListener {
+    interface OnRemoveClickListener {
         fun onClick(position: Int)
     }
 

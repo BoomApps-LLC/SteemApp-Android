@@ -41,7 +41,6 @@ class ProfileFragment : Fragment() {
                     }
                     ViewState.FAULT_RESULT -> {
                         viewModelShared.state.value = ViewState.COMMON
-                        Toast.makeText(activity, "Error: ${viewModelShared.stringError}", Toast.LENGTH_LONG)
                         viewModelShared.stringError = ""
                     }
                     ViewState.COMMON -> {

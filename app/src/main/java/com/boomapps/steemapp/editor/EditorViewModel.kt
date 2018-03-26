@@ -145,7 +145,7 @@ class EditorViewModel : BaseViewModel() {
 
     fun uploadPickedPhoto() {
         // copy file
-        RxUtils().copyFile(sourceUriPickedPhoto!!, destinationUriPickedPhoto!!, SteemApplication.instance, object : RxUtils.OnCopyFileResultListener {
+        RxUtils().copyFile(sourceUriPickedPhoto!!, destinationUriPickedPhoto!!, object : RxUtils.OnCopyFileResultListener {
             override fun onResult(success: Boolean) {
                 if (success) {
                     // call uploading photo
@@ -231,8 +231,8 @@ class EditorViewModel : BaseViewModel() {
 
                 }
 
-                override fun onLoadStory(loadedStory: String) {
-                    story = loadedStory
+                override fun onLoadStory(story: String) {
+                    this@EditorViewModel.story = story
                 }
             })
             title = storyData.title

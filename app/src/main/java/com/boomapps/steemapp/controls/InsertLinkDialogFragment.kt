@@ -51,7 +51,7 @@ class InsertLinkDialogFragment : AppCompatDialogFragment() {
         val dialog = AlertDialog.Builder(activity as Context)
         dialog.setTitle("Add link")
         dialog.setView(view)
-        dialog.setPositiveButton("ADD", {_, which ->
+        dialog.setPositiveButton("ADD", {_, _ ->
             val title = textToDisplayEditText.getText().toString().trim()
             val url = linkToEditText.getText().toString().trim()
 
