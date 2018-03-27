@@ -7,6 +7,7 @@ import com.boomapps.steemapp.BaseViewModel
 import com.boomapps.steemapp.repository.RepositoryProvider
 import com.boomapps.steemapp.repository.SteemWorker
 import com.boomapps.steemapp.repository.network.NetworkRepository
+import com.boomapps.steemapp.repository.network.NetworkRepositoryDefault
 import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -64,11 +65,11 @@ class SplashViewModel : BaseViewModel() {
                 }
                 .doOnComplete {
                     Log.d("SplashViewModel", "doOnComplete")
-//                    loginState.value = LoginState.LOGGED
-                    // TODO uncomment
-                    if (loginState.value != LoginState.NO_EXT_DATA) {
-                        loadFullAdditionalData(userData.nickname!!)
-                    }
+//                    if (loginState.value != LoginState.NO_EXT_DATA) {
+//                        loadFullAdditionalData(userData.nickname!!)
+//                    }
+                    // TEST
+                    loadTestFullAdditionalData(userData.nickname!!)
                 }
                 .doOnError {
                     Log.d("SplashViewModel", "doOnError")
@@ -83,6 +84,28 @@ class SplashViewModel : BaseViewModel() {
 
             override fun onSuccessRequestFinish() {
                 loginState.value = LoginState.LOGGED
+            }
+
+            override fun onFailureRequestFinish(throwable: Throwable) {
+                stringError = if (throwable.localizedMessage != null) {
+                    throwable.localizedMessage
+                } else {
+                    throwable.message ?: "empty error"
+                }
+                loginState.value = LoginState.NO_EXT_DATA
+            }
+        })
+    }
+
+
+    private fun loadTestFullAdditionalData(nick: String) {
+
+        (RepositoryProvider.instance.getNetworkRepository() as NetworkRepositoryDefault).testFullDataLoading(nick, object : NetworkRepository.OnRequestFinishCallback {
+
+            override fun onSuccessRequestFinish() {
+                if (loginState.value != LoginState.LOGGED) {
+                    loginState.value = LoginState.LOGGED
+                }
             }
 
             override fun onFailureRequestFinish(throwable: Throwable) {

@@ -21,9 +21,8 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
-import java.net.*
+import java.net.URL
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeoutException
 
 
 /**
@@ -181,22 +180,106 @@ class NetworkRepositoryDefault(
                 .observeOn(AndroidSchedulers.mainThread())
 //                .subscribe(FullDataLoadSubscriber(callback))
                 .doOnComplete {
-                    Log.d("NetworkRepository", "loadFullStartData >> doOnComplete")
+                    Log.d("NetworkRepoDef", "loadFullStartData >> doOnComplete")
                     callback.onSuccessRequestFinish()
                 }
                 .onExceptionResumeNext({
-                    if (it is TimeoutException || it is UnknownHostException || it is ConnectException || it is SocketException || it is SocketTimeoutException) {
-                        Log.d("NetworkRepository", "loadFullStartData >> onExceptionResumeNext : ${it.onNext(null)}")
-                    }
+                    //                    if (it is TimeoutException || it is UnknownHostException || it is ConnectException || it is SocketException || it is SocketTimeoutException) {
+                    Log.d("NetworkRepoDef", "loadFullStartData >> onExceptionResumeNext : ${it.onNext(null)}")
+//                    }
                 })
                 .doOnError {
-                    Log.d("NetworkRepository", "loadFullStartData >> doOnError")
+                    Log.d("NetworkRepoDef", "loadFullStartData >> doOnError")
                     callback.onFailureRequestFinish(it)
                     return@doOnError
                 }.doOnNext {
                     Log.d("NetworkRepository", "loadFullStartData >> doOnNext")
                 }
                 .subscribe()
+    }
+
+
+    fun testFullDataLoading(nick: String, callback: NetworkRepository.OnRequestFinishCallback){
+        val coinmarketcapToUsdFloawable: Flowable<Array<CoinmarketcapCurrency>> = getFlowableForCurrency("steem")//.onErrorResumeNext { s: Subscriber<in Array<CoinmarketcapCurrency>>? -> Log.d("NetworkRepoDef", "steemToUsd error loading") }
+        val coinmarketcapDollarToUsdFlowable: Flowable<Array<CoinmarketcapCurrency>> = getFlowableForCurrency("steem-dollars")//.onErrorResumeNext { s: Subscriber<in Array<CoinmarketcapCurrency>>? -> Log.d("NetworkRepoDef", "steemDollarToUsd error loading") }
+        val balanceVestFlowable: Flowable<Array<Double>> = getBalanceVetstFlowable()//.onErrorResumeNext { s: Subscriber<in Array<Double>>? -> Log.d("NetworkRepoDef", "balanceVests error loading") }
+        val exUserData: Flowable<ProfileResponse> = getRequestsApi("https://steemit.com/", null).loadProfileExtendedData(nick)
+
+        var toUSD = CoinmarketcapCurrency("steem")
+        var dollarToUsd = CoinmarketcapCurrency("steem-dollars")
+        var balanceVest: Array<Double> = arrayOf()
+        var profile = ProfileResponse()
+
+        Flowable.mergeDelayError(coinmarketcapDollarToUsdFlowable, coinmarketcapToUsdFloawable, balanceVestFlowable, exUserData)
+                .timeout(30, TimeUnit.SECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread(), true)
+                .doOnError {
+                    Log.d("NetworkRepository", "loadFullStartData >> doOnError")
+//                    callback.onSuccessRequestFinish()
+                }
+                .doOnNext {
+                    Log.d("NetworkRepository", "loadFullStartData >> doOnNext")
+                    when (it) {
+                        is Array<*> -> {
+                            if (it.size > 0) {
+                                when (it.get(0)) {
+                                    is CoinmarketcapCurrency -> {
+                                        val currency = (it[0] as CoinmarketcapCurrency)
+                                        if (currency.id.toLowerCase().equals("steem")) {
+                                            toUSD = currency
+                                        } else {
+                                            dollarToUsd = currency
+                                        }
+                                    }
+                                    is Double -> {
+                                        balanceVest = it as Array<Double>
+                                    }
+                                }
+                            }
+                        }
+                        is ProfileResponse -> {
+                            profile = it
+                        }
+                    }
+
+                }
+                .onExceptionResumeNext {
+                    Log.d("NetworkRepository", "loadFullStartData >> onExceptionResumeNext")
+//                    callback.onSuccessRequestFinish()
+                }
+//                .doAfterTerminate {
+//                    Log.d("NetworkRepository", "loadFullStartData >> doAfterTerminate")
+//                    saveData(toUSD, dollarToUsd, profile, balanceVest)
+//                    callback.onSuccessRequestFinish()
+//                }
+                .doOnComplete {
+                    Log.d("NetworkRepository", "loadFullStartData >> doOnComplete")
+                    saveData(toUSD, dollarToUsd, profile, balanceVest)
+                    callback.onSuccessRequestFinish()
+                }
+                .subscribe()
+    }
+
+
+    fun saveData(su: CoinmarketcapCurrency, sdu: CoinmarketcapCurrency, pr: ProfileResponse, bv: Array<Double>) {
+        if (su.currencyName.isNotEmpty()) {
+            Storage.get().setSteemCurrency(su)
+        }
+        if (sdu.currencyName.isNotEmpty()) {
+            Storage.get().setSBDCurrency(sdu)
+        }
+        if (pr.userExtended != null) {
+            Storage.get().setUserExtended(pr.userExtended as UserExtended)
+        }
+        Storage.get().setSBDCurrency(sdu)
+        Log.d("NetworkRepoDef", "loadFullStartData:: combineFunction >> su = ${su.usdPrice}")
+        Log.d("NetworkRepoDef", "loadFullStartData:: combineFunction >> sdu = ${sdu.usdPrice}")
+        if (bv.size == 2) {
+            Log.d("NetworkRepoDef", "loadFullStartData:: combineFunction >> bv[0] = ${bv[0]}")
+            Log.d("NetworkRepository", "loadFullStartData:: combineFunction >> bv[1] = ${bv[1]}")
+            Storage.get().setTotalVestingData(bv)
+        }
     }
 
 
