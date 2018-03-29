@@ -1,22 +1,15 @@
-package com.boomapps.steemapp.repository
+package com.boomapps.steemapp.repository.preferences
 
 import com.boomapps.steemapp.UserData
-import com.boomapps.steemapp.main.Balance
+import com.boomapps.steemapp.repository.Balance
+import com.boomapps.steemapp.repository.RepositoryProvider
 import com.boomapps.steemapp.repository.currency.CoinmarketcapCurrency
 import com.boomapps.steemapp.repository.entity.profile.UserExtended
 
 /**
  * Created by Vitali Grechikha on 13.02.2018.
  */
-class Storage {
-
-    companion object {
-        var storage: Storage = Storage()
-        fun get(): Storage {
-            return storage
-        }
-    }
-
+class MemoryStorage {
 
     private var currencySteem: CoinmarketcapCurrency = CoinmarketcapCurrency("steem")
     private var currencySBD: CoinmarketcapCurrency = CoinmarketcapCurrency("steem-dollars")
@@ -29,21 +22,6 @@ class Storage {
      */
     private var totalVestingData: Array<Double> = arrayOf()
 
-    fun getShortUserData(): UserData {
-        if (shortUserInfo == null) {
-            shortUserInfo = RepositoryProvider.instance.getSharedRepository().loadUserData()
-        }
-        return shortUserInfo!!
-    }
-
-    fun loadSteemCurrency(listener: OnLoadingResultListener<CoinmarketcapCurrency>) {
-        // TODO add checking expired time
-        if (currencySteem.lastUpdateTime != 0L) {
-            listener.onLoadingSuccess(currencySteem)
-        } else {
-            // TODO load new data and return result
-        }
-    }
 
     fun getSteemCurrency(): CoinmarketcapCurrency {
         return currencySteem
@@ -55,15 +33,6 @@ class Storage {
 
     fun setSteemCurrency(value: CoinmarketcapCurrency) {
         currencySteem = value
-    }
-
-    fun loadSBDCurrency(listener: OnLoadingResultListener<CoinmarketcapCurrency>) {
-        // TODO add checking expired time
-        if (currencySBD.lastUpdateTime != 0L) {
-            listener.onLoadingSuccess(currencySBD)
-        } else {
-            // TODO load new data and return result
-        }
     }
 
     fun setSBDCurrency(value: CoinmarketcapCurrency) {
@@ -96,7 +65,10 @@ class Storage {
                     oldData?.photoUrl
                 },
                 oldData?.postKey)
-
+        if (extUserData != null) {
+            val newUserData = UserData(shortUserInfo?.nickname, userExtended.profileMetadata.userName, userExtended.profileMetadata.photoUrl, shortUserInfo?.postKey)
+            RepositoryProvider.instance.getSharedRepository().updateUserData(newUserData)
+        }
     }
 
     fun getTotalVestingData(): Array<Double> {
@@ -107,18 +79,9 @@ class Storage {
         totalVestingData = values
     }
 
-    interface OnLoadingResultListener<R> {
-        fun onLoadingSuccess(result: R)
-
-        fun onLoadingError(message: String)
-    }
-
     fun clearAllData() {
         extUserData = null
         shortUserInfo = null
-        val repo = RepositoryProvider.instance.getSharedRepository()
-        repo.saveUserData(UserData(null, null, null, null))
-        repo.saveBalanceData(Balance())
     }
 
 

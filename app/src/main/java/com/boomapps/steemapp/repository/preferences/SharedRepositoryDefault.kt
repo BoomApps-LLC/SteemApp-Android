@@ -8,8 +8,10 @@ import com.boomapps.steemapp.SteemApplication
 import com.boomapps.steemapp.UserData
 import com.boomapps.steemapp.editor.tabs.CategoryItem
 import com.boomapps.steemapp.getMatColor
-import com.boomapps.steemapp.main.Balance
+import com.boomapps.steemapp.repository.Balance
 import com.boomapps.steemapp.repository.StoryInstance
+import com.boomapps.steemapp.repository.currency.CoinmarketcapCurrency
+import com.boomapps.steemapp.repository.entity.profile.UserExtended
 import com.boomapps.steemapp.utils.Crypto
 import com.boomapps.steemapp.utils.SettingsRepository
 
@@ -22,6 +24,10 @@ class SharedRepositoryDefault : SharedRepository {
         @JvmStatic
         private val crypto = Crypto()
     }
+
+    var storage: MemoryStorage = MemoryStorage()
+    var balanceHelper: BalanceHelper = BalanceHelper(loadBalanceFromPrefs())
+
 
     private fun getReadableSharedPreferences(): SharedPreferences {
         return SteemApplication.instance.getSharedPreferences("steem_shares", Context.MODE_PRIVATE)
@@ -114,23 +120,55 @@ class SharedRepositoryDefault : SharedRepository {
         }
     }
 
-    override fun loadBalance(): Balance {
-        val prefs = getReadableSharedPreferences()
-        val sb = prefs.getFloat("steemBalance", 0f)
-        val ssb = prefs.getFloat("steemSavingBalance", 0f)
-        val sbdb = prefs.getFloat("sbdBalance", 0f)
-        val sbdsb = prefs.getFloat("sbdSavingBalance", 0f)
-        val vs = prefs.getFloat("vestShares", 0f)
-        val fullBalance = prefs.getFloat("fullBalance", 0f)
-        val updateTime = prefs.getLong("updateTime", 0L)
-        return Balance(
-                sb.toDouble(),
-                ssb.toDouble(),
-                sbdb.toDouble(),
-                sbdsb.toDouble(),
-                vs.toDouble(),
-                fullBalance.toDouble(),
-                updateTime)
+    override fun loadBalance(recalculate: Boolean): Balance {
+        if (recalculate || !balanceHelper.hasBalance()) {
+            val b = balanceHelper.calculateBalance(storage.getSteemCurrency(), storage.getSbdCurrency(), storage.getTotalVestingData())
+            saveBalanceInPrefs(b)
+            return b
+        } else {
+            return balanceHelper.balance
+        }
+    }
+
+    private fun loadBalanceFromPrefs(): Balance {
+        var result = Balance()
+        try {
+            val prefs = getReadableSharedPreferences()
+            val sb = prefs.getFloat("steemBalance", 0f)
+            val ssb = prefs.getFloat("steemSavingBalance", 0f)
+            val sbdb = prefs.getFloat("sbdBalance", 0f)
+            val sbdsb = prefs.getFloat("sbdSavingBalance", 0f)
+            val vs = prefs.getFloat("vestShares", 0f)
+            val fullBalance = prefs.getFloat("fullBalance", -1f)
+            val updateTime = prefs.getLong("updateTime", 0L)
+            result = Balance(
+                    sb.toDouble(),
+                    ssb.toDouble(),
+                    sbdb.toDouble(),
+                    sbdsb.toDouble(),
+                    vs.toDouble(),
+                    fullBalance.toDouble(),
+                    updateTime)
+        } catch (exc: ClassCastException) {
+
+        } finally {
+            return result
+        }
+
+    }
+
+    private fun saveBalanceInPrefs(balance: Balance) {
+        val editor = getSharedPreferencesEditor()
+        editor.apply {
+            putFloat("steemBalance", balance.steemBalance.toFloat())
+            putFloat("steemSavingBalance", balance.steemSavingBalance.toFloat())
+            putFloat("sbdBalance", balance.sbdBalance.toFloat())
+            putFloat("sbdSavingBalance", balance.sbdSavingBalance.toFloat())
+            putFloat("vestShares", balance.vestShares.toFloat())
+            putFloat("fullBalance", balance.fullBalance.toFloat())
+            putLong("updateTime", balance.updateTime)
+
+        }.apply()
     }
 
     override fun saveStoryData(storyInstance: StoryInstance) {
@@ -182,5 +220,30 @@ class SharedRepositoryDefault : SharedRepository {
         val editor = getSharedPreferencesEditor()
         editor.putBoolean("first_launch", isFirst)
         editor.apply()
+    }
+
+
+    override fun saveSteemCurrency(currency: CoinmarketcapCurrency) {
+        storage.setSteemCurrency(currency)
+    }
+
+    override fun saveSBDCurrency(currency: CoinmarketcapCurrency) {
+        storage.setSBDCurrency(currency)
+    }
+
+    override fun saveUserExtendedData(data: UserExtended) {
+        storage.setUserExtended(data)
+        balanceHelper.updateUserValues(data)
+    }
+
+    override fun saveTotalVestingData(data: Array<Double>) {
+        storage.setTotalVestingData(data)
+    }
+
+    override fun clearAllData() {
+        storage.clearAllData()
+        saveBalanceInPrefs(Balance())
+        balanceHelper = BalanceHelper(Balance())
+        saveUserData(UserData(null, null, null, null))
     }
 }

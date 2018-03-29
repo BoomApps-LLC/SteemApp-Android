@@ -49,11 +49,9 @@ class ProfileFragment : Fragment() {
                 }
             }
         })
-        viewModelShared.getUserProfile().observe(this, object : Observer<UserData> {
-            override fun onChanged(data: UserData?) {
-                if (data != null) {
-                    showProfileData(data)
-                }
+        viewModelShared.getUserProfile().observe(this, Observer<UserData> { data ->
+            if (data != null) {
+                showProfileData(data)
             }
         })
     }
@@ -82,7 +80,7 @@ class ProfileFragment : Fragment() {
 
         view.profileFeedbackControl.setOnClickListener {
             val intent = Intent(Intent.ACTION_SENDTO)
-            intent.setData(Uri.parse("mailto:")); // only email apps should handle this
+            intent.data = Uri.parse("mailto:"); // only email apps should handle this
             intent.putExtra(Intent.EXTRA_EMAIL, arrayOf("support@steemitapp.com"))
             intent.putExtra(Intent.EXTRA_SUBJECT, "Feedback")
             if (intent.resolveActivity(activity?.packageManager) != null) {

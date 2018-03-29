@@ -3,37 +3,34 @@ package com.boomapps.steemapp.repository.network
 import android.net.Uri
 import android.util.Log
 import com.boomapps.steemapp.repository.HeadersInterceptor
+import com.boomapps.steemapp.repository.RepositoryProvider
 import com.boomapps.steemapp.repository.RequestsApi
 import com.boomapps.steemapp.repository.SteemWorker
-import com.boomapps.steemapp.repository.Storage
 import com.boomapps.steemapp.repository.currency.CoinmarketcapCurrency
 import com.boomapps.steemapp.repository.entity.UserDataEntity
 import com.boomapps.steemapp.repository.entity.profile.ProfileMetadataDeserializer
 import com.boomapps.steemapp.repository.entity.profile.ProfileResponse
 import com.boomapps.steemapp.repository.entity.profile.UserExtended
 import com.google.gson.GsonBuilder
-import io.reactivex.Flowable
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.rxkotlin.Flowables
 import io.reactivex.schedulers.Schedulers
-import okhttp3.*
+import okhttp3.Cookie
+import okhttp3.CookieJar
+import okhttp3.HttpUrl
+import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
-import java.net.*
+import java.net.URL
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeoutException
 
+class NetworkRepositoryDefault : NetworkRepository {
 
-/**
- * Created by Vitali Grechikha on 03.02.2018.
- */
-class NetworkRepositoryDefault(
-        override var extendedProfileResponse: ProfileResponse? = null,
-        override var coinmarketcapCurrency: CoinmarketcapCurrency? = null,
-        override var lastUploadedPhotoUrl: URL? = null) : NetworkRepository {
-
+    override var extendedProfileResponse: ProfileResponse? = null
+    override var coinmarketcapCurrency: CoinmarketcapCurrency? = null
+    override var lastUploadedPhotoUrl: URL? = null
 
     companion object {
         var instance: NetworkRepositoryDefault = NetworkRepositoryDefault()
@@ -65,12 +62,12 @@ class NetworkRepositoryDefault(
                 };
             }
         })
-        httpClient = httpClientBuilder.build()
+        NetworkRepositoryDefault.httpClient = httpClientBuilder.build()
     }
 
 
     override fun postStory(title: String, content: String, tags: Array<String>, postingKey: String, rewardsPercent: Short, upvote: Boolean, callback: NetworkRepository.OnRequestFinishCallback) {
-        Flowable.fromCallable {
+        Observable.fromCallable {
             return@fromCallable SteemWorker.get().post(title, content, tags, postingKey, rewardsPercent, upvote)
         }.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -93,7 +90,7 @@ class NetworkRepositoryDefault(
     }
 
     override fun uploadNewPhoto(uri: Uri, callback: NetworkRepository.OnRequestFinishCallback) {
-        Flowable.fromCallable {
+        Observable.fromCallable {
             return@fromCallable SteemWorker.get().uploadImage(uri)
         }.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -118,12 +115,6 @@ class NetworkRepositoryDefault(
                 .subscribe()
     }
 
-
-    private fun getFlowableForCurrency(currencyName: String): Flowable<Array<CoinmarketcapCurrency>> {
-        return getRequestsApi("https://api.coinmarketcap.com/v1/ticker/", null).loadCurrencyFor(currencyName)
-    }
-
-
     override fun loadExtendedUserProfile(nick: String, callback: NetworkRepository.OnRequestFinishCallback) {
         if (extendedProfileResponse != null) {
             callback.onSuccessRequestFinish()
@@ -146,68 +137,100 @@ class NetworkRepositoryDefault(
                 )
     }
 
-
     override fun loadFullStartData(nick: String, callback: NetworkRepository.OnRequestFinishCallback) {
-        val coinmarketcapToUsdFloawable: Flowable<Array<CoinmarketcapCurrency>> = getFlowableForCurrency("steem")//.onErrorResumeNext { s: Subscriber<in Array<CoinmarketcapCurrency>>? -> Log.d("NetworkRepoDef", "steemToUsd error loading") }
-        val coinmarketcapDollarToUsdFlowable: Flowable<Array<CoinmarketcapCurrency>> = getFlowableForCurrency("steem-dollars")//.onErrorResumeNext { s: Subscriber<in Array<CoinmarketcapCurrency>>? -> Log.d("NetworkRepoDef", "steemDollarToUsd error loading") }
-        val balanceVestFlowable: Flowable<Array<Double>> = getBalanceVetstFlowable()//.onErrorResumeNext { s: Subscriber<in Array<Double>>? -> Log.d("NetworkRepoDef", "balanceVests error loading") }
-        val exUserData: Flowable<ProfileResponse> = getRequestsApi("https://steemit.com/", null).loadProfileExtendedData(nick)
-        Flowables.combineLatest(
+        val coinmarketcapToUsdFloawable: Observable<Array<CoinmarketcapCurrency>> = getObservableForCurrency("steem")//.onErrorResumeNext { s: Subscriber<in Array<CoinmarketcapCurrency>>? -> Log.d("NetworkRepoDef", "steemToUsd error loading") }
+        val coinmarketcapDollarToUsdFlowable: Observable<Array<CoinmarketcapCurrency>> = getObservableForCurrency("steem-dollars")//.onErrorResumeNext { s: Subscriber<in Array<CoinmarketcapCurrency>>? -> Log.d("NetworkRepoDef", "steemDollarToUsd error loading") }
+        val balanceVestFlowable: Observable<Array<Double>> = getBalanceVetstObservable()//.onErrorResumeNext { s: Subscriber<in Array<Double>>? -> Log.d("NetworkRepoDef", "balanceVests error loading") }
+        val exUserData: Observable<ProfileResponse> = getRequestsApi("https://steemit.com/", null).loadProfileExtendedData(nick)
+
+        Observable.combineLatestDelayError(arrayOf(
                 coinmarketcapToUsdFloawable,
                 coinmarketcapDollarToUsdFlowable,
-                exUserData,
                 balanceVestFlowable,
-                { su, sdu, pr, bv ->
-                    if (su.isNotEmpty()) {
-                        Storage.get().setSteemCurrency(su[0])
+                exUserData),
+                {
+
+                    var toUSD = CoinmarketcapCurrency("steem")
+                    var dollarToUsd = CoinmarketcapCurrency("steem-dollars")
+                    var balanceVest: Array<Double> = arrayOf()
+                    var profile = ProfileResponse()
+
+                    for (obj in it) {
+                        when (obj) {
+                            is Array<*> -> {
+                                if (obj.isNotEmpty()) {
+                                    when (obj.get(0)) {
+                                        is CoinmarketcapCurrency -> {
+                                            val currency = (obj[0] as CoinmarketcapCurrency)
+                                            if (currency.id.toLowerCase() == "steem") {
+                                                toUSD = currency
+                                            } else {
+                                                dollarToUsd = currency
+                                            }
+                                        }
+                                        is Double -> {
+                                            balanceVest = obj as Array<Double>
+                                        }
+                                    }
+                                }
+                            }
+                            is ProfileResponse -> {
+                                profile = obj
+                            }
+                        }
                     }
-                    if (sdu.isNotEmpty()) {
-                        Storage.get().setSBDCurrency(sdu[0])
-                    }
-                    if (pr.userExtended != null) {
-                        Storage.get().setUserExtended(pr.userExtended as UserExtended)
-                    }
-                    Storage.get().setSBDCurrency(sdu[0])
-                    Log.d("NetworkRepoDef", "loadFullStartData:: combineFunction >> su = ${su[0].usdPrice}")
-                    Log.d("NetworkRepoDef", "loadFullStartData:: combineFunction >> sdu = ${sdu[0].usdPrice}")
-                    if (bv.size == 2) {
-                        Log.d("NetworkRepoDef", "loadFullStartData:: combineFunction >> bv[0] = ${bv[0]}")
-                        Log.d("NetworkRepository", "loadFullStartData:: combineFunction >> bv[1] = ${bv[1]}")
-                        Storage.get().setTotalVestingData(bv)
-                    }
-                }
-        ).timeout(30, TimeUnit.SECONDS)
+                    saveData(toUSD, dollarToUsd, profile, balanceVest)
+                })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(FullDataLoadSubscriber(callback))
-                .doOnComplete {
+                .onExceptionResumeNext {
+                    Log.d("NetworkRepository", "loadFullStartData >> onExceptionResumeNext")
+                    callback.onSuccessRequestFinish()
+                }
+                .doOnError {
+                    Log.d("NetworkRepository", "loadFullStartData >> doOnError")
+//                    callback.onSuccessRequestFinish()
+                }.doOnComplete {
                     Log.d("NetworkRepository", "loadFullStartData >> doOnComplete")
                     callback.onSuccessRequestFinish()
                 }
-                .onExceptionResumeNext({
-                    if (it is TimeoutException || it is UnknownHostException || it is ConnectException || it is SocketException || it is SocketTimeoutException) {
-                        Log.d("NetworkRepository", "loadFullStartData >> onExceptionResumeNext : ${it.onNext(null)}")
-                    }
-                })
-                .doOnError {
-                    Log.d("NetworkRepository", "loadFullStartData >> doOnError")
-                    callback.onFailureRequestFinish(it)
-                    return@doOnError
-                }.doOnNext {
-                    Log.d("NetworkRepository", "loadFullStartData >> doOnNext")
-                }
                 .subscribe()
+
+    }
+
+    fun saveData(su: CoinmarketcapCurrency, sdu: CoinmarketcapCurrency, pr: ProfileResponse, bv: Array<Double>) {
+        if (su.currencyName.isNotEmpty()) {
+            RepositoryProvider.instance.getSharedRepository().saveSteemCurrency(su)
+        }
+        if (sdu.currencyName.isNotEmpty()) {
+            RepositoryProvider.instance.getSharedRepository().saveSBDCurrency(sdu)
+        }
+        if (pr.userExtended != null) {
+            RepositoryProvider.instance.getSharedRepository().saveUserExtendedData(pr.userExtended as UserExtended)
+        }
+        Log.d("NetworkRepoDef", "loadFullStartData:: combineFunction >> su = ${su.usdPrice}")
+        Log.d("NetworkRepoDef", "loadFullStartData:: combineFunction >> sdu = ${sdu.usdPrice}")
+        if (bv.size == 2) {
+            Log.d("NetworkRepoDef", "loadFullStartData:: combineFunction >> bv[0] = ${bv[0]}")
+            Log.d("NetworkRepository", "loadFullStartData:: combineFunction >> bv[1] = ${bv[1]}")
+            RepositoryProvider.instance.getSharedRepository().saveTotalVestingData(bv)
+        }
     }
 
 
-    fun getBalanceVetstFlowable(): Flowable<Array<Double>> {
-        return Flowable.fromCallable {
+    private fun getBalanceVetstObservable(): Observable<Array<Double>> {
+        return Observable.fromCallable {
             return@fromCallable SteemWorker.get().getVestingShares()
         }
     }
 
+
+    private fun getObservableForCurrency(currencyName: String): Observable<Array<CoinmarketcapCurrency>> {
+        return getRequestsApi("https://api.coinmarketcap.com/v1/ticker/", null).loadCurrencyFor(currencyName)
+    }
+
     private fun getRequestsApi(basePoint: String, headers: Map<String, String>?): RequestsApi {
-        val localBuilder: OkHttpClient.Builder = httpClient.newBuilder()
+        val localBuilder: OkHttpClient.Builder = NetworkRepositoryDefault.httpClient.newBuilder()
         if (headers != null) {
             localBuilder.addNetworkInterceptor(HeadersInterceptor(headers))
         }
@@ -228,13 +251,5 @@ class NetworkRepositoryDefault(
                 .build()
         return retrofit.create(RequestsApi::class.java)
     }
-
-    val headersInterceptor: Interceptor = object : Interceptor {
-
-        override fun intercept(chain: Interceptor.Chain?): Response {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-        }
-    }
-
 
 }

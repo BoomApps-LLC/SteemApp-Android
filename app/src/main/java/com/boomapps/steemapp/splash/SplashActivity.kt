@@ -25,11 +25,14 @@ class SplashActivity : AppCompatActivity() {
         viewModel.getLoginState().observe(this, Observer<SplashViewModel.LoginState> { state ->
             when (state) {
                 SplashViewModel.LoginState.NO_NICK -> {
-                    goToNextScreen(SignInActivity::class.java)
+                    goToSignInScreen()
                 }
                 SplashViewModel.LoginState.LOGGED -> {
-                    goToNextScreen(MainActivity::class.java)
+                    goToMainScreen()
 
+                }
+                SplashViewModel.LoginState.LOGGED_WITHOUT_BALANCE -> {
+                    goToMainScreen(true)
                 }
                 SplashViewModel.LoginState.NO_EXT_DATA -> {
                     showNetworkErrorMessage()
@@ -49,9 +52,17 @@ class SplashActivity : AppCompatActivity() {
         })
     }
 
-    fun goToNextScreen(cls: Class<*>) {
-        val intent = Intent(this, cls)
+    private fun goToMainScreen(updateData: Boolean = false) {
+        val intent = Intent(this, MainActivity::class.java)
+        intent.putExtra(MainActivity.EXTRA_UPDATE_DATA, updateData)
         startActivity(intent)
         finish()
     }
+
+    private fun goToSignInScreen() {
+        val intent = Intent(this, SignInActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
+
 }

@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import com.boomapps.steemapp.R
 import com.boomapps.steemapp.ViewState
+import com.boomapps.steemapp.repository.Balance
 import kotlinx.android.synthetic.main.fragment_wallet.*
 
 class WalletFragment : Fragment() {
@@ -45,7 +46,10 @@ class WalletFragment : Fragment() {
             override fun onChanged(data: Balance?) {
                 if (data != null) {
                     val asString: String = data.fullBalance.toString()
-                    val intVal = asString.substringBefore(".")
+                    var intVal = asString.substringBefore(".")
+                    if (intVal.toInt() < 0) {
+                        intVal = "0"
+                    }
                     val after = asString.substringAfter(".")
                     balanceValue = arrayOf(
                             intVal,
