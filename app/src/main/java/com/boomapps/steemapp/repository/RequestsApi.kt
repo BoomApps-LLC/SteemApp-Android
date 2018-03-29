@@ -2,7 +2,7 @@ package com.boomapps.steemapp.repository
 
 import com.boomapps.steemapp.repository.currency.CoinmarketcapCurrency
 import com.boomapps.steemapp.repository.entity.profile.ProfileResponse
-import io.reactivex.Flowable
+import io.reactivex.Observable
 import retrofit2.http.GET
 import retrofit2.http.Path
 
@@ -13,9 +13,9 @@ interface RequestsApi {
 
 
     @GET("@{userExtended}.json")
-    fun loadProfileExtendedData(@Path("userExtended") user: String): Flowable<ProfileResponse>
+    fun loadProfileExtendedData(@Path("userExtended") user: String): Observable<ProfileResponse>
 
     @GET("{currency_name}")
-    fun loadCurrencyFor(@Path("currency_name") user: String): Flowable<Array<CoinmarketcapCurrency>>
+    fun loadCurrencyFor(@Path("currency_name") user: String): Observable<Array<CoinmarketcapCurrency>>
 
 }

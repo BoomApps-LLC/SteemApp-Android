@@ -3,7 +3,7 @@ package com.boomapps.steemapp.repository
 import com.boomapps.steemapp.repository.files.FilesRepository
 import com.boomapps.steemapp.repository.files.FilesRepositoryDefault
 import com.boomapps.steemapp.repository.network.NetworkRepository
-import com.boomapps.steemapp.repository.network.NetworkRepositoryDefault
+import com.boomapps.steemapp.repository.network.NetworkRepositoryDeafult
 import com.boomapps.steemapp.repository.preferences.SharedRepository
 import com.boomapps.steemapp.repository.preferences.SharedRepositoryDefault
 
@@ -16,7 +16,7 @@ class RepositoryProvider {
         val instance = RepositoryProvider()
     }
 
-    private var networkRepository: NetworkRepository = NetworkRepositoryDefault()
+    private var networkRepository: NetworkRepository = NetworkRepositoryDeafult()
     private var sharedRepository: SharedRepository = SharedRepositoryDefault()
     private var filesRepository: FilesRepository = FilesRepositoryDefault()
 

@@ -7,7 +7,6 @@ import com.boomapps.steemapp.BaseViewModel
 import com.boomapps.steemapp.repository.RepositoryProvider
 import com.boomapps.steemapp.repository.SteemWorker
 import com.boomapps.steemapp.repository.network.NetworkRepository
-import com.boomapps.steemapp.repository.network.NetworkRepositoryDefault
 import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -65,11 +64,11 @@ class SplashViewModel : BaseViewModel() {
                 }
                 .doOnComplete {
                     Log.d("SplashViewModel", "doOnComplete")
-//                    if (loginState.value != LoginState.NO_EXT_DATA) {
-//                        loadFullAdditionalData(userData.nickname!!)
-//                    }
-                    // TEST
-                    loadTestFullAdditionalData(userData.nickname!!)
+                    if (loginState.value != LoginState.NO_EXT_DATA) {
+                        loadFullAdditionalData(userData.nickname!!)
+                    }
+//                    // TEST
+//                    loadTestFullAdditionalData(userData.nickname!!)
                 }
                 .doOnError {
                     Log.d("SplashViewModel", "doOnError")
@@ -100,7 +99,7 @@ class SplashViewModel : BaseViewModel() {
 
     private fun loadTestFullAdditionalData(nick: String) {
 
-        (RepositoryProvider.instance.getNetworkRepository() as NetworkRepositoryDefault).testFullDataLoading(nick, object : NetworkRepository.OnRequestFinishCallback {
+        RepositoryProvider.instance.getNetworkRepository().loadFullStartData(nick, object : NetworkRepository.OnRequestFinishCallback {
 
             override fun onSuccessRequestFinish() {
                 if (loginState.value != LoginState.LOGGED) {
