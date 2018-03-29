@@ -24,6 +24,7 @@ class MainActivity : BaseActivity() {
     private val FRAGMENT_PROFILE_TAG = "profile"
 
     companion object {
+        val EXTRA_UPDATE_DATA = "update_data"
         val TAG = MainActivity::class.java.simpleName
     }
 
@@ -56,9 +57,12 @@ class MainActivity : BaseActivity() {
 
     lateinit var viewModel: MainViewModel
 
+    var updateData: Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_bn)
+        updateData = intent.getBooleanExtra(EXTRA_UPDATE_DATA, false)
         viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
         viewModel.state.observe(this, object : Observer<ViewState> {
             override fun onChanged(t: ViewState?) {
@@ -141,4 +145,12 @@ class MainActivity : BaseActivity() {
         finish()
     }
 
+    override fun onStart() {
+        super.onStart()
+        if (updateData) {
+            updateData = false
+            viewModel.updateData()
+        }
+
+    }
 }

@@ -3,9 +3,9 @@ package com.boomapps.steemapp.repository.network
 import android.net.Uri
 import android.util.Log
 import com.boomapps.steemapp.repository.HeadersInterceptor
+import com.boomapps.steemapp.repository.RepositoryProvider
 import com.boomapps.steemapp.repository.RequestsApi
 import com.boomapps.steemapp.repository.SteemWorker
-import com.boomapps.steemapp.repository.Storage
 import com.boomapps.steemapp.repository.currency.CoinmarketcapCurrency
 import com.boomapps.steemapp.repository.entity.UserDataEntity
 import com.boomapps.steemapp.repository.entity.profile.ProfileMetadataDeserializer
@@ -26,16 +26,16 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.net.URL
 import java.util.concurrent.TimeUnit
 
-class NetworkRepositoryDeafult : NetworkRepository {
+class NetworkRepositoryDefault : NetworkRepository {
 
     override var extendedProfileResponse: ProfileResponse? = null
     override var coinmarketcapCurrency: CoinmarketcapCurrency? = null
     override var lastUploadedPhotoUrl: URL? = null
 
     companion object {
-        var instance: NetworkRepositoryDeafult = NetworkRepositoryDeafult()
+        var instance: NetworkRepositoryDefault = NetworkRepositoryDefault()
         lateinit var httpClient: OkHttpClient
-        fun get(): NetworkRepositoryDeafult {
+        fun get(): NetworkRepositoryDefault {
             return instance
         }
     }
@@ -62,7 +62,7 @@ class NetworkRepositoryDeafult : NetworkRepository {
                 };
             }
         })
-        NetworkRepositoryDeafult.httpClient = httpClientBuilder.build()
+        NetworkRepositoryDefault.httpClient = httpClientBuilder.build()
     }
 
 
@@ -200,21 +200,20 @@ class NetworkRepositoryDeafult : NetworkRepository {
 
     fun saveData(su: CoinmarketcapCurrency, sdu: CoinmarketcapCurrency, pr: ProfileResponse, bv: Array<Double>) {
         if (su.currencyName.isNotEmpty()) {
-            Storage.get().setSteemCurrency(su)
+            RepositoryProvider.instance.getSharedRepository().saveSteemCurrency(su)
         }
         if (sdu.currencyName.isNotEmpty()) {
-            Storage.get().setSBDCurrency(sdu)
+            RepositoryProvider.instance.getSharedRepository().saveSBDCurrency(sdu)
         }
         if (pr.userExtended != null) {
-            Storage.get().setUserExtended(pr.userExtended as UserExtended)
+            RepositoryProvider.instance.getSharedRepository().saveUserExtendedData(pr.userExtended as UserExtended)
         }
-        Storage.get().setSBDCurrency(sdu)
         Log.d("NetworkRepoDef", "loadFullStartData:: combineFunction >> su = ${su.usdPrice}")
         Log.d("NetworkRepoDef", "loadFullStartData:: combineFunction >> sdu = ${sdu.usdPrice}")
         if (bv.size == 2) {
             Log.d("NetworkRepoDef", "loadFullStartData:: combineFunction >> bv[0] = ${bv[0]}")
             Log.d("NetworkRepository", "loadFullStartData:: combineFunction >> bv[1] = ${bv[1]}")
-            Storage.get().setTotalVestingData(bv)
+            RepositoryProvider.instance.getSharedRepository().saveTotalVestingData(bv)
         }
     }
 
@@ -231,7 +230,7 @@ class NetworkRepositoryDeafult : NetworkRepository {
     }
 
     private fun getRequestsApi(basePoint: String, headers: Map<String, String>?): RequestsApi {
-        val localBuilder: OkHttpClient.Builder = NetworkRepositoryDeafult.httpClient.newBuilder()
+        val localBuilder: OkHttpClient.Builder = NetworkRepositoryDefault.httpClient.newBuilder()
         if (headers != null) {
             localBuilder.addNetworkInterceptor(HeadersInterceptor(headers))
         }
