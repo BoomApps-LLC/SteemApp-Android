@@ -12,6 +12,7 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.View
 import android.widget.EditText
 import android.widget.Toast
 import com.boomapps.steemapp.BaseActivity
@@ -124,14 +125,21 @@ class SignInActivity : BaseActivity() {
             startActivity(intent)
         })
 
-        qreaderStartButton.setOnClickListener({
-            val sr = RepositoryProvider.instance.getSharedRepository()
-            if (sr.isFirstLaunch()) {
-                openLocalHelpScreen()
-                sr.setFirstLaunchState(false)
-            } else {
-                openBarCodeReadScreen()
+        val sr = RepositoryProvider.instance.getSharedRepository()
+        if (sr.isFirstLaunch()) {
+            signInInputPostingKey.onFocusChangeListener = object : View.OnFocusChangeListener {
+                override fun onFocusChange(v: View?, hasFocus: Boolean) {
+                    if (hasFocus) {
+                        signInInputPostingKey.onFocusChangeListener = null
+                        sr.setFirstLaunchState(false)
+                        openLocalHelpScreen()
+                    }
+                }
             }
+        }
+
+        qreaderStartButton.setOnClickListener({
+            openBarCodeReadScreen()
         })
 
         signInInfo.setOnClickListener({
