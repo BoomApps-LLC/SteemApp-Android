@@ -9,8 +9,11 @@ import android.widget.Button
 import com.boomapps.steemapp.BaseActivity
 import com.boomapps.steemapp.R
 import com.boomapps.steemapp.barcode.PointsOverlayView
+import com.boomapps.steemapp.help.HelpActivity
+import com.boomapps.steemapp.repository.RepositoryProvider
 import com.dlazaro66.qrcodereaderview.QRCodeReaderView
 import kotlinx.android.synthetic.main.activity_input_new_key.*
+import kotlinx.android.synthetic.main.activity_signin.*
 
 /**
  * Created by vgrechikha on 14.03.2018.
@@ -24,6 +27,15 @@ class InputNewPostingKeyActivity : BaseActivity(), QRCodeReaderView.OnQRCodeRead
         aNewKey_qreaderStartButton.setOnClickListener { _ ->
             enableQRreader()
         }
+
+        qrInInfo.setOnClickListener({
+            openLocalHelpScreen()
+            RepositoryProvider.instance.getSharedRepository().setFirstLaunchState(false)
+        })
+    }
+
+    private fun openLocalHelpScreen() {
+        startActivity(Intent(this, HelpActivity::class.java))
     }
 
     private fun enableQRreader() {
@@ -38,9 +50,6 @@ class InputNewPostingKeyActivity : BaseActivity(), QRCodeReaderView.OnQRCodeRead
 
         // Use this function to enable/disable Torch
         aNewKey_qrdecoderview.setTorchEnabled(false);
-
-        // Use this function to set front camera preview
-//        qrCodeReaderView?.setFrontCamera();
 
         // Use this function to set back camera preview
         aNewKey_qrdecoderview.setBackCamera();
