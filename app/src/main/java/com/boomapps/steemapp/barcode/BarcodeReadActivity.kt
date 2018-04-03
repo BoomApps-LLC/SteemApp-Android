@@ -9,7 +9,10 @@ import android.support.v7.app.AppCompatActivity
 import android.widget.Button
 import android.widget.TextView
 import com.boomapps.steemapp.R
+import com.boomapps.steemapp.help.HelpActivity
+import com.boomapps.steemapp.repository.RepositoryProvider
 import com.dlazaro66.qrcodereaderview.QRCodeReaderView
+import kotlinx.android.synthetic.main.activity_input_new_key.*
 
 
 /**
@@ -49,6 +52,15 @@ class BarcodeReadActivity : AppCompatActivity(), QRCodeReaderView.OnQRCodeReadLi
         findViewById<Button>(R.id.buttonReturnResult).setOnClickListener({
             onBackPressed()
         })
+
+        qrInInfo.setOnClickListener({
+            openLocalHelpScreen()
+            RepositoryProvider.instance.getSharedRepository().setFirstLaunchState(false)
+        })
+    }
+
+    private fun openLocalHelpScreen() {
+        startActivity(Intent(this, HelpActivity::class.java))
     }
 
     override fun onBackPressed() {

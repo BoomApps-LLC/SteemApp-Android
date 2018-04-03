@@ -107,33 +107,6 @@ class MainViewModel : BaseViewModel() {
             return
         }
         updateData()
-
-//        state.value = ViewState.PROGRESS
-//        if (userData.value?.nickname.isNullOrEmpty()) {
-//            userData.value = RepositoryProvider.instance.getSharedRepository().loadUserData()
-//        }
-//        val nickName = userData.value?.nickname
-//        if (nickName.isNullOrEmpty()) {
-//            // nick is needed for data loading
-//            stringError = "can't find any login"
-//            state.value = ViewState.FAULT_RESULT
-//            return
-//        } else {
-//            RepositoryProvider.instance.getNetworkRepository().loadFullStartData(userData.value?.nickname!!, object : NetworkRepository.OnRequestFinishCallback {
-//
-//                override fun onSuccessRequestFinish() {
-//                    balanceData.value = RepositoryProvider.instance.getSharedRepository().loadBalance()
-//                    state.value = ViewState.SUCCESS_RESULT
-//                }
-//
-//                override fun onFailureRequestFinish(throwable: Throwable) {
-//
-//                    state.value = ViewState.FAULT_RESULT
-//                }
-//            })
-//
-//
-//        }
     }
 
     @Volatile
