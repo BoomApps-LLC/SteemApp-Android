@@ -21,7 +21,7 @@ interface SharedRepository {
 
     fun saveBalanceData(balance: Balance?)
 
-    fun loadBalance(recalculate : Boolean): Balance
+    fun loadBalance(recalculate: Boolean): Balance
 
     fun saveStoryData(storyInstance: StoryInstance)
 
@@ -33,16 +33,24 @@ interface SharedRepository {
 
     fun isFirstLaunch(): Boolean
 
-    fun setFirstLaunchState(isFirst : Boolean)
+    fun setFirstLaunchState(isFirst: Boolean)
 
-    fun  saveSteemCurrency(currency : CoinmarketcapCurrency)
+    fun saveSteemCurrency(currency: CoinmarketcapCurrency)
 
-    fun saveSBDCurrency(currency : CoinmarketcapCurrency)
+    fun saveSBDCurrency(currency: CoinmarketcapCurrency)
 
-    fun saveUserExtendedData(data : UserExtended)
+    fun saveUserExtendedData(data: UserExtended)
 
-    fun saveTotalVestingData(data : Array<Double>)
+    fun saveTotalVestingData(data: Array<Double>)
 
     fun clearAllData()
+
+    fun saveSuccessfulPostingNumber(num: Int)
+
+    fun loadSuccessfulPostingNumber(): Int
+
+    fun saveVotingState(isRejected: Boolean)
+
+    fun loadVotingState(): Boolean
 
 }

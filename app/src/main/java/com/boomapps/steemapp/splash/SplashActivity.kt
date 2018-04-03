@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity
 import com.boomapps.steemapp.R
 import com.boomapps.steemapp.controls.WarningDialog
 import com.boomapps.steemapp.main.MainActivity
+import com.boomapps.steemapp.repository.RepositoryProvider
 import com.boomapps.steemapp.signin.SignInActivity
 
 /**
@@ -42,6 +43,12 @@ class SplashActivity : AppCompatActivity() {
                 }
             }
         })
+        // TODO remove after testing
+//        if (BuidConfig.TEST_VOTE) {
+//            val repo = RepositoryProvider.instance.getSharedRepository()
+//            repo.saveSuccessfulPostingNumber(0)
+//            repo.saveVotingState(true)
+//        }
     }
 
     private fun showNetworkErrorMessage() {

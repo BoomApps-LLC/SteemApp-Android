@@ -82,4 +82,8 @@ Do you want to enter correct key and try to post again?</string>
     <string name="onboarding_btn_next">Next</string>
     <string name="onboarding_btn_done">Done</string>
 
+    <!-- VOTE DIALOG -->
+    <string name="d_vote_message">Like this App?\nVote for Witness!</string>
+    <string name="d_vote_btn_vote">Vote</string>
+
 </resources>

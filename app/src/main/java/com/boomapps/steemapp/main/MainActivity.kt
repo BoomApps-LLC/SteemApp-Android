@@ -3,7 +3,9 @@ package com.boomapps.steemapp.main
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.Fragment
 import android.util.Log
@@ -15,6 +17,7 @@ import com.boomapps.steemapp.main.MainViewModel.Companion.TAB_EDIT
 import com.boomapps.steemapp.main.MainViewModel.Companion.TAB_PROFILE
 import com.boomapps.steemapp.main.MainViewModel.Companion.TAB_WALLET
 import com.boomapps.steemapp.signin.SignInActivity
+import com.boomapps.steemapp.votedialog.VoteDialog
 import kotlinx.android.synthetic.main.activity_main_bn.*
 
 class MainActivity : BaseActivity() {
@@ -151,6 +154,26 @@ class MainActivity : BaseActivity() {
             updateData = false
             viewModel.updateData()
         }
+        Handler().postDelayed({ showVoteDialog() }, 1000)
+    }
 
+    private fun showVoteDialog() {
+        if (!viewModel.shouldShowVoteDialog()) {
+            return
+        }
+        val voteDialog: android.app.DialogFragment = VoteDialog.newInstance(object : VoteDialog.OnVoteInteractListener {
+
+            override fun onCloseClick() {
+                viewModel.updateVotingState(true)
+            }
+
+            override fun onVoteClick() {
+                // TODO increment voting counter
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://steemconnect.com/sign/account-witness-vote?witness=yuriks2000&approve=1"))
+                startActivity(intent)
+                viewModel.updateVotingState(false)
+            }
+        })
+        voteDialog.show(fragmentManager, VoteDialog.TAG)
     }
 }

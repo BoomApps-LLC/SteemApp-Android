@@ -11,6 +11,7 @@ import android.content.Intent
 import android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.PersistableBundle
@@ -28,6 +29,7 @@ import com.boomapps.steemapp.controls.PostingSuccessDialog
 import com.boomapps.steemapp.controls.WarningDialog
 import com.boomapps.steemapp.editor.inputpostingkey.InputNewPostingKeyActivity
 import com.boomapps.steemapp.editor.tabs.*
+import com.boomapps.steemapp.repository.RepositoryProvider
 import kotlinx.android.synthetic.main.activity_editor.*
 
 
@@ -168,6 +170,13 @@ class EditorActivity : BaseActivity() {
                 }
             }
         })
+
+        // TODO remove after testing
+//        if (BuildConfig.TEST_VOTE) {
+//            val repo = RepositoryProvider.instance.getSharedRepository()
+//            val oldNum = repo.loadSuccessfulPostingNumber()
+//            repo.saveSuccessfulPostingNumber(oldNum + 1)
+//        }
     }
 
     private fun setActiveTab(position: Int) {

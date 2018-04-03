@@ -28,6 +28,8 @@ class MainViewModel : BaseViewModel() {
 
     var balanceData: MutableLiveData<Balance> = MutableLiveData()
 
+    var successfulPostingNumber: Int = -1
+
 
     fun getUserProfile(): MutableLiveData<UserData> {
         if (userData.value == null) {
@@ -143,6 +145,19 @@ class MainViewModel : BaseViewModel() {
 
             }
         })
+    }
+
+    fun shouldShowVoteDialog(): Boolean {
+        successfulPostingNumber = RepositoryProvider.instance.getSharedRepository().loadSuccessfulPostingNumber()
+        if (successfulPostingNumber == 1 || successfulPostingNumber == 3) {
+            return RepositoryProvider.instance.getSharedRepository().loadVotingState() // was rejected -> to show
+        } else {
+            return false
+        }
+    }
+
+    fun updateVotingState(isRejected: Boolean) {
+        RepositoryProvider.instance.getSharedRepository().saveVotingState(isRejected)
     }
 
 }

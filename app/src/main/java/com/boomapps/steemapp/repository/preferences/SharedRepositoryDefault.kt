@@ -222,6 +222,27 @@ class SharedRepositoryDefault : SharedRepository {
         editor.apply()
     }
 
+    override fun saveSuccessfulPostingNumber(num: Int) {
+        val editor = getSharedPreferencesEditor()
+        editor.putInt("SuccessfulPostingNumber", num)
+        editor.apply()
+    }
+
+    override fun loadSuccessfulPostingNumber(): Int {
+        val prefs = getReadableSharedPreferences()
+        return prefs.getInt("SuccessfulPostingNumber", 0)
+    }
+
+    override fun saveVotingState(isRejected: Boolean) {
+        val editor = getSharedPreferencesEditor()
+        editor.putBoolean("voting_rejected", isRejected)
+        editor.apply()
+    }
+
+    override fun loadVotingState(): Boolean {
+        val prefs = getReadableSharedPreferences()
+        return prefs.getBoolean("voting_rejected", true)
+    }
 
     override fun saveSteemCurrency(currency: CoinmarketcapCurrency) {
         storage.setSteemCurrency(currency)
@@ -246,4 +267,6 @@ class SharedRepositoryDefault : SharedRepository {
         balanceHelper = BalanceHelper(Balance())
         saveUserData(UserData(null, null, null, null))
     }
+
+
 }

@@ -37,7 +37,6 @@ class EditorViewModel : BaseViewModel() {
     var postingDelay: Long = 0L
 
 
-
     companion object {
         val SUCCESS_IMAGE_UPLOAD = 1111
         val SUCCESS_STORY_UPLOAD = 2222
@@ -47,7 +46,6 @@ class EditorViewModel : BaseViewModel() {
         saveStoryData()
         super.onCleared()
     }
-
 
 
     fun addNewCategory(category: CategoryItem) {
@@ -189,25 +187,30 @@ class EditorViewModel : BaseViewModel() {
                 }
         RepositoryProvider.instance.getNetworkRepository().postStory(title, story, getCategoriesName(), "", rewardsPercent, upvoteState, object : NetworkRepository.OnRequestFinishCallback {
             override fun onSuccessRequestFinish() {
-                successCode = SUCCESS_STORY_UPLOAD
-                state.value = ViewState.SUCCESS_RESULT
+                val repo = RepositoryProvider.instance.getSharedRepository()
+                repo.saveLastTimePosting(lastPostingTime)
+                val oldNum = repo.loadSuccessfulPostingNumber()
+                repo.saveSuccessfulPostingNumber(oldNum + 1)
                 title = ""
                 story = ""
                 categories.clear()
                 saveStoryData()
                 lastPostingTime = System.currentTimeMillis()
-                RepositoryProvider.instance.getSharedRepository().saveLastTimePosting(lastPostingTime)
+
+                successCode = SUCCESS_STORY_UPLOAD
+                state.value = ViewState.SUCCESS_RESULT
             }
 
             override fun onFailureRequestFinish(throwable: Throwable) {
+                saveStoryData()
+
                 Log.d("EditorActivity", "can't post story >> " + throwable.localizedMessage)
                 stringError = throwable.localizedMessage
                 state.value = ViewState.FAULT_RESULT
-                saveStoryData()
+
             }
         })
     }
-
 
 
     fun saveStoryData() {

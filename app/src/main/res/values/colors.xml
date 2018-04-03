@@ -13,6 +13,7 @@
     <color name="grey_secondary">#eaeeec</color>
     <color name="grey_third">#33ffffff</color>
     <color name="green_active">#51EDBB</color>
+    <color name="green_pressed">#13FFCD</color>
     <color name="white">#ffffff</color>
 
 
