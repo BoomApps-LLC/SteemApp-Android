@@ -139,7 +139,6 @@ class EditorActivity : BaseActivity() {
             }
 
             override fun onPageSelected(position: Int) {
-                if (position != 0 && viewModel.activeTab == position) return
                 viewModel.activeTab = position
                 Log.d("onPageChangeLoader", "onPageSelected(${position})")
                 setActiveTab(position)
@@ -169,8 +168,6 @@ class EditorActivity : BaseActivity() {
                 }
             }
         })
-        viewPager.currentItem = viewModel.activeTab
-        setActiveTab(viewModel.activeTab)
     }
 
     private fun setActiveTab(position: Int) {
