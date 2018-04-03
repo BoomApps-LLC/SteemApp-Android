@@ -139,24 +139,9 @@ class EditorActivity : BaseActivity() {
             }
 
             override fun onPageSelected(position: Int) {
-                if (position != 0 && viewModel.activeTab == position) return
                 viewModel.activeTab = position
                 Log.d("onPageChangeLoader", "onPageSelected(${position})")
-                when (position) {
-                    0 -> {
-                        setUIforTitleTab()
-                    }
-                    1 -> {
-                        setUIforStoryTab()
-                    }
-                    2 -> {
-                        setUIforTagsTab()
-                    }
-                    3 -> {
-                        setUIfor3rdTab()
-                    }
-                }
-
+                setActiveTab(position)
             }
         })
         actionButtonTopRight.setOnClickListener({
@@ -175,8 +160,6 @@ class EditorActivity : BaseActivity() {
 
         actionButtonTopLeft.setOnClickListener(onBackClickListener)
         actionButtonTopLeftTitle.setOnClickListener(onBackClickListener)
-
-        Handler().postDelayed({ viewPager.currentItem = viewModel.activeTab }, 300)
         viewPager.addOnLayoutChangeListener(object : View.OnLayoutChangeListener {
             override fun onLayoutChange(v: View?, left: Int, top: Int, right: Int, bottom: Int, oldLeft: Int, oldTop: Int, oldRight: Int, oldBottom: Int) {
                 if (bottom - top > 0) {
@@ -185,6 +168,24 @@ class EditorActivity : BaseActivity() {
                 }
             }
         })
+    }
+
+    private fun setActiveTab(position: Int) {
+        Log.d("setActiveTab", "setActiveTab(${position})")
+        when (position) {
+            0 -> {
+                setUIforTitleTab()
+            }
+            1 -> {
+                setUIforStoryTab()
+            }
+            2 -> {
+                setUIforTagsTab()
+            }
+            3 -> {
+                setUIfor3rdTab()
+            }
+        }
     }
 
 
