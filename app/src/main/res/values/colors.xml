@@ -38,8 +38,7 @@
     <color name="onboarding_dot_color_inactive">#FFA5A5A5</color>
 
     <color name="bckg_btn_login_enable">#51EDBB</color>
-
-
+    <color name="black">#000</color>
 
 
 </resources>

@@ -73,11 +73,11 @@ Do you want to enter correct key and try to post again?</string>
 
     <!--  ONBOARDING -->
     <string name="onboarding_title">A Quick Guide to Log In</string>
-    <string name="onboarding_message_1">Go to the Tab of <b>My Wallet</b></string>
-    <string name="onboarding_message_2">Then Select Tab <b>Permissions</b></string>
-    <string name="onboarding_message_3">Tap <b>Show Private Key</b></string>
-    <string name="onboarding_message_4">The posting key must begin with <b>5</b></string>
-    <string name="onboarding_message_5">Click on the <b>QR Code icon</b>b><strong>5</strong></string>
+    <string name="onboarding_message_1">Go to <b>My Wallet</b> tab</string>
+    <string name="onboarding_message_2">Then Select <b>Permissions</b> Tab</string>
+    <string name="onboarding_message_3">Tap on <b>Show Private Key</b></string>
+    <string name="onboarding_message_4">The posting key must begin with a <b>5</b></string>
+    <string name="onboarding_message_5">Click on the <b>QR Code icon</b></string>
     <string name="onboarding_btn_skip">Skip</string>
     <string name="onboarding_btn_next">Next</string>
     <string name="onboarding_btn_done">Done</string>

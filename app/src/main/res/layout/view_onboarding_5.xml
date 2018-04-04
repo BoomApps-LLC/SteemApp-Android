@@ -31,7 +31,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
         android:gravity="center_horizontal"
-        android:text="@string/onboarding_message_4"
+        android:text="@string/onboarding_message_5"
         android:textColor="@color/white"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
