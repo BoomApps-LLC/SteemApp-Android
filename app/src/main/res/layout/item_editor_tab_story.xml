@@ -17,7 +17,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-
     <HorizontalScrollView
         android:id="@+id/editor_toolbar_sv"
         android:layout_width="0dp"
@@ -83,7 +82,6 @@
                 android:contentDescription="@null"
                 android:padding="@dimen/toolbar_item_padding"
                 android:src="@drawable/ic_format_underlined" />
-
 
             <ImageButton
                 android:id="@+id/actionTextTypeStrikethrough"
@@ -184,7 +182,6 @@
             <!--android:padding="@dimen/toolbar_item_padding"-->
             <!--android:src="@drawable/ic_format_color_fill" />-->
 
-
             <ImageButton
                 android:id="@+id/actionAddBulletList"
                 android:layout_width="48dp"
@@ -193,7 +190,6 @@
                 android:contentDescription="@null"
                 android:padding="@dimen/toolbar_item_padding"
                 android:src="@drawable/ic_format_list_bulleted" />
-
 
             <ImageButton
                 android:id="@+id/actionAddNumberedList"
@@ -204,16 +200,15 @@
                 android:padding="@dimen/toolbar_item_padding"
                 android:src="@drawable/ic_format_list_numbered" />
 
-
             <ImageButton
                 android:id="@+id/actionAddQuote"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:contentDescription="@null"
+                android:visibility="gone"
                 android:padding="@dimen/toolbar_item_padding"
                 android:src="@drawable/ic_format_quote" />
-
 
             <!--<ImageButton-->
             <!--android:id="@+id/actionAlignLeft"-->
@@ -224,7 +219,6 @@
             <!--android:padding="@dimen/toolbar_item_padding"-->
             <!--android:src="@drawable/ic_format_align_left" />-->
 
-
             <!--<ImageButton-->
             <!--android:id="@+id/actionAlignCenter"-->
             <!--android:layout_width="48dp"-->
@@ -233,7 +227,6 @@
             <!--android:contentDescription="@null"-->
             <!--android:padding="@dimen/toolbar_item_padding"-->
             <!--android:src="@drawable/ic_format_align_center" />-->
-
 
             <!--<ImageButton-->
             <!--android:id="@+id/actionAlignRight"-->
@@ -244,7 +237,6 @@
             <!--android:padding="@dimen/toolbar_item_padding"-->
             <!--android:src="@drawable/ic_format_align_right" />-->
 
-
             <ImageButton
                 android:id="@+id/actionInsertLine"
                 android:layout_width="48dp"
@@ -254,7 +246,6 @@
                 android:padding="@dimen/toolbar_item_padding"
                 android:src="@drawable/ic_insert_line" />
 
-
             <!--<ImageButton-->
             <!--android:id="@+id/actionAddIndent"-->
             <!--android:layout_width="48dp"-->
@@ -263,7 +254,6 @@
             <!--android:contentDescription="@null"-->
             <!--android:padding="@dimen/toolbar_item_padding"-->
             <!--android:src="@drawable/ic_format_indent_increase" />-->
-
 
             <!--<ImageButton-->
             <!--android:id="@+id/actionAddOutdent"-->
@@ -299,13 +289,14 @@
                 android:background="?android:attr/selectableItemBackground"
                 android:contentDescription="@null"
                 android:padding="@dimen/toolbar_item_padding"
+                android:visibility="gone"
                 android:src="@drawable/ic_clear" />
         </LinearLayout>
     </HorizontalScrollView>
 
     <View
         android:id="@+id/shadow_list"
-        android:layout_width="24dp"
+        android:layout_width="36dp"
         android:layout_height="0dp"
         android:background="@drawable/bg_shadow"
         app:layout_constraintBottom_toBottomOf="@+id/editor_toolbar_sv"
