@@ -61,10 +61,10 @@ class PostingTab(view: View, tabListener: TabListener, viewModel: EditorViewMode
 
     override fun onShow() {
         Log.d("PostingTab", "onShow")
-        if (viewModel.postingDelay > 0) {
-            postButton.postDelayed({
+        if (viewModel.getDelay() > 0) {
+//            postButton.postDelayed({
                 startTimer(viewModel.postingDelay)
-            }, 500)
+//            }, 500)
         }
     }
 
@@ -125,6 +125,7 @@ class PostingTab(view: View, tabListener: TabListener, viewModel: EditorViewMode
 
             override fun onFinish() {
                 setPostButtonReady()
+                viewModel.postingDelay = -1
                 timer = null
             }
 
@@ -132,7 +133,14 @@ class PostingTab(view: View, tabListener: TabListener, viewModel: EditorViewMode
                 val secs = (millisUntilFinished / 1000).toInt()
                 val mins: Int = secs / 60
                 val restSecs = secs - mins * 60
-                setPostButtonUnready(postButton.context.getString(R.string.btn_posting_timer, mins, restSecs))
+                setPostButtonUnready(
+                        postButton.context.getString(R.string.btn_posting_timer,
+                                mins,
+                                if (restSecs < 10) {
+                                    "0$restSecs"
+                                } else {
+                                    "$restSecs"
+                                }))
             }
         }
         timer?.start()

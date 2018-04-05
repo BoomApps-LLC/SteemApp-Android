@@ -62,6 +62,7 @@ class SplashActivity : AppCompatActivity() {
     private fun goToMainScreen(updateData: Boolean = false) {
         val intent = Intent(this, MainActivity::class.java)
         intent.putExtra(MainActivity.EXTRA_UPDATE_DATA, updateData)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
         finish()
     }

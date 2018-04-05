@@ -68,7 +68,7 @@
     <string name="warning_wrong_postingKey_message">Posting was saved, but not published due to INVALID PRIVATE POSTING KEY error.
 Do you want to enter correct key and try to post again?</string>
     <string name="btn_posting_default">POST</string>
-    <string name="btn_posting_timer">POST available after    %1$d:%2$d</string>
+    <string name="btn_posting_timer">POST available after    %1$d:%2$s</string>
     <string name="d_publish_success_message">Your article was successfully\npublished</string>
 
     <!--  ONBOARDING -->

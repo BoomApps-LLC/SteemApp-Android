@@ -4,6 +4,7 @@ import com.boomapps.steemapp.UserData
 import com.boomapps.steemapp.repository.Balance
 import com.boomapps.steemapp.repository.StoryInstance
 import com.boomapps.steemapp.repository.currency.CoinmarketcapCurrency
+import com.boomapps.steemapp.repository.entity.VoteState
 import com.boomapps.steemapp.repository.entity.profile.UserExtended
 
 /**
@@ -49,8 +50,8 @@ interface SharedRepository {
 
     fun loadSuccessfulPostingNumber(): Int
 
-    fun saveVotingState(isRejected: Boolean)
+    fun saveVotingState(state: VoteState)
 
-    fun loadVotingState(): Boolean
+    fun loadVotingState(): VoteState
 
 }

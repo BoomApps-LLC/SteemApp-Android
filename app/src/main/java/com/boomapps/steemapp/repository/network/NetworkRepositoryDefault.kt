@@ -96,7 +96,6 @@ class NetworkRepositoryDefault : NetworkRepository {
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext {
                     Log.d("uploadNewPhoto", "doOnNext: ${it.toString()}")
-                    // TODO check nullable url
                     lastUploadedPhotoUrl = it
                 }
                 .doOnComplete {

@@ -11,6 +11,7 @@ import com.boomapps.steemapp.getMatColor
 import com.boomapps.steemapp.repository.Balance
 import com.boomapps.steemapp.repository.StoryInstance
 import com.boomapps.steemapp.repository.currency.CoinmarketcapCurrency
+import com.boomapps.steemapp.repository.entity.VoteState
 import com.boomapps.steemapp.repository.entity.profile.UserExtended
 import com.boomapps.steemapp.utils.Crypto
 import com.boomapps.steemapp.utils.SettingsRepository
@@ -233,15 +234,15 @@ class SharedRepositoryDefault : SharedRepository {
         return prefs.getInt("SuccessfulPostingNumber", 0)
     }
 
-    override fun saveVotingState(isRejected: Boolean) {
+    override fun saveVotingState(state: VoteState) {
         val editor = getSharedPreferencesEditor()
-        editor.putBoolean("voting_rejected", isRejected)
+        editor.putInt("voting_rejected", state.ordinal)
         editor.apply()
     }
 
-    override fun loadVotingState(): Boolean {
+    override fun loadVotingState(): VoteState {
         val prefs = getReadableSharedPreferences()
-        return prefs.getBoolean("voting_rejected", true)
+        return VoteState.values().get(prefs.getInt("voting_rejected", 0))
     }
 
     override fun saveSteemCurrency(currency: CoinmarketcapCurrency) {

@@ -167,16 +167,7 @@ class EditorViewModel : BaseViewModel() {
         return true
     }
 
-//    var testAttempt = 0
-
     fun publishStory() {
-//        if (testAttempt == 0) {
-//            testAttempt = 1
-//            stringError = "private posting key"
-//            state.value = ViewState.FAULT_RESULT
-//            saveStoryData()
-//            return
-//        }
         state.value = ViewState.PROGRESS
         val rewardsPercent: Short =
                 when (rewardPosition) {
@@ -185,20 +176,10 @@ class EditorViewModel : BaseViewModel() {
                     2 -> 0
                     else -> 30000
                 }
+
         RepositoryProvider.instance.getNetworkRepository().postStory(title, story, getCategoriesName(), "", rewardsPercent, upvoteState, object : NetworkRepository.OnRequestFinishCallback {
             override fun onSuccessRequestFinish() {
-                val repo = RepositoryProvider.instance.getSharedRepository()
-                repo.saveLastTimePosting(lastPostingTime)
-                val oldNum = repo.loadSuccessfulPostingNumber()
-                repo.saveSuccessfulPostingNumber(oldNum + 1)
-                title = ""
-                story = ""
-                categories.clear()
-                saveStoryData()
-                lastPostingTime = System.currentTimeMillis()
-
-                successCode = SUCCESS_STORY_UPLOAD
-                state.value = ViewState.SUCCESS_RESULT
+                processSuccessPosting()
             }
 
             override fun onFailureRequestFinish(throwable: Throwable) {
@@ -210,6 +191,20 @@ class EditorViewModel : BaseViewModel() {
 
             }
         })
+    }
+
+    private fun processSuccessPosting() {
+        lastPostingTime = System.currentTimeMillis()
+        val repo = RepositoryProvider.instance.getSharedRepository()
+        repo.saveLastTimePosting(lastPostingTime)
+        val oldNum = repo.loadSuccessfulPostingNumber()
+        repo.saveSuccessfulPostingNumber(oldNum + 1)
+        title = ""
+        story = ""
+        categories.clear()
+        saveStoryData()
+        successCode = SUCCESS_STORY_UPLOAD
+        state.value = ViewState.SUCCESS_RESULT
     }
 
 
@@ -244,11 +239,23 @@ class EditorViewModel : BaseViewModel() {
             categories.addAll(storyData.categories)
         }
         lastPostingTime = RepositoryProvider.instance.getSharedRepository().loadLastTimePosting()
+        getDelay()
+    }
+
+    fun getDelay() : Long{
         postingDelay = if (lastPostingTime == 0L) {
             0L
         } else {
-            Math.max(0L, System.currentTimeMillis() - lastPostingTime)
+            val tDelay = System.currentTimeMillis() - lastPostingTime
+            Log.d("EditorViewModel", "currentTime=${System.currentTimeMillis()} && lastPostingTime=${lastPostingTime} && tDelay=$tDelay")
+            if (tDelay > 5 * 60 * 1000) {
+                RepositoryProvider.instance.getSharedRepository().saveLastTimePosting(0L)
+                0L
+            } else {
+                5 * 60 * 1000 - tDelay
+            }
         }
+        return postingDelay
     }
 
 

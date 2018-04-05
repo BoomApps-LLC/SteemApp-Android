@@ -8,6 +8,7 @@ import com.boomapps.steemapp.ViewState
 import com.boomapps.steemapp.repository.Balance
 import com.boomapps.steemapp.repository.RepositoryProvider
 import com.boomapps.steemapp.repository.SteemWorker
+import com.boomapps.steemapp.repository.entity.VoteState
 import com.boomapps.steemapp.repository.network.NetworkRepository
 
 /**
@@ -149,15 +150,21 @@ class MainViewModel : BaseViewModel() {
 
     fun shouldShowVoteDialog(): Boolean {
         successfulPostingNumber = RepositoryProvider.instance.getSharedRepository().loadSuccessfulPostingNumber()
-        if (successfulPostingNumber == 1 || successfulPostingNumber == 3) {
-            return RepositoryProvider.instance.getSharedRepository().loadVotingState() // was rejected -> to show
-        } else {
-            return false
+        when (successfulPostingNumber) {
+            1 -> return RepositoryProvider.instance.getSharedRepository().loadVotingState() == VoteState.UNDEFINED
+            3 -> return RepositoryProvider.instance.getSharedRepository().loadVotingState() in arrayOf(VoteState.REJECTED, VoteState.UNDEFINED)
         }
+        return false
     }
 
     fun updateVotingState(isRejected: Boolean) {
-        RepositoryProvider.instance.getSharedRepository().saveVotingState(isRejected)
+        RepositoryProvider.instance.getSharedRepository().saveVotingState(
+                if (isRejected) {
+                    VoteState.REJECTED
+                } else {
+                    VoteState.VOTED
+                }
+        )
     }
 
 }

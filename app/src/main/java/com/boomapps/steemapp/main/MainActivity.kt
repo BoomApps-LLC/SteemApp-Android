@@ -168,10 +168,9 @@ class MainActivity : BaseActivity() {
             }
 
             override fun onVoteClick() {
-                // TODO increment voting counter
+                viewModel.updateVotingState(false)
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://steemconnect.com/sign/account-witness-vote?witness=yuriks2000&approve=1"))
                 startActivity(intent)
-                viewModel.updateVotingState(false)
             }
         })
         voteDialog.show(fragmentManager, VoteDialog.TAG)

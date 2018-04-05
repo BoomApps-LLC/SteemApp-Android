@@ -57,6 +57,7 @@ class SignInActivity : BaseActivity() {
                         viewModel.stringSuccess = ""
                         val intent = Intent(this@SignInActivity, MainActivity::class.java)
                         startActivity(intent)
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         finish()
                     }
                     ViewState.FAULT_RESULT -> {
