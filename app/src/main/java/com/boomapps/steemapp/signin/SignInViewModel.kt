@@ -50,8 +50,11 @@ class SignInViewModel : BaseViewModel() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext {
                     if (!it.result) {
+                        if (it.errorMessage != null) {
+                            stringError = it.errorMessage
+                        }
                         when (it.errorCode) {
-                            SteemErrorCodes.INCORRECT_USER_DATA_ERROR -> {
+                            SteemErrorCodes . INCORRECT_USER_DATA_ERROR -> {
                                 loginResult = LOGIN_ERROR_BAD_DATA
                             }
                             else -> {

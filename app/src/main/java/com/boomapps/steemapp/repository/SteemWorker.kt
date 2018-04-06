@@ -61,14 +61,15 @@ class SteemWorker() {
 
     fun login(nickname: String, postingKey: String?, activeKey: String?): SteemWorkerResponse {
         Timber.log(Log.INFO, "login($nickname, $postingKey")
-        steemJConfig = SteemJConfig.getInstance()
-        steemJConfig?.setAppName("SteemApp")
-        steemJConfig?.setAppVersion(BuildConfig.VERSION_NAME)
+
+        try {
+            steemJConfig = SteemJConfig.getInstance()
+            steemJConfig?.setAppName("SteemApp")
+            steemJConfig?.setAppVersion(BuildConfig.VERSION_NAME)
 
 //        steemJConfig?.addEndpointURI(URI.create("https://api.steemit.com"))
-        steemJConfig?.defaultAccount = AccountName(nickname)
-        steemJConfig?.responseTimeout = 10000;
-        try {
+            steemJConfig?.defaultAccount = AccountName(nickname)
+            steemJConfig?.responseTimeout = 10000
             val privateKeys = arrayListOf<ImmutablePair<PrivateKeyType, String>>()
             if (postingKey != null && postingKey.isNotEmpty()) {
                 privateKeys.add(ImmutablePair(PrivateKeyType.POSTING, postingKey))
@@ -85,26 +86,30 @@ class SteemWorker() {
             steemJ = SteemJ()
             var result = steemJ?.lookupAccounts(nickname, 1)
             if (result == null || result.size == 0 || result[0].toLowerCase() != nickname.toLowerCase()) {
-                return SteemWorkerResponse(false, SteemErrorCodes.INCORRECT_USER_DATA_ERROR)
+                return SteemWorkerResponse(false, SteemErrorCodes.INCORRECT_USER_DATA_ERROR, null)
             }
         } catch (sce: SteemConnectionException) {
             Timber.e(sce)
             sce.printStackTrace()
-            return SteemWorkerResponse(false, SteemErrorCodes.CONNECTION_ERROR)
+            return SteemWorkerResponse(false, SteemErrorCodes.CONNECTION_ERROR, null)
         } catch (sre: SteemResponseException) {
             Timber.e(sre)
             sre.printStackTrace()
-            return SteemWorkerResponse(false, SteemErrorCodes.TIMEOUT_ERROR)
+            return SteemWorkerResponse(false, SteemErrorCodes.TIMEOUT_ERROR, null)
         } catch (afe: AddressFormatException) {
             Timber.e(afe)
             afe.printStackTrace()
-            return SteemWorkerResponse(false, SteemErrorCodes.INCORRECT_USER_DATA_ERROR)
+            return SteemWorkerResponse(false, SteemErrorCodes.INCORRECT_USER_DATA_ERROR, null)
+        } catch (ipe: InvalidParameterException) {
+            Timber.e(ipe)
+            ipe.printStackTrace()
+            return SteemWorkerResponse(false, SteemErrorCodes.INCORRECT_USER_DATA_ERROR, ipe.message)
         } catch (ex: Exception) {
             Timber.e(ex)
             ex.printStackTrace()
-            return SteemWorkerResponse(false, SteemErrorCodes.UNDEFINED_ERROR)
+            return SteemWorkerResponse(false, SteemErrorCodes.UNDEFINED_ERROR, null)
         }
-        return SteemWorkerResponse(true, SteemErrorCodes.EMPTY_ERROR)
+        return SteemWorkerResponse(true, SteemErrorCodes.EMPTY_ERROR, null)
     }
 
     fun getProfile(nickname: String): UserData {

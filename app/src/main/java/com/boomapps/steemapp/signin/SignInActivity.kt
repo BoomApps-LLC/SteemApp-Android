@@ -37,6 +37,14 @@ class SignInActivity : BaseActivity() {
     private val PERMISSION_REQUEST_CAMERA = 3546
 
 
+    fun getErrorString(defValueId: Int): String {
+        return if (viewModel.stringError.isNullOrBlank()) {
+            getString(defValueId)
+        } else {
+            viewModel.stringError
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_signin)
@@ -62,12 +70,10 @@ class SignInActivity : BaseActivity() {
                     }
                     ViewState.FAULT_RESULT -> {
                         viewModel.state.value = ViewState.COMMON
-                        Toast.makeText(this@SignInActivity, "Error: ${viewModel.stringError}", Toast.LENGTH_LONG).show()
-                        viewModel.stringError = ""
                         val errorMessage = if (viewModel.loginResult == SignInViewModel.LOGIN_ERROR_BAD_DATA) {
-                            getString(R.string.error_message_bad_user_data)
+                            getErrorString(R.string.error_message_bad_user_data)
                         } else {
-                            getString(R.string.error_message_network_connection_fault)
+                            getErrorString(R.string.error_message_network_connection_fault)
                         }
                         WarningDialog.getInstance().showSpecial(context =
                         this@SignInActivity,
@@ -77,6 +83,7 @@ class SignInActivity : BaseActivity() {
                                 negative = null,
                                 listener = null)
                         viewModel.loginResult = -1
+                        viewModel.stringError = ""
                     }
                 }
             }
