@@ -382,6 +382,9 @@ class EditorActivity : BaseActivity() {
         }
 
         override fun onAddPictureClick() {
+            // save data before calling dialog
+            viewModel.saveStoryData()
+            // show image source dialog
             showAddNewPictureSourceDialog()
         }
     }
