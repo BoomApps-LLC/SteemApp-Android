@@ -257,20 +257,6 @@ class SteemWorker() {
         } else {
             return arrayOf(tFund, tShares)
         }
-//        val userNames = listOf<AccountName>(AccountName("yuriks2000"))
-//        val listOfUsers = steemJ?.getAccounts(userNames)
-//        val userExtended = listOfUsers?.get(0)
-//        val rewardSteems = userExtended?.rewardSteemBalance?.toReal()
-//        val fullBalance = userExtended?.balance?.toReal()
-//        Log.d(LOG_TAG, "for userExtended yurics2000 balances are : ${fullBalance} & ${rewardSteems}")
-//        if (userExtended != null && tFund != null && tShares != null) {
-//            val userVests = userExtended.vestingShares?.toReal()
-//            val steemPower = tFund * (userVests!!.div(tShares))
-//            Log.d(LOG_TAG, "Calculated steemPower = " + steemPower)
-//            return steemPower
-//        } else {
-//            return BigDecimal.ZERO
-//        }
     }
 
 
