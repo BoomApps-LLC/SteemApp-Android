@@ -27,6 +27,9 @@ import eu.bittrade.libs.steemj.image.upload.config.SteemJImageUploadConfig
 import org.apache.commons.lang3.tuple.ImmutablePair
 import timber.log.Timber
 import java.io.File
+import java.io.IOException
+import java.net.SocketException
+import java.net.SocketTimeoutException
 import java.net.URL
 import java.security.InvalidParameterException
 import java.text.SimpleDateFormat
@@ -186,19 +189,25 @@ class SteemWorker() {
         return PostingResult()
     }
 
-    fun uploadImage(uri: Uri): URL {
+    fun uploadImage(uri: Uri): URL? {
         val imageFile = File(uri.path)
         if (!imageFile.exists() || imageFile.isDirectory || !imageFile.canRead()) {
             return URL("http://empty.com")
         }
         val config = SteemJImageUploadConfig.getInstance()
-        config.connectTimeout = 3000
-        config.readTimeout = 3000
+        config.connectTimeout = 30000
+        config.readTimeout = 30000
         val uData = RepositoryProvider.instance.getSharedRepository().loadUserData()
-        return SteemJImageUpload.uploadImage(
-                eu.bittrade.libs.steemj.image.upload.models.AccountName(uData.nickname),
-                uData.postKey,
-                imageFile)
+        var url : URL? = null
+        try{
+            url = SteemJImageUpload.uploadImage(
+                    eu.bittrade.libs.steemj.image.upload.models.AccountName(uData.nickname),
+                    uData.postKey,
+                    imageFile)
+        }catch (e : IOException){
+            Timber.e(e, "Image upload exception")
+        }
+        return url
     }
 
 
@@ -248,20 +257,6 @@ class SteemWorker() {
         } else {
             return arrayOf(tFund, tShares)
         }
-//        val userNames = listOf<AccountName>(AccountName("yuriks2000"))
-//        val listOfUsers = steemJ?.getAccounts(userNames)
-//        val userExtended = listOfUsers?.get(0)
-//        val rewardSteems = userExtended?.rewardSteemBalance?.toReal()
-//        val fullBalance = userExtended?.balance?.toReal()
-//        Log.d(LOG_TAG, "for userExtended yurics2000 balances are : ${fullBalance} & ${rewardSteems}")
-//        if (userExtended != null && tFund != null && tShares != null) {
-//            val userVests = userExtended.vestingShares?.toReal()
-//            val steemPower = tFund * (userVests!!.div(tShares))
-//            Log.d(LOG_TAG, "Calculated steemPower = " + steemPower)
-//            return steemPower
-//        } else {
-//            return BigDecimal.ZERO
-//        }
     }
 
 
