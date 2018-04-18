@@ -44,6 +44,18 @@ android {
     buildToolsVersion '27.0.3'
     productFlavors {
     }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+        unitTests.all {
+            // All the usual Gradle options.
+            testLogging {
+                events "passed", "skipped", "failed", "standardOut", "standardError"
+                outputs.upToDateWhen {false}
+                showStandardStreams = true
+            }
+        }
+    }
 }
 
 configurations {
