@@ -6,8 +6,8 @@ import com.boomapps.steemapp.SteemApplication
 import com.boomapps.steemapp.UserData
 import com.boomapps.steemapp.ViewState
 import com.boomapps.steemapp.repository.RepositoryProvider
-import com.boomapps.steemapp.repository.SteemErrorCodes
-import com.boomapps.steemapp.repository.SteemWorker
+import com.boomapps.steemapp.repository.steem.SteemErrorCodes
+import com.boomapps.steemapp.repository.steem.SteemWorker
 import com.boomapps.steemapp.repository.network.NetworkRepository
 import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -54,7 +54,7 @@ class SignInViewModel : BaseViewModel() {
                             stringError = it.errorMessage
                         }
                         when (it.errorCode) {
-                            SteemErrorCodes . INCORRECT_USER_DATA_ERROR -> {
+                            SteemErrorCodes. INCORRECT_USER_DATA_ERROR -> {
                                 loginResult = LOGIN_ERROR_BAD_DATA
                             }
                             else -> {

@@ -7,7 +7,7 @@ import com.boomapps.steemapp.UserData
 import com.boomapps.steemapp.ViewState
 import com.boomapps.steemapp.repository.Balance
 import com.boomapps.steemapp.repository.RepositoryProvider
-import com.boomapps.steemapp.repository.SteemWorker
+import com.boomapps.steemapp.repository.steem.SteemWorker
 import com.boomapps.steemapp.repository.entity.VoteState
 import com.boomapps.steemapp.repository.network.NetworkRepository
 

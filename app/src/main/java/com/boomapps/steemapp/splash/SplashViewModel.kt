@@ -5,9 +5,8 @@ import android.arch.lifecycle.MutableLiveData
 import android.util.Log
 import com.boomapps.steemapp.BaseViewModel
 import com.boomapps.steemapp.repository.RepositoryProvider
-import com.boomapps.steemapp.repository.SteemWorker
+import com.boomapps.steemapp.repository.steem.SteemWorker
 import com.boomapps.steemapp.repository.network.NetworkRepository
-import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers

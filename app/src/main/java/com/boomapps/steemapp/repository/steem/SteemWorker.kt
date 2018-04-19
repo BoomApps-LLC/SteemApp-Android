@@ -1,9 +1,10 @@
-package com.boomapps.steemapp.repository
+package com.boomapps.steemapp.repository.steem
 
 import android.net.Uri
 import android.util.Log
 import com.boomapps.steemapp.BuildConfig
 import com.boomapps.steemapp.UserData
+import com.boomapps.steemapp.repository.RepositoryProvider
 import com.boomapps.steemapp.repository.entity.profile.ProfileMetadata
 import com.google.gson.Gson
 import eu.bittrade.crypto.core.AddressFormatException
@@ -28,8 +29,6 @@ import org.apache.commons.lang3.tuple.ImmutablePair
 import timber.log.Timber
 import java.io.File
 import java.io.IOException
-import java.net.SocketException
-import java.net.SocketTimeoutException
 import java.net.URL
 import java.security.InvalidParameterException
 import java.text.SimpleDateFormat

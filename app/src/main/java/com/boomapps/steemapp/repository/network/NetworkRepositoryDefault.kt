@@ -5,7 +5,7 @@ import android.util.Log
 import com.boomapps.steemapp.repository.HeadersInterceptor
 import com.boomapps.steemapp.repository.RepositoryProvider
 import com.boomapps.steemapp.repository.RequestsApi
-import com.boomapps.steemapp.repository.SteemWorker
+import com.boomapps.steemapp.repository.steem.SteemWorker
 import com.boomapps.steemapp.repository.currency.CoinmarketcapCurrency
 import com.boomapps.steemapp.repository.entity.UserDataEntity
 import com.boomapps.steemapp.repository.entity.profile.ProfileMetadataDeserializer

@@ -2,7 +2,7 @@ package com.boomapps.steemapp
 
 import android.app.Application
 import android.content.Context
-import com.boomapps.steemapp.repository.SteemWorker
+import com.boomapps.steemapp.repository.steem.SteemWorker
 import com.boomapps.steemapp.logging.CrashReportingTree
 import timber.log.Timber
 import timber.log.Timber.DebugTree
