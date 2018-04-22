@@ -94,5 +94,18 @@
         <item name="android:background">@drawable/selector_dots_in_onboarding</item>
     </style>
 
+    <style name="FeedTabStyle" parent="Widget.Design.TabLayout">
+        <item name="tabIndicatorColor">@color/violet</item>
+        <item name="tabBackground">@color/violet</item>
+        <item name="tabMode">fixed</item>
+        <item name="tabSelectedTextColor">@color/white</item>
+        <item name="tabTextAppearance">@style/FeedTabTextAppearance</item>
+    </style>
+    
+    <style name="FeedTabTextAppearance" parent="TextAppearance.Design.Tab">
+        <item name="textAllCaps">true</item>
+        <item name="android:textColor">#BFABEE</item>
+        <item name="android:textSize">18sp</item>
+    </style>
 
 </resources>

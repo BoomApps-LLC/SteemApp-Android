@@ -17,13 +17,13 @@ import com.boomapps.steemapp.repository.network.NetworkRepository
 class MainViewModel : BaseViewModel() {
 
     companion object {
-        const val TAB_WALLET = 0
+        const val TAB_FEEDS = 0
         const val TAB_EDIT = 1
         const val TAB_PROFILE = 2
     }
 
 
-    var currentTab = TAB_WALLET
+    var currentTab = TAB_FEEDS
 
     var userData: MutableLiveData<UserData> = MutableLiveData()
 

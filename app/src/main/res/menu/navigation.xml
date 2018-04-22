@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/navigation_wallet"
+        android:id="@+id/navigation_feeds"
         android:icon="@drawable/ic_account_balance_wallet_black_24dp"
         android:title="@string/title_wallet" />
 

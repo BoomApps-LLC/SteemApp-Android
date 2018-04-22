@@ -13,16 +13,17 @@ import com.boomapps.steemapp.BaseActivity
 import com.boomapps.steemapp.R
 import com.boomapps.steemapp.ViewState
 import com.boomapps.steemapp.editor.EditorActivity
+import com.boomapps.steemapp.feeds.FeedsFragment
 import com.boomapps.steemapp.main.MainViewModel.Companion.TAB_EDIT
+import com.boomapps.steemapp.main.MainViewModel.Companion.TAB_FEEDS
 import com.boomapps.steemapp.main.MainViewModel.Companion.TAB_PROFILE
-import com.boomapps.steemapp.main.MainViewModel.Companion.TAB_WALLET
 import com.boomapps.steemapp.signin.SignInActivity
 import com.boomapps.steemapp.votedialog.VoteDialog
 import kotlinx.android.synthetic.main.activity_main_bn.*
 
 class MainActivity : BaseActivity() {
 
-    private val FRAGMENT_WALLET_TAG = "wallet"
+    private val FRAGMENT_FEEDS_TAG = "feeds"
     private val FRAGMENT_EDIT_TAG = "edit"
     private val FRAGMENT_PROFILE_TAG = "profile"
 
@@ -33,18 +34,18 @@ class MainActivity : BaseActivity() {
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
-            R.id.navigation_wallet -> {
-                Log.d(TAG, "mOnNavigationItemSelectedListener(R.id.navigation_home) >> showFragment(FRAGMENT_WALLET_TAG)")
-                val animArray = getAnim(viewModel.currentTab, TAB_WALLET)
-                viewModel.currentTab = TAB_WALLET
-                showFragment(FRAGMENT_WALLET_TAG, animArray)
+            R.id.navigation_feeds -> {
+                Log.d(TAG, "mOnNavigationItemSelectedListener(R.id.navigation_home) >> showFragment(FRAGMENT_FEEDS_TAG)")
+                val animArray = getAnim(viewModel.currentTab, TAB_FEEDS)
+                viewModel.currentTab = TAB_FEEDS
+                showFragment(FRAGMENT_FEEDS_TAG, animArray)
                 return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_edit -> {
                 Log.d(TAG, "mOnNavigationItemSelectedListener(R.id.navigation_dashboard) >> showFragment(FRAGMENT_EDIT_TAG)")
                 val intent = Intent(this, EditorActivity::class.java)
                 startActivity(intent)
-                viewModel.currentTab = TAB_WALLET
+                viewModel.currentTab = TAB_FEEDS
                 return@OnNavigationItemSelectedListener false
             }
             R.id.navigation_profile -> {
@@ -81,8 +82,8 @@ class MainActivity : BaseActivity() {
         })
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
         when (viewModel.currentTab) {
-            TAB_WALLET -> {
-                navigation.selectedItemId = R.id.navigation_wallet
+            TAB_FEEDS -> {
+                navigation.selectedItemId = R.id.navigation_feeds
             }
             TAB_EDIT -> {
                 navigation.selectedItemId = R.id.navigation_edit
@@ -135,9 +136,9 @@ class MainActivity : BaseActivity() {
     private fun getFragmentNewInstance(tag: String): Fragment {
         Log.d(TAG, "getFragmentNewInstance(${tag})")
         return when (tag) {
-            FRAGMENT_WALLET_TAG -> WalletFragment.newInstance()
+            FRAGMENT_FEEDS_TAG -> FeedsFragment.newInstance("", "")
             FRAGMENT_PROFILE_TAG -> ProfileFragment.newInstance()
-            else -> WalletFragment.newInstance()
+            else -> FeedsFragment.newInstance("", "")
         }
     }
 
