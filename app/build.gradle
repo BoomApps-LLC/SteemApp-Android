@@ -51,7 +51,7 @@ android {
             // All the usual Gradle options.
             testLogging {
                 events "passed", "skipped", "failed", "standardOut", "standardError"
-                outputs.upToDateWhen {false}
+                outputs.upToDateWhen { false }
                 showStandardStreams = true
             }
         }
@@ -76,12 +76,16 @@ dependencies {
     implementation "com.android.support:design:$supportVersion"
     implementation "com.android.support:appcompat-v7:$supportVersion"
     implementation "com.android.support:customtabs:$supportVersion"
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0-beta6'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
     implementation "com.android.support:design:$supportVersion"
-    implementation 'com.google.firebase:firebase-crash:12.0.1'
+    implementation "com.android.support:cardview-v7:$supportVersion"
+    implementation 'com.google.firebase:firebase-crash:15.0.0'
+    implementation 'com.android.support:support-v4:27.1.1'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+
+    implementation 'androidx.core:core-ktx:0.3'
 
     // QR reader
     implementation 'com.dlazaro66.qrcodereaderview:qrcodereaderview:2.0.3'
