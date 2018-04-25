@@ -35,16 +35,17 @@ class SignInViewModel : BaseViewModel() {
         state.value = ViewState.COMMON
     }
 
-
     fun login(): Boolean {
+        val name : String
         if (nickname.isNotEmpty()) {
-            SteemApplication.instance.saveUserName(nickname.toLowerCase())
+            name = nickname.toLowerCase().trim().removePrefix("@")
+            SteemApplication.instance.saveUserName(name)
         } else {
             return false
         }
         state.value = ViewState.PROGRESS
         Flowable.fromCallable {
-            return@fromCallable SteemWorker.get().login(nickname.toLowerCase(), postingKey, activeKey)
+            return@fromCallable SteemWorker.get().login(name, postingKey, activeKey)
         }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -69,8 +70,8 @@ class SignInViewModel : BaseViewModel() {
                 .doOnComplete {
                     Log.d("SignInViewModel", "doOnComplete")
                     if (loginResult == LOGIN_SUCCESS) {
-                        RepositoryProvider.instance.getSharedRepository().saveUserData(UserData(nickname, null, null, postingKey))
-                        loadFullAdditionalData(nickname)
+                        RepositoryProvider.instance.getSharedRepository().saveUserData(UserData(name, null, null, postingKey))
+                        loadFullAdditionalData(name)
                     } else {
                         state.value = ViewState.FAULT_RESULT
                     }
