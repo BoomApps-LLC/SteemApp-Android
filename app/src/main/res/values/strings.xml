@@ -86,4 +86,23 @@ Do you want to enter correct key and try to post again?</string>
     <string name="d_vote_message">Like this App?\nVote for Witness!</string>
     <string name="d_vote_btn_vote">Vote</string>
 
+    <string name="retry">Retry</string>
+
+    <plurals name="years">
+        <item quantity="one">year</item>
+        <item quantity="few">years</item>
+        <item quantity="many">years</item>
+    </plurals>
+
+    <plurals name="months">
+        <item quantity="one">month</item>
+        <item quantity="few">months</item>
+        <item quantity="many">months</item>
+    </plurals>
+
+    <plurals name="days">
+        <item quantity="one">day</item>
+        <item quantity="few">days</item>
+        <item quantity="many">days</item>
+    </plurals>
 </resources>

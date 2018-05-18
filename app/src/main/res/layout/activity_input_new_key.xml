@@ -55,7 +55,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/aNewKey_signInInputPostingKey"/>
 
-    <com.boomapps.steemapp.barcode.PointsOverlayView
+    <com.boomapps.steemapp.ui.qrreader.PointsOverlayView
         android:id="@+id/aNewKey_points_overlay_view"
         android:layout_width="0dp"
         android:layout_height="0dp"

@@ -1,7 +1,6 @@
 package com.boomapps.steemapp.repository.preferences
 
-import com.boomapps.steemapp.UserData
-import com.boomapps.steemapp.repository.Balance
+import com.boomapps.steemapp.repository.UserData
 import com.boomapps.steemapp.repository.RepositoryProvider
 import com.boomapps.steemapp.repository.currency.CoinmarketcapCurrency
 import com.boomapps.steemapp.repository.entity.profile.UserExtended

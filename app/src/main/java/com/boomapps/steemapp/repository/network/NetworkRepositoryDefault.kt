@@ -5,12 +5,14 @@ import android.util.Log
 import com.boomapps.steemapp.repository.HeadersInterceptor
 import com.boomapps.steemapp.repository.RepositoryProvider
 import com.boomapps.steemapp.repository.RequestsApi
-import com.boomapps.steemapp.repository.steem.SteemWorker
 import com.boomapps.steemapp.repository.currency.CoinmarketcapCurrency
 import com.boomapps.steemapp.repository.entity.UserDataEntity
 import com.boomapps.steemapp.repository.entity.profile.ProfileMetadataDeserializer
 import com.boomapps.steemapp.repository.entity.profile.ProfileResponse
 import com.boomapps.steemapp.repository.entity.profile.UserExtended
+import com.boomapps.steemapp.repository.feed.FeedFullData
+import com.boomapps.steemapp.repository.feed.ServerDate
+import com.boomapps.steemapp.repository.feed.ServerDateSerialiizer
 import com.google.gson.GsonBuilder
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -68,7 +70,7 @@ class NetworkRepositoryDefault : NetworkRepository {
 
     override fun postStory(title: String, content: String, tags: Array<String>, postingKey: String, rewardsPercent: Short, upvote: Boolean, callback: NetworkRepository.OnRequestFinishCallback) {
         Observable.fromCallable {
-            return@fromCallable SteemWorker.get().post(title, content, tags, postingKey, rewardsPercent, upvote)
+            return@fromCallable RepositoryProvider.instance.getSteemRepository().post(title, content, tags, postingKey, rewardsPercent, upvote)
         }.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext {
@@ -91,7 +93,7 @@ class NetworkRepositoryDefault : NetworkRepository {
 
     override fun uploadNewPhoto(uri: Uri, callback: NetworkRepository.OnRequestFinishCallback) {
         Observable.fromCallable {
-            return@fromCallable SteemWorker.get().uploadImage(uri)
+            return@fromCallable RepositoryProvider.instance.getSteemRepository().uploadImage(uri)
         }.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext {
@@ -197,6 +199,7 @@ class NetworkRepositoryDefault : NetworkRepository {
 
     }
 
+
     fun saveData(su: CoinmarketcapCurrency, sdu: CoinmarketcapCurrency, pr: ProfileResponse, bv: Array<Double>) {
         if (su.currencyName.isNotEmpty()) {
             RepositoryProvider.instance.getSharedRepository().saveSteemCurrency(su)
@@ -219,7 +222,7 @@ class NetworkRepositoryDefault : NetworkRepository {
 
     private fun getBalanceVetstObservable(): Observable<Array<Double>> {
         return Observable.fromCallable {
-            return@fromCallable SteemWorker.get().getVestingShares()
+            return@fromCallable RepositoryProvider.instance.getSteemRepository().getVestingShares()
         }
     }
 
@@ -240,6 +243,7 @@ class NetworkRepositoryDefault : NetworkRepository {
         localBuilder.retryOnConnectionFailure(false)
         val gson = GsonBuilder()
                 .registerTypeAdapter(UserDataEntity::class.java, ProfileMetadataDeserializer())
+                .registerTypeAdapter(ServerDate::class.java, ServerDateSerialiizer())
                 .create()
 
         val retrofit = Retrofit.Builder()
@@ -249,6 +253,15 @@ class NetworkRepositoryDefault : NetworkRepository {
                 .client(localBuilder.build())
                 .build()
         return retrofit.create(RequestsApi::class.java)
+    }
+
+
+    override fun loadExtendedPostData(name : String, permlink : String) : Observable<FeedFullData>{
+        return getRequestsApi("https://steemit.com/", null).loadFeedFullData(name, permlink)
+    }
+
+    private fun loadFeedFullData() {
+
     }
 
 }

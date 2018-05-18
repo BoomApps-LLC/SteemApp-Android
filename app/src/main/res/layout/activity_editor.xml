@@ -98,7 +98,7 @@
         application:layout_constraintTop_toBottomOf="@id/actionButtonTopLeft" />
 
 
-    <com.boomapps.steemapp.controls.NoSwipableViewPager
+    <com.boomapps.steemapp.ui.controls.NoSwipableViewPager
         android:id="@+id/viewPager"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -108,7 +108,7 @@
         application:layout_constraintRight_toRightOf="parent"
         application:layout_constraintTop_toBottomOf="@id/topIndicator_3">
 
-    </com.boomapps.steemapp.controls.NoSwipableViewPager>
+    </com.boomapps.steemapp.ui.controls.NoSwipableViewPager>
 
 
 </android.support.constraint.ConstraintLayout>

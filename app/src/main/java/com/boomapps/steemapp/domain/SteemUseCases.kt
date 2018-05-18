@@ -1,0 +1,14 @@
+package com.boomapps.steemapp.domain
+
+import com.boomapps.steemapp.repository.RepositoryProvider
+import com.boomapps.steemapp.repository.steem.SteemWorkerResponse
+import eu.bittrade.libs.steemj.apis.follow.model.CommentFeedEntry
+import io.reactivex.Observable
+
+interface SteemUseCases {
+
+    fun login(provider: RepositoryProvider, nickname: String, postingKey: String?) : SteemWorkerResponse
+
+    fun getAllBlogShortList(provider : RepositoryProvider): Observable<ArrayList<CommentFeedEntry>>
+
+}

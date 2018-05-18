@@ -3,7 +3,7 @@ package com.boomapps.steemapp.repository.steem
 import android.net.Uri
 import android.util.Log
 import com.boomapps.steemapp.BuildConfig
-import com.boomapps.steemapp.UserData
+import com.boomapps.steemapp.repository.UserData
 import com.boomapps.steemapp.repository.RepositoryProvider
 import com.boomapps.steemapp.repository.entity.profile.ProfileMetadata
 import com.google.gson.Gson

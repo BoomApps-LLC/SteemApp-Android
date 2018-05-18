@@ -8,5 +8,4 @@ import com.bumptech.glide.module.AppGlideModule
  */
 
 @GlideModule
-class SteemAppGlideModule : AppGlideModule() {
-}
+class SteemAppGlideModule : AppGlideModule()

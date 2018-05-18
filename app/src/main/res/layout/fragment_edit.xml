@@ -85,7 +85,7 @@
         application:layout_constraintTop_toBottomOf="@id/fragmentEditButtonTopLeft" />
 
 
-    <com.boomapps.steemapp.controls.NoSwipableViewPager
+    <com.boomapps.steemapp.ui.controls.NoSwipableViewPager
         android:id="@+id/fragmentEditViewPager"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -95,7 +95,7 @@
         application:layout_constraintRight_toRightOf="parent"
         application:layout_constraintTop_toBottomOf="@id/fragmentEditTopIndicator_3">
 
-    </com.boomapps.steemapp.controls.NoSwipableViewPager>
+    </com.boomapps.steemapp.ui.controls.NoSwipableViewPager>
 
 
 </android.support.constraint.ConstraintLayout>

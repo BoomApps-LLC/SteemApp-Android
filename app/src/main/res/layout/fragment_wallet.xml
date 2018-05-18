@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:background="@color/violet"
     android:orientation="vertical"
-    tools:context="com.boomapps.steemapp.main.WalletFragment">
+    tools:context=".ui.main.WalletFragment">
 
     <TextView
         android:id="@+id/myBalanceLabel"

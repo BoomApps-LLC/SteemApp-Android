@@ -3,13 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".feeds.FeedsFragment">
+    tools:context=".ui.feeds.FeedsFragment">
 
     <android.support.design.widget.TabLayout
         android:id="@+id/feedsTabs"
         style="@style/FeedTabStyle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:background="@color/violet"
         />
 
@@ -17,6 +17,7 @@
         android:id="@+id/feedsPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="40dp"
         android:background="@color/violet">
     </android.support.v4.view.ViewPager>
 </FrameLayout>

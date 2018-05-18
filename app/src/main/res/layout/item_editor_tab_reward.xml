@@ -40,7 +40,7 @@
             app:layout_constraintTop_toBottomOf="@id/rewardTitle"
             app:layout_constraintVertical_bias="0.01999998">
 
-            <com.boomapps.steemapp.controls.SquareLinearLayout
+            <com.boomapps.steemapp.ui.controls.SquareLinearLayout
                 android:id="@+id/rewardItem1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -71,9 +71,9 @@
                     android:textColor="@color/selector_violet_white"
                     android:textSize="20sp"
                     android:textStyle="bold" />
-            </com.boomapps.steemapp.controls.SquareLinearLayout>
+            </com.boomapps.steemapp.ui.controls.SquareLinearLayout>
 
-            <com.boomapps.steemapp.controls.SquareLinearLayout
+            <com.boomapps.steemapp.ui.controls.SquareLinearLayout
                 android:id="@+id/rewardItem3"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -104,9 +104,9 @@
                     android:textColor="@color/selector_violet_white"
                     android:textSize="20sp"
                     android:textStyle="bold" />
-            </com.boomapps.steemapp.controls.SquareLinearLayout>
+            </com.boomapps.steemapp.ui.controls.SquareLinearLayout>
 
-            <com.boomapps.steemapp.controls.SquareLinearLayout
+            <com.boomapps.steemapp.ui.controls.SquareLinearLayout
                 android:id="@+id/rewardItem2"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -137,7 +137,7 @@
                     android:textColor="@color/selector_violet_white"
                     android:textSize="20sp"
                     android:textStyle="bold" />
-            </com.boomapps.steemapp.controls.SquareLinearLayout>
+            </com.boomapps.steemapp.ui.controls.SquareLinearLayout>
         </LinearLayout>
 
         <View

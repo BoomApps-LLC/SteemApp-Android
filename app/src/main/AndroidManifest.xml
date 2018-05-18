@@ -19,7 +19,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
         <activity
-            android:name="com.boomapps.steemapp.splash.SplashActivity"
+            android:name="com.boomapps.steemapp.ui.splash.SplashActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,22 +28,22 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.boomapps.steemapp.editor.EditorActivity"
+            android:name="com.boomapps.steemapp.ui.editor.EditorActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.boomapps.steemapp.signin.SignInActivity"
+            android:name="com.boomapps.steemapp.ui.signin.SignInActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustResize" />
 
         <activity
-            android:name="com.boomapps.steemapp.main.MainActivity"
+            android:name="com.boomapps.steemapp.ui.main.MainActivity"
             android:label="@string/title_activity_main" />
         <activity
-            android:name=".barcode.BarcodeReadActivity"
+            android:name="com.boomapps.steemapp.ui.qrreader.BarcodeReadActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".editor.inputpostingkey.InputNewPostingKeyActivity"
+        <activity android:name="com.boomapps.steemapp.ui.editor.inputpostingkey.InputNewPostingKeyActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
-        <activity android:name=".help.HelpActivity"
+        <activity android:name="com.boomapps.steemapp.ui.help.HelpActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
 
         <provider

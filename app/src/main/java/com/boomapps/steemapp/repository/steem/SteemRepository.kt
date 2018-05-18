@@ -1,0 +1,48 @@
+package com.boomapps.steemapp.repository.steem
+
+import android.net.Uri
+import eu.bittrade.libs.steemj.apis.database.models.state.Discussion
+import eu.bittrade.libs.steemj.apis.follow.model.CommentFeedEntry
+import eu.bittrade.libs.steemj.base.models.AccountName
+import eu.bittrade.libs.steemj.base.models.Permlink
+import io.reactivex.Observable
+import io.reactivex.Single
+import java.net.URL
+
+interface SteemRepository {
+
+
+    fun isLogged(): Boolean
+
+    /**
+     * Fake login into SteemIt
+     * Method only initialize {@link eu.bittrade.libs.steemj.configuration.SteemJConfig}
+     * and {@link eu.bittrade.libs.steemj.SteemJ} objects
+     */
+    fun login(nickname: String, postingKey: String?): SteemWorkerResponse
+
+    fun signOut()
+
+    fun post(title: String, content: String, tags: Array<String>, postingKey: String, rewardsPercent: Short, upvote: Boolean): SteemWorker.PostingResult
+
+    fun uploadImage(uri: Uri): URL?
+
+    fun getVestingShares(): Array<Double>
+
+    fun getStoryDetails(aName: AccountName?, pLink: Permlink, orderId : Int): Observable<DiscussionData>
+
+    fun getFeedShortDataList(aName: AccountName?): Observable<ArrayList<StoryShortEntry>>
+
+    fun getFeedShortDataList(aName: AccountName?, start: Int, limit: Int): Observable<ArrayList<StoryShortEntry>>
+
+    fun getBlogShortDataList(aName: AccountName?): Observable<ArrayList<StoryShortEntry>>
+
+
+    fun getBlogShortDataList(aName: AccountName?, start: Int, limit: Int): Observable<ArrayList<StoryShortEntry>>
+
+
+    fun getFeedStories(aName: AccountName?, start: Int, limit: Int): Single<ArrayList<DiscussionData>>
+
+
+    fun getBlogStories(aName: AccountName?, start: Int, limit: Int): Single<ArrayList<DiscussionData>>
+}
