@@ -1,5 +1,7 @@
 package com.boomapps.steemapp.ui.feeds
 
+import com.boomapps.steemapp.repository.FeedType
+
 interface FeedListHolderCallback {
 
     fun onRefresh(type : FeedType)

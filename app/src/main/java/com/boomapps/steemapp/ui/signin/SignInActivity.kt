@@ -15,14 +15,14 @@ import android.text.TextWatcher
 import android.view.View
 import android.widget.EditText
 import android.widget.Toast
-import com.boomapps.steemapp.ui.BaseActivity
 import com.boomapps.steemapp.R
+import com.boomapps.steemapp.repository.ServiceLocator
+import com.boomapps.steemapp.ui.BaseActivity
 import com.boomapps.steemapp.ui.ViewState
-import com.boomapps.steemapp.ui.qrreader.BarcodeReadActivity
 import com.boomapps.steemapp.ui.dialogs.WarningDialog
 import com.boomapps.steemapp.ui.help.HelpActivity
 import com.boomapps.steemapp.ui.main.MainActivity
-import com.boomapps.steemapp.repository.RepositoryProvider
+import com.boomapps.steemapp.ui.qrreader.BarcodeReadActivity
 import kotlinx.android.synthetic.main.activity_signin.*
 
 /**
@@ -133,7 +133,7 @@ class SignInActivity : BaseActivity() {
             startActivity(intent)
         })
 
-        val sr = RepositoryProvider.instance.getSharedRepository()
+        val sr = ServiceLocator.getPreferencesRepository()
         if (sr.isFirstLaunch()) {
             signInInputPostingKey.onFocusChangeListener = object : View.OnFocusChangeListener {
                 override fun onFocusChange(v: View?, hasFocus: Boolean) {
@@ -152,7 +152,7 @@ class SignInActivity : BaseActivity() {
 
         signInInfo.setOnClickListener({
             openLocalHelpScreen()
-            RepositoryProvider.instance.getSharedRepository().setFirstLaunchState(false)
+            ServiceLocator.getPreferencesRepository().setFirstLaunchState(false)
         })
     }
 

@@ -1,14 +1,13 @@
 package com.boomapps.steemapp.ui.signin
 
 import android.util.Log
-import com.boomapps.steemapp.ui.BaseViewModel
 import com.boomapps.steemapp.SteemApplication
+import com.boomapps.steemapp.repository.ServiceLocator
 import com.boomapps.steemapp.repository.UserData
-import com.boomapps.steemapp.ui.ViewState
-import com.boomapps.steemapp.repository.RepositoryProvider
-import com.boomapps.steemapp.repository.steem.SteemErrorCodes
-import com.boomapps.steemapp.repository.steem.SteemWorker
 import com.boomapps.steemapp.repository.network.NetworkRepository
+import com.boomapps.steemapp.repository.steem.SteemErrorCodes
+import com.boomapps.steemapp.ui.BaseViewModel
+import com.boomapps.steemapp.ui.ViewState
 import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -44,7 +43,7 @@ class SignInViewModel : BaseViewModel() {
         }
         state.value = ViewState.PROGRESS
         Flowable.fromCallable {
-            return@fromCallable RepositoryProvider.instance.getSteemRepository().login(nickname.toLowerCase(), postingKey)
+            return@fromCallable ServiceLocator.getSteemRepository().login(nickname.toLowerCase(), postingKey)
         }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -69,7 +68,7 @@ class SignInViewModel : BaseViewModel() {
                 .doOnComplete {
                     Log.d("SignInViewModel", "doOnComplete")
                     if (loginResult == LOGIN_SUCCESS) {
-                        RepositoryProvider.instance.getSharedRepository().saveUserData(UserData(nickname, null, null, postingKey))
+                        ServiceLocator.getPreferencesRepository().saveUserData(UserData(nickname, null, null, postingKey))
                         loadFullAdditionalData(nickname)
                     } else {
                         state.value = ViewState.FAULT_RESULT
@@ -86,7 +85,7 @@ class SignInViewModel : BaseViewModel() {
     }
 
     private fun loadFullAdditionalData(nick: String) {
-        RepositoryProvider.instance.getNetworkRepository().loadFullStartData(nick, object : NetworkRepository.OnRequestFinishCallback {
+        ServiceLocator.getNetworkRepository().loadFullStartData(nick, object : NetworkRepository.OnRequestFinishCallback {
 
             override fun onSuccessRequestFinish() {
                 state.value = ViewState.SUCCESS_RESULT

@@ -90,19 +90,25 @@ Do you want to enter correct key and try to post again?</string>
 
     <plurals name="years">
         <item quantity="one">year</item>
+        <item quantity="two">years</item>
         <item quantity="few">years</item>
         <item quantity="many">years</item>
+        <item quantity="other">years</item>
     </plurals>
 
     <plurals name="months">
         <item quantity="one">month</item>
+        <item quantity="two">months</item>
         <item quantity="few">months</item>
         <item quantity="many">months</item>
+        <item quantity="other">months</item>
     </plurals>
 
     <plurals name="days">
         <item quantity="one">day</item>
+        <item quantity="two">days</item>
         <item quantity="few">days</item>
         <item quantity="many">days</item>
+        <item quantity="other">days</item>
     </plurals>
 </resources>

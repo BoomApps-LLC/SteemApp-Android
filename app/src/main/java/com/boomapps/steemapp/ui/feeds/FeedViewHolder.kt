@@ -76,9 +76,9 @@ class FeedViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var sCreated = "unknown"
         if (created.timeInMillis > 0) {
             val curCal = currentDate()
-            var yearsDelta = curCal.get(Calendar.YEAR) - created.get(Calendar.YEAR)
-            var monthDelta = curCal.get(Calendar.MONTH) - created.get(Calendar.MONTH)
-            var dayDelta = curCal.get(Calendar.DAY_OF_YEAR) - created.get(Calendar.DAY_OF_YEAR)
+            val yearsDelta = curCal.get(Calendar.YEAR) - created.get(Calendar.YEAR)
+            val monthDelta = curCal.get(Calendar.MONTH) - created.get(Calendar.MONTH)
+            val dayDelta = curCal.get(Calendar.DAY_OF_YEAR) - created.get(Calendar.DAY_OF_YEAR)
             if (yearsDelta > 0) {
                 lastTime.text = String.format("%d %s ago", yearsDelta, itemView.context.resources.getQuantityString(R.plurals.years, yearsDelta))
             } else if (monthDelta > 0) {

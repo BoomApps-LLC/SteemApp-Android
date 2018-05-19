@@ -4,7 +4,7 @@ import android.net.Uri
 import android.util.Log
 import com.boomapps.steemapp.BuildConfig
 import com.boomapps.steemapp.repository.FeedType
-import com.boomapps.steemapp.repository.RepositoryProvider
+import com.boomapps.steemapp.repository.ServiceLocator
 import eu.bittrade.crypto.core.AddressFormatException
 import eu.bittrade.libs.steemj.SteemJ
 import eu.bittrade.libs.steemj.base.models.AccountName
@@ -148,7 +148,7 @@ class SteemRepositoryDefault : SteemRepository {
         val config = SteemJImageUploadConfig.getInstance()
         config.connectTimeout = 30000
         config.readTimeout = 30000
-        val uData = RepositoryProvider.instance.getSharedRepository().loadUserData()
+        val uData = ServiceLocator.getPreferencesRepository().loadUserData()
         var url: URL? = null
         try {
             url = SteemJImageUpload.uploadImage(

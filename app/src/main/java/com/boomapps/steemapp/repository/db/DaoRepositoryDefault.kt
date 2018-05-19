@@ -18,11 +18,7 @@ import java.util.concurrent.Executor
 class DaoRepositoryDefault(
         val db: AppDatabase,
         private val ioExecutor: Executor,
-        private val networkPageSize: Int = DEFAULT_NETWORK_PAGE_SIZE) : DaoRepository {
-
-    companion object {
-        private const val DEFAULT_NETWORK_PAGE_SIZE = 10
-    }
+        private val networkPageSize: Int = ServiceLocator.NETWORK_PAGE_SIZE) : DaoRepository {
 
 
     override fun insertBlogEntities(blogEntities: ArrayList<StoryEntity>) {
@@ -67,9 +63,9 @@ class DaoRepositoryDefault(
         networkState.value = NetworkState.LOADING
         val discussions: ArrayList<DiscussionData> = arrayListOf()
         val obs = if (type == FeedType.BLOG) {
-            ServiceLocator.getSteemRepository().getBlogShortDataList(null, 0, networkPageSize)
+            ServiceLocator.getSteemRepository().getBlogShortDataList(null, 0, ServiceLocator.NETWORK_PAGE_SIZE)
         } else {
-            ServiceLocator.getSteemRepository().getFeedShortDataList(null, 0, networkPageSize)
+            ServiceLocator.getSteemRepository().getFeedShortDataList(null, 0, ServiceLocator.NETWORK_PAGE_SIZE)
         }
         obs.subscribeOn(Schedulers.io())
                 .take(networkPageSize.toLong())
@@ -150,7 +146,7 @@ class DaoRepositoryDefault(
                 pagedList = builder.build(),
                 networkState = boundaryCallback.networkState,
                 retry = {
-                    boundaryCallback.helper.retryAllFailed()
+                    boundaryCallback.retryAllFailed()
                 },
                 refresh = {
                     refreshTrigger.value = null

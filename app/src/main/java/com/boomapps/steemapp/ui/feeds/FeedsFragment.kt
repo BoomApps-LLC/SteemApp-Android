@@ -1,7 +1,6 @@
 package com.boomapps.steemapp.ui.feeds
 
 
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.design.widget.TabLayout
@@ -12,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.boomapps.steemapp.R
+import com.boomapps.steemapp.repository.FeedType
 
 /**
  * A simple [Fragment] subclass.
@@ -61,15 +61,13 @@ class FeedsFragment : Fragment(), FeedListHolderCallback {
 
 
     private fun updatePage(position: Int) {
-        if (!viewModel.getData(FeedType.values()[position]).hasActiveObservers()) {
-            viewModel.getData(FeedType.values()[position]).observe(this@FeedsFragment, object : Observer<ArrayList<FeedCardViewData>> {
-                override fun onChanged(t: ArrayList<FeedCardViewData>?) {
-                    val result = t ?: arrayListOf()
-                    (feedsPager.adapter as FeedsTabsAdapter).getItem(position).updateList(result)
-                }
-            })
-            (feedsPager.adapter as FeedsTabsAdapter).getItem(position).setProgressState(true)
+        when (position) {
+            0 ->
+                viewModel.showList(FeedType.BLOG)
+            1 ->
+                viewModel.showList(FeedType.FEED)
         }
+
     }
 
 
@@ -90,6 +88,8 @@ class FeedsFragment : Fragment(), FeedListHolderCallback {
         @JvmStatic
         fun newInstance() =
                 FeedsFragment()
+
+        const val KEY_FEED_TYPE = "feed_type"
 
     }
 }

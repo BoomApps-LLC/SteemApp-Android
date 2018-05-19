@@ -3,8 +3,8 @@ package com.boomapps.steemapp.repository.steem
 import android.net.Uri
 import android.util.Log
 import com.boomapps.steemapp.BuildConfig
+import com.boomapps.steemapp.repository.ServiceLocator
 import com.boomapps.steemapp.repository.UserData
-import com.boomapps.steemapp.repository.RepositoryProvider
 import com.boomapps.steemapp.repository.entity.profile.ProfileMetadata
 import com.google.gson.Gson
 import eu.bittrade.crypto.core.AddressFormatException
@@ -133,7 +133,7 @@ class SteemWorker() {
                         "")
             }
         }
-        return RepositoryProvider.instance.getSharedRepository().loadUserData()
+        return ServiceLocator.getPreferencesRepository().loadUserData()
     }
 
     fun uploadPhoto() {
@@ -196,7 +196,7 @@ class SteemWorker() {
         val config = SteemJImageUploadConfig.getInstance()
         config.connectTimeout = 30000
         config.readTimeout = 30000
-        val uData = RepositoryProvider.instance.getSharedRepository().loadUserData()
+        val uData = ServiceLocator.getPreferencesRepository().loadUserData()
         var url : URL? = null
         try{
             url = SteemJImageUpload.uploadImage(

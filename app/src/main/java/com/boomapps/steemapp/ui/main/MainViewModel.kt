@@ -2,14 +2,13 @@ package com.boomapps.steemapp.ui.main
 
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
-import com.boomapps.steemapp.ui.BaseViewModel
-import com.boomapps.steemapp.repository.UserData
-import com.boomapps.steemapp.ui.ViewState
 import com.boomapps.steemapp.repository.Balance
-import com.boomapps.steemapp.repository.RepositoryProvider
-import com.boomapps.steemapp.repository.steem.SteemWorker
+import com.boomapps.steemapp.repository.ServiceLocator
+import com.boomapps.steemapp.repository.UserData
 import com.boomapps.steemapp.repository.entity.VoteState
 import com.boomapps.steemapp.repository.network.NetworkRepository
+import com.boomapps.steemapp.ui.BaseViewModel
+import com.boomapps.steemapp.ui.ViewState
 
 /**
  * Created by vgrechikha on 25.01.2018.
@@ -34,22 +33,22 @@ class MainViewModel : BaseViewModel() {
 
     fun getUserProfile(): MutableLiveData<UserData> {
         if (userData.value == null) {
-            userData.value = RepositoryProvider.instance.getSharedRepository().loadUserData()
+            userData.value = ServiceLocator.getPreferencesRepository().loadUserData()
             loadUserProfile()
         }
         return userData
     }
 
     fun signOut() {
-        RepositoryProvider.instance.getSharedRepository().clearAllData()
-        RepositoryProvider.instance.getSteemRepository().signOut()
+        ServiceLocator.getPreferencesRepository().clearAllData()
+        ServiceLocator.getSteemRepository().signOut()
 
     }
 
 
     private fun loadUserProfile() {
         if (userData.value?.nickname.isNullOrEmpty()) {
-            userData.value = RepositoryProvider.instance.getSharedRepository().loadUserData()
+            userData.value = ServiceLocator.getPreferencesRepository().loadUserData()
         }
         if (!userData.value?.userName.isNullOrEmpty()) {
             state.value = ViewState.COMMON
@@ -62,15 +61,15 @@ class MainViewModel : BaseViewModel() {
             return
         } else {
             state.value = ViewState.PROGRESS
-            RepositoryProvider.instance.getNetworkRepository().loadExtendedUserProfile(nickName!!, object : NetworkRepository.OnRequestFinishCallback {
+            ServiceLocator.getNetworkRepository().loadExtendedUserProfile(nickName!!, object : NetworkRepository.OnRequestFinishCallback {
 
                 override fun onSuccessRequestFinish() {
                     Log.d("MainViewModel", "onSuccessRequestFinish")
-                    val exUserData = RepositoryProvider.instance.getNetworkRepository().extendedProfileResponse?.userExtended
+                    val exUserData = ServiceLocator.getNetworkRepository().extendedProfileResponse?.userExtended
                     if (exUserData != null) {
                         val newUserData = UserData(nickName, exUserData.profileMetadata.userName, exUserData.profileMetadata.photoUrl, userData.value?.postKey)
                         userData.value = newUserData
-                        RepositoryProvider.instance.getSharedRepository().updateUserData(newUserData)
+                        ServiceLocator.getPreferencesRepository().updateUserData(newUserData)
                     }
                     if (userData.value?.userName.isNullOrEmpty()) {
                         stringError = "UserExtended profile loading error."
@@ -100,7 +99,7 @@ class MainViewModel : BaseViewModel() {
     }
 
     private fun loadBalance() {
-        balanceData.value = RepositoryProvider.instance.getSharedRepository().loadBalance(false)
+        balanceData.value = ServiceLocator.getPreferencesRepository().loadBalance(false)
         val fullBalance = balanceData.value?.fullBalance
         if (fullBalance != null && fullBalance >= 0) {
             return
@@ -117,7 +116,7 @@ class MainViewModel : BaseViewModel() {
 
     fun updateData() {
         if (userData.value?.nickname.isNullOrEmpty()) {
-            userData.value = RepositoryProvider.instance.getSharedRepository().loadUserData()
+            userData.value = ServiceLocator.getPreferencesRepository().loadUserData()
         }
         val nick = userData.value?.nickname
         if (nick.isNullOrEmpty()) {
@@ -127,11 +126,11 @@ class MainViewModel : BaseViewModel() {
             return
         }
         isDataUpdating = true
-        RepositoryProvider.instance.getNetworkRepository().loadFullStartData(nick!!, object : NetworkRepository.OnRequestFinishCallback {
+        ServiceLocator.getNetworkRepository().loadFullStartData(nick!!, object : NetworkRepository.OnRequestFinishCallback {
 
             override fun onSuccessRequestFinish() {
-                userData.value = RepositoryProvider.instance.getSharedRepository().loadUserData()
-                balanceData.value = RepositoryProvider.instance.getSharedRepository().loadBalance(true)
+                userData.value = ServiceLocator.getPreferencesRepository().loadUserData()
+                balanceData.value = ServiceLocator.getPreferencesRepository().loadBalance(true)
                 state.value = ViewState.SUCCESS_RESULT
                 isDataUpdating = false
             }
@@ -149,16 +148,16 @@ class MainViewModel : BaseViewModel() {
     }
 
     fun shouldShowVoteDialog(): Boolean {
-        successfulPostingNumber = RepositoryProvider.instance.getSharedRepository().loadSuccessfulPostingNumber()
+        successfulPostingNumber = ServiceLocator.getPreferencesRepository().loadSuccessfulPostingNumber()
         when (successfulPostingNumber) {
-            1 -> return RepositoryProvider.instance.getSharedRepository().loadVotingState() == VoteState.UNDEFINED
-            3 -> return RepositoryProvider.instance.getSharedRepository().loadVotingState() in arrayOf(VoteState.REJECTED, VoteState.UNDEFINED)
+            1 -> return ServiceLocator.getPreferencesRepository().loadVotingState() == VoteState.UNDEFINED
+            3 -> return ServiceLocator.getPreferencesRepository().loadVotingState() in arrayOf(VoteState.REJECTED, VoteState.UNDEFINED)
         }
         return false
     }
 
     fun updateVotingState(isRejected: Boolean) {
-        RepositoryProvider.instance.getSharedRepository().saveVotingState(
+        ServiceLocator.getPreferencesRepository().saveVotingState(
                 if (isRejected) {
                     VoteState.REJECTED
                 } else {

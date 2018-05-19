@@ -1,13 +1,14 @@
 package com.boomapps.steemapp.repository
 
+import android.arch.lifecycle.MutableLiveData
 import android.arch.paging.PagedList
-import android.arch.paging.PagingRequestHelper
 import android.support.annotation.MainThread
 import com.boomapps.steemapp.repository.db.DiscussionToStoryMapper
 import com.boomapps.steemapp.repository.db.entities.StoryEntity
 import com.boomapps.steemapp.repository.steem.DiscussionData
 import com.boomapps.steemapp.repository.steem.SteemRepository
 import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import java.util.concurrent.Executor
@@ -20,8 +21,7 @@ class FeedBoundaryCallback(
         private val networkPageSize: Int) : PagedList.BoundaryCallback<StoryEntity>() {
 
 
-    val helper = PagingRequestHelper(ioExecutor)
-    val networkState = helper.createStatusLiveData()
+    val networkState = MutableLiveData<NetworkState>()
 
 
     private fun insertItemsIntoDb(items: ArrayList<DiscussionData>) {
@@ -35,6 +35,7 @@ class FeedBoundaryCallback(
      */
     @MainThread
     override fun onZeroItemsLoaded() {
+        networkState.value = NetworkState.LOADING
         Timber.d("onZeroItemsLoaded()")
         val single: Single<ArrayList<DiscussionData>> = if (type == FeedType.FEED) {
             // FEED
@@ -43,14 +44,20 @@ class FeedBoundaryCallback(
             // BLOG
             ServiceLocator.getSteemRepository().getBlogStories(null, 0, networkPageSize)
         }
-        single.observeOn(Schedulers.io())
+        single.observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     insertItemsIntoDb(it)
+                    networkState.value = NetworkState.LOADED
                 }, {
                     Timber.e(it)
+                    networkState.value = NetworkState.error("Loading data error for " + type.name)
                 })
 
 
+    }
+
+    fun retryAllFailed() {
+        // TODO implement retying loading post which were loaded with error
     }
 
     /**
@@ -58,6 +65,7 @@ class FeedBoundaryCallback(
      */
     @MainThread
     override fun onItemAtEndLoaded(itemAtEnd: StoryEntity) {
+        networkState.value = NetworkState.LOADING
         Timber.d("onItemAtEndLoaded(itemAtEnd=[%d, %s])", itemAtEnd.indexInResponse, itemAtEnd.permlink)
         val single: Single<ArrayList<DiscussionData>> = if (type == FeedType.FEED) {
             // FEED
@@ -66,17 +74,18 @@ class FeedBoundaryCallback(
             // BLOG
             ServiceLocator.getSteemRepository().getBlogStories(null, itemAtEnd.indexInResponse, networkPageSize)
         }
-        single.observeOn(Schedulers.io())
+        single.observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     insertItemsIntoDb(it)
+                    networkState.value = NetworkState.LOADED
                 }, {
                     Timber.e(it)
+                    networkState.value = NetworkState.error("Loading data error for " + type.name)
                 })
     }
 
     @MainThread
     override fun onItemAtFrontLoaded(itemAtFront: StoryEntity) {
         super.onItemAtFrontLoaded(itemAtFront)
-        // ignored, since we only ever append to what's in the DB
     }
 }

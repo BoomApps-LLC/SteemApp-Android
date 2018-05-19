@@ -6,11 +6,11 @@ import android.graphics.PointF
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
-import com.boomapps.steemapp.ui.BaseActivity
 import com.boomapps.steemapp.R
-import com.boomapps.steemapp.ui.qrreader.PointsOverlayView
+import com.boomapps.steemapp.repository.ServiceLocator
+import com.boomapps.steemapp.ui.BaseActivity
 import com.boomapps.steemapp.ui.help.HelpActivity
-import com.boomapps.steemapp.repository.RepositoryProvider
+import com.boomapps.steemapp.ui.qrreader.PointsOverlayView
 import com.dlazaro66.qrcodereaderview.QRCodeReaderView
 import kotlinx.android.synthetic.main.activity_input_new_key.*
 
@@ -29,7 +29,7 @@ class InputNewPostingKeyActivity : BaseActivity(), QRCodeReaderView.OnQRCodeRead
 
         qrInInfo.setOnClickListener({
             openLocalHelpScreen()
-            RepositoryProvider.instance.getSharedRepository().setFirstLaunchState(false)
+            ServiceLocator.getPreferencesRepository().setFirstLaunchState(false)
         })
     }
 
