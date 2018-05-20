@@ -9,13 +9,13 @@ import com.boomapps.steemapp.repository.NetworkState
 import com.boomapps.steemapp.repository.db.entities.StoryEntity
 import timber.log.Timber
 
-class StoriesListAdapter(private val retryCallback: () -> Unit) : PagedListAdapter<StoryEntity, RecyclerView.ViewHolder>(STORY_COMPARATOR) {
+class StoriesListAdapter(private val itemsCallback : FeedViewHolder.Callback, private val retryCallback: () -> Unit) : PagedListAdapter<StoryEntity, RecyclerView.ViewHolder>(STORY_COMPARATOR) {
 
     private var networkState: NetworkState? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            R.layout.feed_card -> FeedViewHolder.create(parent)
+            R.layout.feed_card -> FeedViewHolder.create(parent, itemsCallback)
             R.layout.feed_network_state -> NetworkStateItemViewHolder.create(parent, retryCallback)
             else -> throw IllegalArgumentException("unknown view type $viewType")
         }

@@ -10,6 +10,7 @@ class StoryEntity {
     var entityId: Long = 0
     var author: String = ""
     var permlink: String = ""
+    var url : String = ""
     var title: String = ""
     @ColumnInfo(name = "raw_body")
     var rawBody: String = ""

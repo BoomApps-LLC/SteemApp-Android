@@ -37,7 +37,10 @@ class DiscussionToStoryMapper(val data: ArrayList<DiscussionData>) {
         outValue.author = inValue.author.name
         outValue.rawBody = inValue.body
         outValue.permlink = inValue.permlink.link
+        outValue.url = "http://steemit.com${inValue.url}"
         outValue.shortText = getShortText(inValue.body)
+
+        outValue.avatarUrl = "https://steemitimages.com/u/${outValue.author}/avatar"
 
         if (inValue.jsonMetadata != null) {
             val metadata = parseMetadata(inValue.jsonMetadata)

@@ -2,16 +2,20 @@ package com.boomapps.steemapp.ui.feeds
 
 
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
-import android.support.v4.view.PagerTitleStrip
 import android.support.v4.view.ViewPager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import com.boomapps.steemapp.R
 import com.boomapps.steemapp.repository.FeedType
+import com.boomapps.steemapp.ui.post.PostViewActivity
+import timber.log.Timber
 
 /**
  * A simple [Fragment] subclass.
@@ -22,7 +26,6 @@ import com.boomapps.steemapp.repository.FeedType
 class FeedsFragment : Fragment(), FeedListHolderCallback {
 
     lateinit var feedsPager: ViewPager
-    lateinit var feedsPagerStrip: PagerTitleStrip
 
     lateinit var viewModel: FeedsViewModel
 
@@ -36,29 +39,46 @@ class FeedsFragment : Fragment(), FeedListHolderCallback {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_feeds, container, false)
         feedsPager = view.findViewById(R.id.feedsPager)
-        feedsPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
-            override fun onPageScrollStateChanged(state: Int) {
 
-            }
-
-            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-
-            }
-
-            override fun onPageSelected(position: Int) {
-                updatePage(position)
-            }
-        })
         val adapter = FeedsTabsAdapter(arrayOf(
                 FeedListHolder(FeedType.BLOG, "BLOG", View.inflate(context, R.layout.feed_list_view, null), viewModel, this),
                 FeedListHolder(FeedType.FEED, "FEED", View.inflate(context, R.layout.feed_list_view, null), viewModel, this)
         ))
         feedsPager.adapter = adapter
         view.findViewById<TabLayout>(R.id.feedsTabs).setupWithViewPager(feedsPager)
-        updatePage(0)
+        feedsPager.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                view.getViewTreeObserver()
+                        .removeOnGlobalLayoutListener(this);
+                // set page change listener
+                addPagerListener()
+                // call update page with delay
+                // it need for opening screen without freezes
+                Handler().postDelayed({ updatePage(0) }, 1000)
+            }
+        })
         return view
     }
 
+    private fun addPagerListener(){
+        feedsPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+            override fun onPageScrollStateChanged(state: Int) {
+                Timber.d("onPageScrollStateChanged $state")
+            }
+
+            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+                Timber.d("onPageScrolled $position - $positionOffset - $positionOffsetPixels")
+                if (positionOffset == 0.0f) {
+                    updatePage(position)
+                }
+            }
+
+            override fun onPageSelected(position: Int) {
+                Timber.d("onPageSelected $position")
+//                updatePage(position)
+            }
+        })
+    }
 
     private fun updatePage(position: Int) {
         when (position) {
@@ -77,7 +97,13 @@ class FeedsFragment : Fragment(), FeedListHolderCallback {
     }
 
     override fun onItemClick(type: FeedType, position: Int) {
-
+        val story = viewModel.getStory(type, position)
+        if (story != null && story.url.isNotEmpty()) {
+            val postIntent = Intent(this.context, PostViewActivity::class.java)
+            postIntent.putExtra(PostViewActivity.EXTRA_URL, story.url)
+            postIntent.putExtra(PostViewActivity.EXTRA_TITLE, story.title)
+            startActivity(postIntent)
+        }
     }
 
     override fun onActionClick(type: FeedType, position: Int, actions: Actions) {

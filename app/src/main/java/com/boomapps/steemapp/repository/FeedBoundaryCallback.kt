@@ -2,6 +2,7 @@ package com.boomapps.steemapp.repository
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.paging.PagedList
+import android.os.Handler
 import android.support.annotation.MainThread
 import com.boomapps.steemapp.repository.db.DiscussionToStoryMapper
 import com.boomapps.steemapp.repository.db.entities.StoryEntity
@@ -9,8 +10,8 @@ import com.boomapps.steemapp.repository.steem.DiscussionData
 import com.boomapps.steemapp.repository.steem.SteemRepository
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
+import java.util.*
 import java.util.concurrent.Executor
 
 class FeedBoundaryCallback(
@@ -77,7 +78,9 @@ class FeedBoundaryCallback(
         single.observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     insertItemsIntoDb(it)
-                    networkState.value = NetworkState.LOADED
+                    Handler().postDelayed({
+                        networkState.value = NetworkState.LOADED
+                    }, 2000)
                 }, {
                     Timber.e(it)
                     networkState.value = NetworkState.error("Loading data error for " + type.name)

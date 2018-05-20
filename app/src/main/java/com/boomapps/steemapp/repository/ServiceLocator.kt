@@ -18,7 +18,7 @@ import java.util.concurrent.Executors
 
 interface ServiceLocator {
     companion object {
-        const val NETWORK_PAGE_SIZE = 15
+        const val NETWORK_PAGE_SIZE = 12
         const val DATABASE_PAGE_SIZE = 10
 
         val locator: ServiceLocator by lazy {

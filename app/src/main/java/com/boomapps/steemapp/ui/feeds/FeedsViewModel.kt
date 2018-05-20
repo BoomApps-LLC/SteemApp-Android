@@ -56,6 +56,14 @@ class FeedsViewModel : BaseViewModel() {
         return blogsRefreshState
     }
 
+    fun getStory(type: FeedType, position: Int): StoryEntity? {
+        if (type == FeedType.FEED) {
+            return feeds.value?.get(position)
+        } else {
+            return blogs.value?.get(position)
+        }
+    }
+
     fun refresh(type: FeedType) {
         when (type) {
             FeedType.BLOG -> blogRepoResult.value?.refresh?.invoke()

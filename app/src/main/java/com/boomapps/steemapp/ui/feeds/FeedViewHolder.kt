@@ -13,7 +13,14 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import java.util.*
 
-class FeedViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class FeedViewHolder(itemView: View, callback: Callback) : RecyclerView.ViewHolder(itemView) {
+
+    interface Callback {
+
+        fun onHolderClick(position: Int)
+
+    }
+
 
     val image: ImageView = itemView.findViewById(R.id.feedCard_ivMain)
     val title: TextView = itemView.findViewById(R.id.feedCard_tvTitle)
@@ -31,25 +38,16 @@ class FeedViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     init {
         itemView.setOnClickListener {
-            //            feed?.imgUrl?.let { url ->
-//                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-//                itemView.context.startActivity(intent)
-//            }
-            // TODO process on item click
+            if (callback != null) {
+                callback.onHolderClick(this@FeedViewHolder.layoutPosition)
+            }
+
         }
     }
 
 
     fun bind(story: StoryEntity?) {
         this.data = story
-        val imageUrl = data?.mainImageUrl
-        if (!imageUrl.isNullOrEmpty()) {
-            Glide.with(itemView)
-                    .load(imageUrl)
-                    .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.ALL))
-                    .apply(RequestOptions.centerCropTransform())
-                    .into(image)
-        }
         title.text = if (data?.title.isNullOrEmpty()) {
             ""
         } else {
@@ -90,14 +88,29 @@ class FeedViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             }
         }
 
+        val imageUrl = data?.mainImageUrl
+        if (!imageUrl.isNullOrEmpty()) {
+            Glide.with(itemView)
+                    .load(imageUrl)
+                    .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.ALL))
+                    .apply(RequestOptions.centerCropTransform())
+                    .into(image)
+        }
+        val avatarUrl = data?.avatarUrl
+        if (!avatarUrl.isNullOrEmpty()) {
+            Glide.with(itemView)
+                    .load(avatarUrl)
+                    .apply(RequestOptions.circleCropTransform())
+                    .into(avatar)
+        }
 
     }
 
     companion object {
-        fun create(parent: ViewGroup): FeedViewHolder {
+        fun create(parent: ViewGroup, callback: Callback): FeedViewHolder {
             val view = LayoutInflater.from(parent.context)
                     .inflate(R.layout.feed_card, parent, false)
-            return FeedViewHolder(view)
+            return FeedViewHolder(view, callback)
         }
 
         fun currentDate(): Calendar {
