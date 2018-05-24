@@ -67,7 +67,11 @@ configurations {
 
 apply from: '../versions.gradle'
 
-
+repositories {
+    maven {
+        url "https://s3.amazonaws.com/repo.commonsware.com"
+    }
+}
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
@@ -133,6 +137,9 @@ dependencies {
 
     // Paging
     implementation "android.arch.paging:runtime:1.0.0"
+
+    // markdown library
+    compile 'com.commonsware.cwac:anddown:0.4.0'
 
 
     kapt "android.arch.lifecycle:compiler:$architectureComponents"

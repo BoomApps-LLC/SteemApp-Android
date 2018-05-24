@@ -90,5 +90,6 @@ class FeedBoundaryCallback(
     @MainThread
     override fun onItemAtFrontLoaded(itemAtFront: StoryEntity) {
         super.onItemAtFrontLoaded(itemAtFront)
+        Timber.d("onItemAtFrontLoaded(itemAtFront=[%d, %s])", itemAtFront.indexInResponse, itemAtFront.permlink)
     }
 }

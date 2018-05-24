@@ -42,4 +42,10 @@ interface StoriesDao {
     @Query("DELETE FROM story_entities WHERE story_type = :type")
     fun deleteStoriesFor(type: Int)
 
+    @Query("SELECT * FROM story_entities WHERE story_entity_id = :storyId")
+    fun loadStory(storyId: Long): LiveData<StoryEntity>
+
+    @Query("SELECT * FROM story_entities WHERE story_entity_id = :storyId")
+    fun loadStorySync(storyId: Long): StoryEntity
+
 }

@@ -60,7 +60,7 @@ class FeedsFragment : Fragment(), FeedListHolderCallback {
         return view
     }
 
-    private fun addPagerListener(){
+    private fun addPagerListener() {
         feedsPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrollStateChanged(state: Int) {
                 Timber.d("onPageScrollStateChanged $state")
@@ -102,6 +102,7 @@ class FeedsFragment : Fragment(), FeedListHolderCallback {
             val postIntent = Intent(this.context, PostViewActivity::class.java)
             postIntent.putExtra(PostViewActivity.EXTRA_URL, story.url)
             postIntent.putExtra(PostViewActivity.EXTRA_TITLE, story.title)
+            postIntent.putExtra(PostViewActivity.EXTRA_POST_ID, story.entityId)
             startActivity(postIntent)
         }
     }

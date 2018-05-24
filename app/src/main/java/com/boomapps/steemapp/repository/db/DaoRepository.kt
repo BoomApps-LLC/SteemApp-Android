@@ -19,4 +19,8 @@ interface DaoRepository {
 
     fun storiesFor(type: FeedType, pageSize: Int): Listing<StoryEntity>
 
+    fun getStory(storyId : Long) : LiveData<StoryEntity>
+
+    fun getStorySync(storyId : Long) : StoryEntity
+
 }

@@ -1,6 +1,8 @@
 package com.boomapps.steemapp.ui.post
 
 import android.annotation.SuppressLint
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.constraint.ConstraintLayout
 import android.view.MenuItem
@@ -15,10 +17,12 @@ import kotlinx.android.synthetic.main.activity_post.*
 class PostViewActivity : BaseActivity() {
 
     companion object {
+        const val EXTRA_POST_ID = "post_id"
         const val EXTRA_URL = "url"
         const val EXTRA_TITLE = "title"
     }
 
+    lateinit var viewModel: PostViewModel
     var pFullWidth = 0
     private lateinit var progressParams: ConstraintLayout.LayoutParams
     lateinit var extraUrl: String
@@ -28,9 +32,10 @@ class PostViewActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_post)
         val bar = supportActionBar
-        if(bar != null){
+        if (bar != null) {
             bar.setDisplayHomeAsUpEnabled(true)
         }
+        viewModel = ViewModelProviders.of(this).get(PostViewModel::class.java)
         progressParams = postWebViewProgress.layoutParams as ConstraintLayout.LayoutParams
         postWebView.addOnLayoutChangeListener(object : View.OnLayoutChangeListener {
 
@@ -65,12 +70,19 @@ class PostViewActivity : BaseActivity() {
 
             override fun onReceivedTitle(view: WebView, title: String) {
                 super.onReceivedTitle(view, title)
-                setTitle(title)
+//                setTitle(title)
             }
         }
         postWebView.visibility = View.VISIBLE
         postWebView.settings.javaScriptEnabled = true
         postWebView.settings.loadWithOverviewMode = true
+
+        viewModel.postData.observe(this, Observer {
+            if (it != null) {
+                this@PostViewActivity.title = it.title
+                postWebView.loadData(it.body, "text/html", "UTF-8")
+            }
+        })
 
 
     }
@@ -91,7 +103,10 @@ class PostViewActivity : BaseActivity() {
 
     override fun onPostResume() {
         super.onPostResume()
-        postWebView.loadUrl(extraUrl)
+        if (intent != null) {
+            viewModel.getPost(intent.getLongExtra(EXTRA_POST_ID, -1))
+        }
+//        postWebView.loadUrl(extraUrl)
     }
 
     private fun showLoadingProgress(value: Int) {

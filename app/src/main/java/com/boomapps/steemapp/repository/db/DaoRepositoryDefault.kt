@@ -26,6 +26,16 @@ class DaoRepositoryDefault(
     }
 
 
+    override fun getStory(storyId: Long): LiveData<StoryEntity> {
+        Timber.d("getStory($storyId)")
+        return db.storiesDao().loadStory(storyId)
+    }
+
+    override fun getStorySync(storyId: Long): StoryEntity {
+        Timber.d("getStorySync($storyId)")
+        return db.storiesDao().loadStorySync(storyId)
+    }
+
     override fun insertFeedEntities(blogEntities: ArrayList<StoryEntity>) {
         db.storiesDao().insertStories(blogEntities.toTypedArray())
     }
@@ -78,7 +88,7 @@ class DaoRepositoryDefault(
                             .flatMap {
                                 return@flatMap ServiceLocator.getSteemRepository().getStoryDetails(AccountName(it.author), Permlink(it.permlink), it.id)
                             }
-                            .doOnNext{
+                            .doOnNext {
                                 Timber.d("Feed: onNext Details for(%s) >> title = %s", it.discussion?.permlink, it.discussion?.title)
                             }
                             .subscribeOn(Schedulers.io())
