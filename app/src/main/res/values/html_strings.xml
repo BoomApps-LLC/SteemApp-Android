@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="post_prefix" translatable="false">&lt;html>&lt;head>&lt;style>img {max-width : 90%;} a {color: #1FBF8F;}&lt;/style>&lt;head>&lt;body></string>
+    <string name="pos_postfix" translatable="false">&lt;\/body>&lt;\/html></string>
+</resources>

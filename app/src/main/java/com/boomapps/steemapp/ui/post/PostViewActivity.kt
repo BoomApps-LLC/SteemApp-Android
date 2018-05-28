@@ -13,6 +13,7 @@ import android.webkit.WebViewClient
 import com.boomapps.steemapp.R
 import com.boomapps.steemapp.ui.BaseActivity
 import kotlinx.android.synthetic.main.activity_post.*
+import timber.log.Timber
 
 class PostViewActivity : BaseActivity() {
 
@@ -80,12 +81,63 @@ class PostViewActivity : BaseActivity() {
         viewModel.postData.observe(this, Observer {
             if (it != null) {
                 this@PostViewActivity.title = it.title
-                postWebView.loadData(it.body, "text/html", "UTF-8")
+                val prettyHtml = prettifyHtml(it.body)
+                Timber.d("prettified html : $prettyHtml")
+                postWebView.loadData(prettyHtml, "text/html", "UTF-8")
             }
         })
 
-
     }
+
+    private fun prettifyHtml(rawBody: String): String {
+        if (rawBody.isNotEmpty()) {
+            var fullHtml = String.format("%s%s%s", getString(R.string.post_prefix), rawBody, getString(R.string.pos_postfix))
+            val userPattern = Regex("\\s(@\\w*)")
+            val separateLinksPattern = Regex("<.*>((https?|ftp|file)://.*?)<.*?>")
+            val  matchResults = userPattern.findAll(fullHtml)
+            for(mr in matchResults){
+                val range = mr.range
+                val groups = mr.groupValues
+            }
+            val withUsers = userPattern.replace(fullHtml, { matchResult ->
+                val groups = matchResult.groupValues
+                val uRes = if (groups.size == 1) {
+                    "<a href=\"https://steemit.com/${matchResult.value}\">${matchResult.value}</a>"
+                } else {
+                    "<a href=\"https://steemit.com/$groups[1]}\">${groups[1]}</a>"
+                }
+
+                return@replace uRes
+            })
+            val withLinks = separateLinksPattern.replace(withUsers, { matchResult ->
+                if (matchResult.groupValues.size > 1) {
+                    return@replace convertLinkToHtml(matchResult.groupValues[1])
+                } else {
+                    return@replace convertLinkToHtml(matchResult.value)
+                }
+
+            })
+            return withLinks
+
+        } else {
+            return rawBody
+        }
+    }
+
+    private fun convertLinkToHtml(inLink: String): String {
+        val isExt = inLink.substringAfterLast(".")
+        if (isExt.length in 1..4) {
+            if (isExt.endsWith("png") or
+                    isExt.endsWith("jpg") or
+                    isExt.endsWith("jpeg") or
+                    isExt.endsWith("gif")) {
+                return "<img src=\"$inLink\" alt=\"img${inLink.length}\">"
+            }
+        }
+
+        return "<a href=\"https://steemit.com/$inLink\">$inLink</a>"
+    }
+
 
     val loadingListener = object : LoadingWebViewClient.LoadingListener {
         override fun showProgress() {
