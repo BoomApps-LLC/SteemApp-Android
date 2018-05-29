@@ -13,7 +13,6 @@ import android.webkit.WebViewClient
 import com.boomapps.steemapp.R
 import com.boomapps.steemapp.ui.BaseActivity
 import kotlinx.android.synthetic.main.activity_post.*
-import timber.log.Timber
 
 class PostViewActivity : BaseActivity() {
 
@@ -27,6 +26,8 @@ class PostViewActivity : BaseActivity() {
     var pFullWidth = 0
     private lateinit var progressParams: ConstraintLayout.LayoutParams
     lateinit var extraUrl: String
+    var extraPostId: Long = -1
+    var extraTitle = ""
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,7 +37,20 @@ class PostViewActivity : BaseActivity() {
         if (bar != null) {
             bar.setDisplayHomeAsUpEnabled(true)
         }
-        viewModel = ViewModelProviders.of(this).get(PostViewModel::class.java)
+        val inData = intent
+        if (inData != null) {
+            extraUrl = inData.getStringExtra(EXTRA_URL)
+            extraPostId = inData.getLongExtra(EXTRA_POST_ID, -1L)
+            extraTitle = if (inData.hasExtra(EXTRA_TITLE)) {
+                inData.getStringExtra(EXTRA_TITLE)
+            } else {
+                ""
+            }
+            if (title.isNotEmpty()) {
+                title = extraTitle
+            }
+        }
+        viewModel = ViewModelProviders.of(this, PostViewModelFactory(extraPostId, extraUrl, extraTitle)).get(PostViewModel::class.java)
         progressParams = postWebViewProgress.layoutParams as ConstraintLayout.LayoutParams
         postWebView.addOnLayoutChangeListener(object : View.OnLayoutChangeListener {
 
@@ -47,46 +61,30 @@ class PostViewActivity : BaseActivity() {
                 }
             }
         })
-        val inData = intent
-        if (inData != null) {
-            extraUrl = inData.getStringExtra(EXTRA_URL)
-            val extraTitle = if (inData.hasExtra(EXTRA_TITLE)) {
-                inData.getStringExtra(EXTRA_TITLE)
-            } else {
-                ""
-            }
-            if (title.isNotEmpty()) {
-                title = extraTitle
-            }
-        }
+
         postWebView.webViewClient = WebViewClient()// LoadingWebViewClient(loadingListener)
         postWebView.webChromeClient = object : WebChromeClient() {
 
             override fun onProgressChanged(view: WebView, newProgress: Int) {
-                if (newProgress <= 100) {
-                    showLoadingProgress(newProgress)
-                }
                 super.onProgressChanged(view, newProgress)
             }
 
-            override fun onReceivedTitle(view: WebView, title: String) {
-                super.onReceivedTitle(view, title)
-//                setTitle(title)
-            }
         }
         postWebView.visibility = View.VISIBLE
         postWebView.settings.javaScriptEnabled = true
         postWebView.settings.loadWithOverviewMode = true
 
+
         viewModel.postData.observe(this, Observer {
             if (it != null) {
-                this@PostViewActivity.title = it.title
-                val prettyHtml = prettifyHtml(it.body)
-                Timber.d("prettified html : $prettyHtml")
-                postWebView.loadData(prettyHtml, "text/html", "UTF-8")
+                showHtml(it.body)
             }
         })
+    }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.loadPost()
     }
 
     private fun prettifyHtml(rawBody: String): String {
@@ -94,8 +92,8 @@ class PostViewActivity : BaseActivity() {
             var fullHtml = String.format("%s%s%s", getString(R.string.post_prefix), rawBody, getString(R.string.pos_postfix))
             val userPattern = Regex("\\s(@\\w*)")
             val separateLinksPattern = Regex("<.*>((https?|ftp|file)://.*?)<.*?>")
-            val  matchResults = userPattern.findAll(fullHtml)
-            for(mr in matchResults){
+            val matchResults = userPattern.findAll(fullHtml)
+            for (mr in matchResults) {
                 val range = mr.range
                 val groups = mr.groupValues
             }
@@ -139,39 +137,10 @@ class PostViewActivity : BaseActivity() {
     }
 
 
-    val loadingListener = object : LoadingWebViewClient.LoadingListener {
-        override fun showProgress() {
-            setProgressState(true)
-        }
-
-        override fun hideProgress() {
-            setProgressState(false)
-        }
-
-        override fun setTitle(title: String) {
-            this@PostViewActivity.title = title
-        }
-    }
-
-    override fun onPostResume() {
-        super.onPostResume()
-        if (intent != null) {
-            viewModel.getPost(intent.getLongExtra(EXTRA_POST_ID, -1))
-        }
-//        postWebView.loadUrl(extraUrl)
-    }
-
-    private fun showLoadingProgress(value: Int) {
-        progressParams?.width = (pFullWidth / 100f * value).toInt()
-        postWebViewProgress.setLayoutParams(progressParams)
-    }
-
-    private fun setProgressState(visible: Boolean) {
-        postWebViewProgress.visibility = if (visible) {
-            View.VISIBLE
-        } else {
-            View.INVISIBLE
-        }
+    private fun showHtml(html: String) {
+        val fullHtml = String.format("%s%s%s", getString(R.string.post_new_prefix), html, getString(R.string.pos_postfix))
+        postWebView.loadData(fullHtml, "text/html", "UTF-8")
+        postWebViewProgress.visibility = View.GONE
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
