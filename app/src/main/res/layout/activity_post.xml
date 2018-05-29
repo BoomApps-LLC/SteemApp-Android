@@ -14,12 +14,12 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"></WebView>
 
-    <View
+    <ProgressBar
         android:id="@+id/postWebViewProgress"
-        android:layout_width="0dp"
-        android:layout_height="2dp"
-        android:background="@color/colorAccent"
-        android:visibility="invisible"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:indeterminateTint="@color/green_active"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
