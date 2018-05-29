@@ -6,6 +6,7 @@ import android.arch.lifecycle.Transformations
 import android.arch.paging.LivePagedListBuilder
 import android.support.annotation.MainThread
 import com.boomapps.steemapp.repository.*
+import com.boomapps.steemapp.repository.db.entities.PostEntity
 import com.boomapps.steemapp.repository.db.entities.StoryEntity
 import com.boomapps.steemapp.repository.steem.DiscussionData
 import eu.bittrade.libs.steemj.base.models.AccountName
@@ -165,4 +166,28 @@ class DaoRepositoryDefault(
         )
     }
 
+
+    override fun getPost(postId: Long): PostEntity {
+        return db.postsDao().loadPostEntity(postId)
+    }
+
+    override fun getPostLiveData(postId: Long): LiveData<PostEntity> {
+        return db.postsDao().loadPostLiveData(postId)
+    }
+
+    override fun updatePost(postEntity: PostEntity) {
+        db.postsDao().updatePost(postEntity)
+    }
+
+    override fun insertPost(postEntity: PostEntity) {
+        db.postsDao().insertPost(postEntity)
+    }
+
+    override fun deletePost(postId: Long) {
+        db.postsDao().deletePost(postId)
+    }
+
+    override fun deletePost(postEntity: PostEntity) {
+        db.postsDao().deletePost(postEntity)
+    }
 }
