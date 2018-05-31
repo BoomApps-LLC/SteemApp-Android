@@ -95,6 +95,12 @@ class FeedViewHolder(itemView: View, callback: Callback) : RecyclerView.ViewHold
                     .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.ALL))
                     .apply(RequestOptions.centerCropTransform())
                     .into(image)
+        }else{
+            Glide.with(itemView)
+                    .load(R.drawable.img_logo)
+                    .apply(RequestOptions.centerCropTransform())
+                    .into(image)
+
         }
         val avatarUrl = data?.avatarUrl
         if (!avatarUrl.isNullOrEmpty()) {
