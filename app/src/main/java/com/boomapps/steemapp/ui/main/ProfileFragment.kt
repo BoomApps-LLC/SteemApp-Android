@@ -3,6 +3,8 @@ package com.boomapps.steemapp.ui.main
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
@@ -10,17 +12,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.boomapps.steemapp.R
-import com.boomapps.steemapp.repository.UserData
-import com.boomapps.steemapp.ui.ViewState
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions.circleCropTransform
-import kotlinx.android.synthetic.main.activity_profile.*
-import kotlinx.android.synthetic.main.fragment_profile.view.*
-import android.content.Intent
-import android.net.Uri
 import com.boomapps.steemapp.SteemApplication
 import com.boomapps.steemapp.repository.Balance
+import com.boomapps.steemapp.ui.ViewState
 import com.boomapps.steemapp.ui.dialogs.WarningDialog
+import kotlinx.android.synthetic.main.fragment_profile_new.view.*
 import kotlinx.android.synthetic.main.fragment_wallet.*
 
 
@@ -124,6 +120,11 @@ class ProfileFragment : Fragment() {
         view.profileRateControl.setOnClickListener {
             val i = Intent(Intent.ACTION_VIEW)
             i.data = Uri.parse("market://details?id=" + SteemApplication.instance.packageName)
+            startActivity(i)
+        }
+        view.poweredBy.setOnClickListener {
+            val i = Intent(Intent.ACTION_VIEW)
+            i.data = Uri.parse("https://steemit.com/@adsactly")
             startActivity(i)
         }
         return view

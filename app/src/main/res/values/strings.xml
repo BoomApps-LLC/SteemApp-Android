@@ -111,4 +111,6 @@ Do you want to enter correct key and try to post again?</string>
         <item quantity="many">days</item>
         <item quantity="other">days</item>
     </plurals>
+    
+    <string name="adsactly_powered">Powered by "<b>"Adsactly"</b>"</string>
 </resources>

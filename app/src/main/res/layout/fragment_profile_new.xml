@@ -22,10 +22,10 @@
         android:id="@+id/myBalanceValue"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="48dp"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginTop="8dp"
-        android:layout_marginBottom="48dp"
         android:text="$10 000"
         android:textColor="@android:color/white"
         android:textSize="40sp"
@@ -43,9 +43,9 @@
             android:id="@+id/profileFeedbackControl"
             android:layout_width="match_parent"
             android:layout_height="48dp"
+            android:layout_marginBottom="8dp"
             android:background="?selectableItemBackground"
             android:clickable="true"
-            android:layout_marginBottom="8dp"
             android:orientation="horizontal">
 
             <ImageView
@@ -73,9 +73,9 @@
             android:id="@+id/profileShareControl"
             android:layout_width="match_parent"
             android:layout_height="48dp"
+            android:layout_marginBottom="8dp"
             android:background="?selectableItemBackground"
             android:clickable="true"
-            android:layout_marginBottom="8dp"
             android:orientation="horizontal">
 
             <ImageView
@@ -103,9 +103,9 @@
             android:id="@+id/profileRateControl"
             android:layout_width="match_parent"
             android:layout_height="48dp"
+            android:layout_marginBottom="8dp"
             android:background="?selectableItemBackground"
             android:clickable="true"
-            android:layout_marginBottom="8dp"
             android:orientation="horizontal">
 
             <ImageView
@@ -132,8 +132,8 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="8dp"
             android:layout_marginBottom="4dp"
+            android:layout_marginTop="8dp"
             android:background="@color/textGray" />
 
         <LinearLayout
@@ -170,6 +170,28 @@
             android:layout_height="1dp"
             android:layout_marginTop="4dp"
             android:background="@color/textGray" />
+
+        <LinearLayout
+            android:id="@+id/poweredBy"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginBottom="8dp"
+            android:background="?selectableItemBackground"
+            android:clickable="true"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/Text.White"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginRight="32dp"
+                android:duplicateParentState="true"
+                android:gravity="center_vertical|right"
+                android:text="@string/adsactly_powered"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
     </LinearLayout>
 
 
