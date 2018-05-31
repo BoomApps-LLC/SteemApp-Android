@@ -19,12 +19,16 @@ import kotlinx.android.synthetic.main.fragment_profile.view.*
 import android.content.Intent
 import android.net.Uri
 import com.boomapps.steemapp.SteemApplication
+import com.boomapps.steemapp.repository.Balance
 import com.boomapps.steemapp.ui.dialogs.WarningDialog
+import kotlinx.android.synthetic.main.fragment_wallet.*
 
 
 class ProfileFragment : Fragment() {
 
     private lateinit var viewModelShared: MainViewModel
+    private var balanceValue: Array<String> = arrayOf("0", "00")
+    private var balanceSymbol = "$"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,9 +52,32 @@ class ProfileFragment : Fragment() {
                 }
             }
         })
-        viewModelShared.getUserProfile().observe(this, Observer<UserData> { data ->
-            if (data != null) {
-                showProfileData(data)
+//        viewModelShared.getUserProfile().observe(this, Observer<UserData> { data ->
+//            if (data != null) {
+//                showProfileData(data)
+//            }
+//        })
+
+        viewModelShared.getBalance().observe(this, object : Observer<Balance> {
+            override fun onChanged(data: Balance?) {
+                if (data != null) {
+                    val asString: String = data.fullBalance.toString()
+                    var intVal = asString.substringBefore(".")
+                    if (intVal.toInt() < 0) {
+                        intVal = "0"
+                    }
+                    val after = asString.substringAfter(".")
+                    balanceValue = arrayOf(
+                            intVal,
+                            if (after.isEmpty()) {
+                                "0"
+                            } else {
+                                after.subSequence(0, Math.min(2, after.length))
+                            }.toString()
+                    )
+
+                    myBalanceValue.text = getString(R.string.balance_template, balanceSymbol, balanceValue[0], balanceValue[1])
+                }
             }
         })
     }
@@ -58,7 +85,7 @@ class ProfileFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_profile, container, false)
+        val view = inflater.inflate(R.layout.fragment_profile_new, container, false)
         view.profileSignOutControl.setOnClickListener({
             val context = view.context
             WarningDialog.getInstance().showSpecial(
@@ -102,26 +129,26 @@ class ProfileFragment : Fragment() {
         return view
     }
 
-    fun showProfileData(uData: UserData?) {
-        if (uData != null) {
-            if (!uData.userName.isNullOrEmpty()) {
-                profileFullName.setText(uData.userName)
-            } else {
-                profileFullName.setText(uData.nickname)
-            }
-            if (uData.photoUrl.isNullOrEmpty()) {
-                return
-            }
-            Glide.with(this@ProfileFragment)
-                    .load(uData.photoUrl)
-                    .apply(circleCropTransform())
-                    .into(profileAvatar)
-        }
-    }
+//    fun showProfileData(uData: UserData?) {
+//        if (uData != null) {
+//            if (!uData.userName.isNullOrEmpty()) {
+//                profileFullName.setText(uData.userName)
+//            } else {
+//                profileFullName.setText(uData.nickname)
+//            }
+//            if (uData.photoUrl.isNullOrEmpty()) {
+//                return
+//            }
+//            Glide.with(this@ProfileFragment)
+//                    .load(uData.photoUrl)
+//                    .apply(circleCropTransform())
+//                    .into(profileAvatar)
+//        }
+//    }
 
     override fun onResume() {
         super.onResume()
-        showProfileData(viewModelShared.getUserProfile().value)
+//        showProfileData(viewModelShared.getUserProfile().value)
     }
 
     companion object {
