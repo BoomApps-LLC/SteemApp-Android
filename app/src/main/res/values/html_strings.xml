@@ -4,5 +4,13 @@
     <string name="pos_postfix" translatable="false">&lt;\/body>&lt;\/html></string>
 
 
-    <string name="post_new_prefix">&lt;!DOCTYPE html>&lt;html lang=\"en\">&lt;head>&lt;base href=\"https://steemit.com/\" target=\"_blank\">&lt;style>img {;max-width: 96%; margin-left: 2%; margin-right: 2%; margin-top: 10pt} a {color: #1FBF8F;} .PostFull__body {padding: 2rem;clear: left;margin: 0 auto;} h1,h2,h3 {padding: auto auto;} div,iframe{ display: block;max-width: 96%; margin-left: 2%; margin-right: 2%; margin-top: 10pt}body {background-color: #fefefe;color: #333;font-family: \"Source Sans Pro\", \"Helvetica Neue\", Helvetica, Arial, sans-serif;line-height: 1.6;}&lt;/style>&lt;/head></string>
+    <string name="post_new_prefix">
+        &lt;!DOCTYPE html>
+        &lt;html lang=\"en\">
+        &lt;head>
+        &lt;base href=\"https://steemit.com/\" target=\"_blank\">
+        &lt;style>img {;max-width: 96%; margin-left: 2%; margin-right: 2%; margin-top: 10pt} a {color: #1FBF8F;} .PostFull__body {padding: 2rem;clear: left;margin: 0 auto;} h1,h2,h3 {padding: auto auto; line-height: 1.2;} div,iframe{ display: block;max-width: 96%; margin-left: 2%; margin-right: 2%; margin-top: 10pt}body {background-color: #fefefe;color: #333;font-family: \"Source Sans Pro\", \"Helvetica Neue\", Helvetica, Arial, sans-serif;line-height: 1.2;}
+        &lt;/style>
+        &lt;/head></string>
+
 </resources>

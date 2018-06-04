@@ -9,11 +9,6 @@ import com.boomapps.steemapp.repository.db.entities.StoryEntity
 
 interface DaoRepository {
 
-    fun insertBlogEntities(blogEntities: ArrayList<StoryEntity>)
-
-
-    fun insertFeedEntities(blogEntities: ArrayList<StoryEntity>)
-
 
     fun refresh(type: FeedType): LiveData<NetworkState>
 

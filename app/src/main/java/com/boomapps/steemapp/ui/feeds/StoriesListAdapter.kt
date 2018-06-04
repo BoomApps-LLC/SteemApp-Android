@@ -9,7 +9,7 @@ import com.boomapps.steemapp.repository.NetworkState
 import com.boomapps.steemapp.repository.db.entities.StoryEntity
 import timber.log.Timber
 
-class StoriesListAdapter(private val itemsCallback : FeedViewHolder.Callback, private val retryCallback: () -> Unit) : PagedListAdapter<StoryEntity, RecyclerView.ViewHolder>(STORY_COMPARATOR) {
+class StoriesListAdapter(private val itemsCallback: FeedViewHolder.Callback, private val retryCallback: () -> Unit) : PagedListAdapter<StoryEntity, RecyclerView.ViewHolder>(STORY_COMPARATOR) {
 
     private var networkState: NetworkState? = null
 
@@ -63,11 +63,20 @@ class StoriesListAdapter(private val itemsCallback : FeedViewHolder.Callback, pr
 
     companion object {
         val STORY_COMPARATOR = object : DiffUtil.ItemCallback<StoryEntity>() {
-            override fun areContentsTheSame(oldItem: StoryEntity, newItem: StoryEntity): Boolean =
-                    oldItem == newItem
+            override fun areContentsTheSame(oldItem: StoryEntity, newItem: StoryEntity): Boolean {
+                if (oldItem.commentsNum - newItem.commentsNum != 0 ||
+                        oldItem.linksNum - newItem.linksNum != 0 ||
+                        oldItem.commentsNum - newItem.commentsNum != 0 ||
+                        oldItem.reputation - newItem.reputation != 0 ||
+                        oldItem.price != newItem.price
+                ) return false
+                if (oldItem.avatarUrl != newItem.avatarUrl) return false
+                if (oldItem.mainImageUrl != newItem.mainImageUrl) return false
+                return true
+            }
 
             override fun areItemsTheSame(oldItem: StoryEntity, newItem: StoryEntity): Boolean =
-                    oldItem.entityId == newItem.entityId && oldItem.permlink == newItem.permlink
+                    oldItem.entityId == newItem.entityId
 
         }
 

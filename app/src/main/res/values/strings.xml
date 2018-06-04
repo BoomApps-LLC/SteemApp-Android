@@ -113,4 +113,9 @@ Do you want to enter correct key and try to post again?</string>
     </plurals>
     
     <string name="adsactly_powered">Powered by "<b>"Adsactly"</b>"</string>
+
+    <!-- FEEDS-->
+    <string name="feed_card_date_format_common">%d %s ago</string>
+    <string name="feed_card_date_format_yesterday">yesterday</string>
+
 </resources>

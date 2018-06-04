@@ -59,6 +59,7 @@ class FeedListHolder(val type: FeedType, val tabName: String, val feedView: View
         }
     }
 
+
     fun updateList(newData: PagedList<StoryEntity>) {
         refreshLayout.isRefreshing = false
         adapter.submitList(newData)

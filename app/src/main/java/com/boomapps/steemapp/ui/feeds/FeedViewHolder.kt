@@ -78,13 +78,13 @@ class FeedViewHolder(itemView: View, callback: Callback) : RecyclerView.ViewHold
             val monthDelta = curCal.get(Calendar.MONTH) - created.get(Calendar.MONTH)
             val dayDelta = curCal.get(Calendar.DAY_OF_YEAR) - created.get(Calendar.DAY_OF_YEAR)
             if (yearsDelta > 0) {
-                lastTime.text = String.format("%d %s ago", yearsDelta, itemView.context.resources.getQuantityString(R.plurals.years, yearsDelta))
+                lastTime.text = formatDate(yearsDelta, itemView.context.resources.getQuantityString(R.plurals.years, yearsDelta))
             } else if (monthDelta > 0) {
-                lastTime.text = String.format("%d %s ago", monthDelta, itemView.context.resources.getQuantityString(R.plurals.months, monthDelta))
+                lastTime.text = formatDate(monthDelta, itemView.context.resources.getQuantityString(R.plurals.months, monthDelta))
             } else if (dayDelta > 1) {
-                lastTime.text = String.format("%d %s ago", dayDelta, itemView.context.resources.getQuantityString(R.plurals.days, dayDelta))
+                lastTime.text = formatDate(dayDelta, itemView.context.resources.getQuantityString(R.plurals.days, dayDelta))
             } else {
-                lastTime.text = "yesterday"
+                lastTime.text = itemView.context.getString(R.string.feed_card_date_format_yesterday)
             }
         }
 
@@ -95,7 +95,7 @@ class FeedViewHolder(itemView: View, callback: Callback) : RecyclerView.ViewHold
                     .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.ALL))
                     .apply(RequestOptions.centerCropTransform())
                     .into(image)
-        }else{
+        } else {
             Glide.with(itemView)
                     .load(R.drawable.img_logo)
                     .apply(RequestOptions.centerCropTransform())
@@ -106,10 +106,15 @@ class FeedViewHolder(itemView: View, callback: Callback) : RecyclerView.ViewHold
         if (!avatarUrl.isNullOrEmpty()) {
             Glide.with(itemView)
                     .load(avatarUrl)
+                    .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.ALL))
                     .apply(RequestOptions.circleCropTransform())
                     .into(avatar)
         }
 
+    }
+
+    private fun formatDate(days: Int, pluralValue: String): String {
+        return String.format(itemView.context.getString(R.string.feed_card_date_format_common), days, pluralValue)
     }
 
     companion object {

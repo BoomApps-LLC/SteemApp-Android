@@ -13,7 +13,7 @@ import com.boomapps.steemapp.ui.BaseViewModel
 
 class FeedsViewModel : BaseViewModel() {
 
-    // blog
+// BLOG
     private val blogType = MutableLiveData<FeedType>()
     private val blogRepoResult = Transformations.map(blogType, {
         ServiceLocator.getDaoRepository().storiesFor(it, ServiceLocator.DATABASE_PAGE_SIZE)
@@ -22,52 +22,75 @@ class FeedsViewModel : BaseViewModel() {
     val blogsNetworkState = Transformations.switchMap(blogRepoResult, { it.networkState })!!
     val blogsRefreshState = Transformations.switchMap(blogRepoResult, { it.refreshState })!!
 
+// FEED
     private val feedType = MutableLiveData<FeedType>()
     private val feedRepoResult = Transformations.map(feedType, {
         ServiceLocator.getDaoRepository().storiesFor(it, ServiceLocator.DATABASE_PAGE_SIZE)
     })
-
     val feeds = Transformations.switchMap(feedRepoResult, { it.pagedList })!!
     val feedsNetworkState = Transformations.switchMap(feedRepoResult, { it.networkState })!!
     val feedsRefreshState = Transformations.switchMap(feedRepoResult, { it.refreshState })!!
 
-    fun getListLiveData(type: FeedType): LiveData<PagedList<StoryEntity>> {
+// TRENDING
+    private val trendingType = MutableLiveData<FeedType>()
+    private val trendingRepoResult = Transformations.map(trendingType, {
+        ServiceLocator.getDaoRepository().storiesFor(it, ServiceLocator.DATABASE_PAGE_SIZE)
+    })
+    val trendings = Transformations.switchMap(trendingRepoResult, { it.pagedList })!!
+    val trendingsNetworkState = Transformations.switchMap(trendingRepoResult, { it.networkState })!!
+    val trendingsRefreshState = Transformations.switchMap(trendingRepoResult, { it.refreshState })!!
 
-        if (type == FeedType.FEED) {
-            return feeds
+// NEW
+    private val novicesType = MutableLiveData<FeedType>()
+    private val novicesRepoResult = Transformations.map(novicesType, {
+        ServiceLocator.getDaoRepository().storiesFor(it, ServiceLocator.DATABASE_PAGE_SIZE)
+    })
+    val novices = Transformations.switchMap(novicesRepoResult, { it.pagedList })!!
+    val novicesNetworkState = Transformations.switchMap(novicesRepoResult, { it.networkState })!!
+    val novicesRefreshState = Transformations.switchMap(novicesRepoResult, { it.refreshState })!!
+
+    fun getListLiveData(type: FeedType): LiveData<PagedList<StoryEntity>> {
+        return when(type){
+            FeedType.BLOG -> blogs
+            FeedType.TRENDING -> trendings
+            FeedType.NEW -> novices
+            else -> feeds
         }
-        // default is blogs
-        return blogs
     }
 
     fun getNetworkState(type: FeedType): LiveData<NetworkState> {
-        if (type == FeedType.FEED) {
-            return feedsNetworkState
+        return when (type) {
+            FeedType.TRENDING -> trendingsNetworkState
+            FeedType.NEW -> novicesNetworkState
+            FeedType.BLOG -> blogsNetworkState
+            else -> feedsNetworkState // FeedType.FEED
         }
-        // default is blogs
-        return blogsNetworkState
     }
 
     fun getRefreshState(type: FeedType): LiveData<NetworkState> {
-        if (type == FeedType.FEED) {
-            return feedsRefreshState
+        return when (type) {
+            FeedType.TRENDING -> trendingsRefreshState
+            FeedType.NEW -> novicesRefreshState
+            FeedType.BLOG -> blogsRefreshState
+            else -> feedsRefreshState // FeedType.FEED
         }
-
-        return blogsRefreshState
     }
 
     fun getStory(type: FeedType, position: Int): StoryEntity? {
-        if (type == FeedType.FEED) {
-            return feeds.value?.get(position)
-        } else {
-            return blogs.value?.get(position)
+        return when (type) {
+            FeedType.BLOG -> blogs.value?.get(position)
+            FeedType.NEW -> novices.value?.get(position)
+            FeedType.TRENDING -> trendings.value?.get(position)
+            else -> feeds.value?.get(position) // FeedType.FEED
         }
     }
 
     fun refresh(type: FeedType) {
         when (type) {
             FeedType.BLOG -> blogRepoResult.value?.refresh?.invoke()
-            FeedType.FEED -> feedRepoResult.value?.refresh?.invoke()
+            FeedType.TRENDING -> trendingRepoResult.value?.refresh?.invoke()
+            FeedType.NEW -> novicesRepoResult.value?.refresh?.invoke()
+            else -> feedRepoResult.value?.refresh?.invoke() // FeedType.FEED
         }
     }
 
@@ -80,7 +103,21 @@ class FeedsViewModel : BaseViewModel() {
                     return false
                 }
             }
-            FeedType.FEED -> {
+            FeedType.TRENDING -> {
+                if (trendingType.value != type) {
+                    trendingType.value = type
+                } else {
+                    return false
+                }
+            }
+            FeedType.NEW -> {
+                if (novicesType.value != type) {
+                    novicesType.value = type
+                } else {
+                    return false
+                }
+            }
+            else -> { //FeedType.FEED
                 if (feedType.value != type) {
                     feedType.value = type
                 } else {
@@ -95,19 +132,20 @@ class FeedsViewModel : BaseViewModel() {
     fun retry(type: FeedType) {
         val listing = when (type) {
             FeedType.BLOG -> blogRepoResult?.value
-            FeedType.FEED -> feedRepoResult?.value
-            else -> blogRepoResult?.value // default value
+            FeedType.TRENDING -> trendingRepoResult?.value
+            FeedType.NEW -> novicesRepoResult?.value
+            else -> feedRepoResult?.value // FeedType.FEED
         }
         listing?.retry?.invoke()
     }
 
     fun isActivated(type: FeedType): Boolean {
-        if (type == FeedType.FEED) {
-            return feedType.value == type
+        return when (type) {
+            FeedType.BLOG -> blogType.value == type
+            FeedType.TRENDING -> trendingType.value == type
+            FeedType.NEW -> novices.value == type
+            else -> feedType.value == FeedType.FEED // FeedType.FEED
         }
-
-        // default blog
-        return blogType.value == FeedType.BLOG
     }
 
 }

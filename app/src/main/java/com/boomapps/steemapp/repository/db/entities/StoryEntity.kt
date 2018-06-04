@@ -48,6 +48,7 @@ class StoryEntity {
     @ColumnInfo(name = "story_type")
     var storyType: Int = -1
 
+    @ColumnInfo(name = "index_in")
     var indexInResponse = -1
 
 

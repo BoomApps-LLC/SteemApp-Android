@@ -1,27 +1,260 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <WebView
-        android:id="@+id/postWebView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:paddingTop="2dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"></WebView>
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <ProgressBar
-        android:id="@+id/postWebViewProgress"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:indeterminateTint="@color/green_active"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <android.support.v4.widget.NestedScrollView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:paddingTop="2dp"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            app:layout_constraintBottom_toTopOf="@id/aPost_bottomDivider"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-</android.support.constraint.ConstraintLayout>
+            <WebView
+                android:id="@+id/postWebView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                android:paddingTop="2dp" />
+        </android.support.v4.widget.NestedScrollView>
+
+
+        <ProgressBar
+            android:id="@+id/postWebViewProgress"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:indeterminateTint="@color/green_active"
+            app:layout_constraintBottom_toTopOf="@id/aPost_bottomDivider"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <android.support.constraint.Guideline
+            android:id="@+id/aPost_guidelineLeft"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="48dp" />
+
+        <android.support.constraint.Guideline
+            android:id="@+id/aPost_guidelineCenter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5" />
+
+        <android.support.constraint.Guideline
+            android:id="@+id/aPost_guidelineRight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="48dp" />
+
+        <TextView
+            android:id="@+id/aPost_tvVotesNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="16dp"
+            android:textColor="#0b0712"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/aPost_guidelineLeft"
+            app:layout_constraintTop_toBottomOf="@id/aPost_priceLayout"
+            tools:text="20" />
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginTop="16dp"
+            android:src="@drawable/ic_feed_card_votes"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/aPost_guidelineLeft"
+            app:layout_constraintTop_toBottomOf="@id/aPost_priceLayout" />
+
+
+        <TextView
+            android:id="@+id/aPost_tvCommentNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="16dp"
+            android:textColor="#0b0712"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/aPost_guidelineCenter"
+            app:layout_constraintTop_toBottomOf="@id/aPost_priceLayout"
+            tools:text="120" />
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginTop="16dp"
+            android:src="@drawable/ic_feed_card_comments"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/aPost_guidelineCenter"
+            app:layout_constraintTop_toBottomOf="@id/aPost_priceLayout" />
+
+        <TextView
+            android:id="@+id/aPost_tvLinkNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="16dp"
+            android:textColor="#0b0712"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/aPost_guidelineRight"
+            app:layout_constraintTop_toBottomOf="@id/aPost_priceLayout"
+            tools:text="95" />
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginTop="16dp"
+            android:src="@drawable/ic_feed_card_linked"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/aPost_guidelineRight"
+            app:layout_constraintTop_toBottomOf="@id/aPost_priceLayout" />
+
+
+        <ImageView
+            android:id="@+id/aPost_ivAuthorAvatar"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="16dp"
+            app:layout_constraintBottom_toTopOf="@id/aPost_tvCommentNumber"
+            app:layout_constraintStart_toStartOf="parent"
+            app:srcCompat="@drawable/ic_account_circle_black_24dp" />
+
+        <TextView
+            android:id="@+id/aPost_tvAuthor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:gravity="top"
+            android:hint="Unknown"
+            android:textColor="#0b0712"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@id/aPost_ivAuthorAvatar"
+            app:layout_constraintTop_toTopOf="@id/aPost_ivAuthorAvatar"
+            tools:text="yuriks2000" />
+
+        <TextView
+            android:id="@+id/aPost_tvLastActivityTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:gravity="top"
+            android:paddingBottom="2dp"
+            android:textColor="#9c97a4"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/aPost_ivAuthorAvatar"
+            app:layout_constraintStart_toEndOf="@id/aPost_ivAuthorAvatar"
+            tools:text="5 days ago" />
+
+        <android.support.constraint.Barrier
+            android:id="@+id/barrier2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="end"
+            app:constraint_referenced_ids="aPost_tvLastActivityTime,aPost_tvAuthor" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="0dp"
+            android:layout_marginBottom="2dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="2dp"
+            android:background="#e2e2e2"
+            app:layout_constraintBottom_toBottomOf="@id/aPost_tvAuthor"
+            app:layout_constraintStart_toEndOf="@id/barrier2"
+            app:layout_constraintTop_toTopOf="@id/aPost_tvAuthor" />
+
+
+        <TextView
+            android:id="@+id/aPost_tvReputation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:gravity="top"
+            android:textColor="@color/violet"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/aPost_tvAuthor"
+            app:layout_constraintStart_toEndOf="@id/aPost_tvAuthor"
+            app:layout_constraintTop_toTopOf="@id/aPost_tvAuthor"
+            tools:text="59" />
+
+        <LinearLayout
+            android:id="@+id/aPost_priceLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginRight="16dp"
+            android:background="@drawable/selector_feed_card_price"
+            android:clickable="true"
+            android:focusable="false"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="@id/aPost_ivAuthorAvatar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/aPost_ivAuthorAvatar">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
+                android:layout_marginStart="8dp"
+                android:src="@drawable/selector_feed_card_price_icon" />
+
+            <TextView
+                android:id="@+id/aPost_tvFullPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="4dp"
+                android:textColor="@color/selector_feed_card_price_text"
+                tools:text="$127.33" />
+        </LinearLayout>
+
+        <View
+            android:id="@+id/aPost_bottomDivider"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="2dp"
+            android:background="#e2e2e2"
+            app:layout_constraintBottom_toTopOf="@id/aPost_ivAuthorAvatar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </android.support.constraint.ConstraintLayout>
+
+</android.support.design.widget.CoordinatorLayout>
+

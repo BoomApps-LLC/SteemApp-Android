@@ -8,9 +8,11 @@ import com.boomapps.steemapp.repository.ServiceLocator
 import eu.bittrade.crypto.core.AddressFormatException
 import eu.bittrade.libs.steemj.SteemJ
 import eu.bittrade.libs.steemj.base.models.AccountName
+import eu.bittrade.libs.steemj.base.models.DiscussionQuery
 import eu.bittrade.libs.steemj.base.models.Permlink
 import eu.bittrade.libs.steemj.base.models.operations.CommentOperation
 import eu.bittrade.libs.steemj.configuration.SteemJConfig
+import eu.bittrade.libs.steemj.enums.DiscussionSortType
 import eu.bittrade.libs.steemj.enums.PrivateKeyType
 import eu.bittrade.libs.steemj.exceptions.SteemCommunicationException
 import eu.bittrade.libs.steemj.exceptions.SteemConnectionException
@@ -214,7 +216,7 @@ class SteemRepositoryDefault : SteemRepository {
         return Observable.fromCallable { return@fromCallable FeedShortEntriesRequest(FeedType.BLOG, steemJ, aName, start, limit).load() }
     }
 
-    override fun getStoryDetails(aName: AccountName?, pLink: Permlink, orderId : Int): Observable<DiscussionData> {
+    override fun getStoryDetails(aName: AccountName?, pLink: Permlink, orderId: Int): Observable<DiscussionData> {
         val rqName = aName ?: steemJConfig?.defaultAccount
         Timber.d("getStoryDetails >> ${rqName?.name} :: ${pLink.link}")
         return Observable.fromCallable { DiscussionData(orderId, steemJ?.getContent(rqName, pLink)) }
@@ -266,4 +268,39 @@ class SteemRepositoryDefault : SteemRepository {
                 }
 
     }
+
+
+    private fun getDiscussionsDataList(sortType: DiscussionSortType, start: Int, limit: Int, startPermlink: String): Single<ArrayList<DiscussionData>>? {
+        Timber.d("getDiscussionsDataList($start, $limit, $startPermlink")
+        val dQuery = DiscussionQuery()
+        dQuery.limit = limit
+        if (start > 0 || startPermlink.isNotEmpty()) {
+            dQuery.startPermlink = Permlink(startPermlink)
+        }
+
+        val observable = Single.fromCallable {
+            return@fromCallable steemJ?.getDiscussionsBy(dQuery, sortType)
+        }
+                .subscribeOn(Schedulers.io())
+                .map {
+                    val arrayList: ArrayList<DiscussionData> = arrayListOf()
+                    for ((index, discussion) in it.withIndex()) {
+                        arrayList.add(DiscussionData(start + index, discussion))
+                        Timber.d("mapToDiscussionData(${start + index}, ${discussion.permlink.link}")
+                    }
+                    return@map arrayList
+                }
+        return observable
+    }
+
+    override fun getTrendingDataList(start: Int, limit: Int, startPermlink: String): Single<ArrayList<DiscussionData>>? {
+        Timber.d("getTrendingDataList($start, $limit, $startPermlink)")
+        return getDiscussionsDataList(DiscussionSortType.GET_DISCUSSIONS_BY_TRENDING, start, limit, startPermlink)
+    }
+
+    override fun getNewDataList(start: Int, limit: Int, startPermlink: String): Single<ArrayList<DiscussionData>>? {
+        Timber.d("getNewDataList($start, $limit, $startPermlink)")
+        return getDiscussionsDataList(DiscussionSortType.GET_DISCUSSIONS_BY_CREATED, start, limit, startPermlink)
+    }
+
 }

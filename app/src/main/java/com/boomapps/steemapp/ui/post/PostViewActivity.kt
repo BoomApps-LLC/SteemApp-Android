@@ -12,7 +12,11 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.boomapps.steemapp.R
 import com.boomapps.steemapp.ui.BaseActivity
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
 import kotlinx.android.synthetic.main.activity_post.*
+import java.util.*
 
 class PostViewActivity : BaseActivity() {
 
@@ -20,6 +24,14 @@ class PostViewActivity : BaseActivity() {
         const val EXTRA_POST_ID = "post_id"
         const val EXTRA_URL = "url"
         const val EXTRA_TITLE = "title"
+        const val EXTRA_AUTHOR = "author"
+        const val EXTRA_AVATAR_URL = "avatar_url"
+        const val EXTRA_DATE = "date"
+        const val EXTRA_COMMENTS_NUM = "comments_num"
+        const val EXTRA_LINK_NUM = "link_num"
+        const val EXTRA_VOTE_NUM = "vote_num"
+        const val EXTRA_AMOUNT = "amount"
+
     }
 
     lateinit var viewModel: PostViewModel
@@ -28,6 +40,13 @@ class PostViewActivity : BaseActivity() {
     lateinit var extraUrl: String
     var extraPostId: Long = -1
     var extraTitle = ""
+    var extraAvatarUtl = ""
+    var extraAuthor = ""
+    var extraDate = -1L
+    var extraAmount = 0.0f
+    var extraCommentNum = 0
+    var extraLinksNum = 0
+    var extraVoteNum = 0
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,19 +56,9 @@ class PostViewActivity : BaseActivity() {
         if (bar != null) {
             bar.setDisplayHomeAsUpEnabled(true)
         }
-        val inData = intent
-        if (inData != null) {
-            extraUrl = inData.getStringExtra(EXTRA_URL)
-            extraPostId = inData.getLongExtra(EXTRA_POST_ID, -1L)
-            extraTitle = if (inData.hasExtra(EXTRA_TITLE)) {
-                inData.getStringExtra(EXTRA_TITLE)
-            } else {
-                ""
-            }
-            if (title.isNotEmpty()) {
-                title = extraTitle
-            }
-        }
+        extractExtras()
+        initPostDataUI()
+        title = "FEED"
         viewModel = ViewModelProviders.of(this, PostViewModelFactory(extraPostId, extraUrl, extraTitle)).get(PostViewModel::class.java)
         progressParams = postWebViewProgress.layoutParams as ConstraintLayout.LayoutParams
         postWebView.addOnLayoutChangeListener(object : View.OnLayoutChangeListener {
@@ -74,12 +83,79 @@ class PostViewActivity : BaseActivity() {
         postWebView.settings.javaScriptEnabled = true
         postWebView.settings.loadWithOverviewMode = true
 
+        postWebView.postDelayed({
+            viewModel.postData.observe(this, Observer {
+                if (it != null) {
+                    showHtml(it.body)
+                }
+            })
+        }, 1000)
+    }
 
-        viewModel.postData.observe(this, Observer {
-            if (it != null) {
-                showHtml(it.body)
+    private fun extractExtras() {
+        val inData = intent
+        if (inData != null) {
+            extraUrl = inData.getStringExtra(EXTRA_URL)
+            extraPostId = inData.getLongExtra(EXTRA_POST_ID, -1L)
+            extraTitle = if (inData.hasExtra(EXTRA_TITLE)) {
+                inData.getStringExtra(EXTRA_TITLE)
+            } else {
+                ""
             }
-        })
+            extraAvatarUtl = inData.getStringExtra(EXTRA_AVATAR_URL)
+            extraAuthor = inData.getStringExtra(EXTRA_AUTHOR)
+            extraDate = inData.getLongExtra(EXTRA_DATE, -1L)
+            extraAmount = inData.getFloatExtra(EXTRA_AMOUNT, 0.0f)
+            extraCommentNum = inData.getIntExtra(EXTRA_COMMENTS_NUM, 0)
+            extraLinksNum = inData.getIntExtra(EXTRA_LINK_NUM, 0)
+            extraVoteNum = inData.getIntExtra(EXTRA_VOTE_NUM, 0)
+        }
+    }
+
+    private fun initPostDataUI() {
+        if (extraAvatarUtl.isNotEmpty()) {
+            Glide.with(this)
+                    .load(extraAvatarUtl)
+                    .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.ALL))
+                    .apply(RequestOptions.circleCropTransform())
+                    .into(aPost_ivAuthorAvatar)
+        }
+        aPost_tvAuthor.text = extraAuthor
+        aPost_tvVotesNumber.text = extraVoteNum.toString()
+        aPost_tvCommentNumber.text = extraCommentNum.toString()
+        aPost_tvLinkNumber.text = extraLinksNum.toString()
+        if (extraDate > 0) {
+            val created = Calendar.getInstance()
+            created.timeInMillis = extraDate
+            var sCreated = "unknown"
+            if (created.timeInMillis > 0) {
+                val curCal = currentDate()
+                val yearsDelta = curCal.get(Calendar.YEAR) - created.get(Calendar.YEAR)
+                val monthDelta = curCal.get(Calendar.MONTH) - created.get(Calendar.MONTH)
+                val dayDelta = curCal.get(Calendar.DAY_OF_YEAR) - created.get(Calendar.DAY_OF_YEAR)
+                if (yearsDelta > 0) {
+                    aPost_tvLastActivityTime.text = formatDate(yearsDelta, resources.getQuantityString(R.plurals.years, yearsDelta))
+                } else if (monthDelta > 0) {
+                    aPost_tvLastActivityTime.text = formatDate(monthDelta, resources.getQuantityString(R.plurals.months, monthDelta))
+                } else if (dayDelta > 1) {
+                    aPost_tvLastActivityTime.text = formatDate(dayDelta, resources.getQuantityString(R.plurals.days, dayDelta))
+                } else {
+                    aPost_tvLastActivityTime.text = getString(R.string.feed_card_date_format_yesterday)
+                }
+            }
+        }
+        aPost_tvFullPrice.text = String.format("$ %.2f", extraAmount)
+    }
+
+
+    private fun currentDate(): Calendar {
+        val c = Calendar.getInstance()
+        c.timeInMillis = System.currentTimeMillis()
+        return c
+    }
+
+    private fun formatDate(days: Int, pluralValue: String): String {
+        return String.format(getString(R.string.feed_card_date_format_common), days, pluralValue)
     }
 
     override fun onResume() {
@@ -138,8 +214,13 @@ class PostViewActivity : BaseActivity() {
 
 
     private fun showHtml(html: String) {
-        val fullHtml = String.format("%s%s%s", getString(R.string.post_new_prefix), html, getString(R.string.pos_postfix))
-        postWebView.loadData(fullHtml, "text/html", "UTF-8")
+        val sb = StringBuilder()
+                .append(getString(R.string.post_new_prefix))
+                .append("<h1>").append(extraTitle).append("</h1>")
+                .append(html)
+                .append(getString(R.string.pos_postfix))
+        val fullHtml = sb.toString()
+        postWebView.loadData(sb.toString(), "text/html", "UTF-8")
         postWebViewProgress.visibility = View.GONE
     }
 

@@ -29,13 +29,16 @@ interface StoriesDao {
     fun deleteStories(storyEntities: Array<StoryEntity>)
 
 
-    @Query("SELECT * FROM story_entities WHERE story_type=:type ORDER BY indexInResponse DESC")
-    fun loadAllStories(type: Int): DataSource.Factory<Int, StoryEntity>
+    @Query("SELECT * FROM story_entities WHERE story_type=:type ORDER BY index_in DESC")
+    fun loadAllStoriesRevertOrder(type: Int): DataSource.Factory<Int, StoryEntity>
+
+    @Query("SELECT * FROM story_entities WHERE story_type=:type ORDER BY index_in ASC")
+    fun loadAllStoriesDefaultOrder(type: Int): DataSource.Factory<Int, StoryEntity>
 
     @Query("SELECT * FROM story_entities WHERE story_type=:type AND permlink IN (:permlinks)")
     fun loadEntitiesForPage(type: Int, permlinks: Array<String>): LiveData<Array<StoryEntity>>
 
-    @Query("SELECT MAX(indexInResponse) + 1 FROM story_entities WHERE story_type = :type")
+    @Query("SELECT MAX(index_in) + 1 FROM story_entities WHERE story_type = :type")
     fun getNextIndexInStories(type: Int): Int
 
 

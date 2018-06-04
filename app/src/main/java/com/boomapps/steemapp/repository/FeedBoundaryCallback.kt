@@ -8,7 +8,6 @@ import com.boomapps.steemapp.repository.db.DiscussionToStoryMapper
 import com.boomapps.steemapp.repository.db.entities.StoryEntity
 import com.boomapps.steemapp.repository.steem.DiscussionData
 import com.boomapps.steemapp.repository.steem.SteemRepository
-import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import timber.log.Timber
 import java.util.*
@@ -38,15 +37,15 @@ class FeedBoundaryCallback(
     override fun onZeroItemsLoaded() {
         networkState.value = NetworkState.LOADING
         Timber.d("onZeroItemsLoaded()")
-        val single: Single<ArrayList<DiscussionData>> = if (type == FeedType.FEED) {
-            // FEED
-            ServiceLocator.getSteemRepository().getFeedStories(null, 0, networkPageSize)
-        } else {
-            // BLOG
-            ServiceLocator.getSteemRepository().getBlogStories(null, 0, networkPageSize)
+        val observable = when (type) {
+            FeedType.BLOG -> ServiceLocator.getSteemRepository().getBlogStories(null, 0, networkPageSize)
+            FeedType.TRENDING -> ServiceLocator.getSteemRepository().getTrendingDataList(0, networkPageSize, "")
+            FeedType.NEW -> ServiceLocator.getSteemRepository().getNewDataList(0, networkPageSize, "")
+            else -> /*FeedType.FEED*/ ServiceLocator.getSteemRepository().getFeedStories(null, 0, networkPageSize)
         }
-        single.observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
+
+        observable?.observeOn(AndroidSchedulers.mainThread())
+                ?.subscribe({
                     insertItemsIntoDb(it)
                     networkState.value = NetworkState.LOADED
                 }, {
@@ -68,15 +67,14 @@ class FeedBoundaryCallback(
     override fun onItemAtEndLoaded(itemAtEnd: StoryEntity) {
         networkState.value = NetworkState.LOADING
         Timber.d("onItemAtEndLoaded(itemAtEnd=[%d, %s])", itemAtEnd.indexInResponse, itemAtEnd.permlink)
-        val single: Single<ArrayList<DiscussionData>> = if (type == FeedType.FEED) {
-            // FEED
-            ServiceLocator.getSteemRepository().getFeedStories(null, itemAtEnd.indexInResponse, networkPageSize)
-        } else {
-            // BLOG
-            ServiceLocator.getSteemRepository().getBlogStories(null, itemAtEnd.indexInResponse, networkPageSize)
+        val single = when (type) {
+            FeedType.BLOG -> ServiceLocator.getSteemRepository().getBlogStories(null, itemAtEnd.indexInResponse, networkPageSize)
+            FeedType.TRENDING -> ServiceLocator.getSteemRepository().getTrendingDataList(itemAtEnd.indexInResponse, networkPageSize, itemAtEnd.permlink)
+            FeedType.NEW -> ServiceLocator.getSteemRepository().getNewDataList(itemAtEnd.indexInResponse, networkPageSize, itemAtEnd.permlink)
+            else -> /*FeedType.FEED*/ ServiceLocator.getSteemRepository().getFeedStories(null, itemAtEnd.indexInResponse, networkPageSize)
         }
-        single.observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
+        single?.observeOn(AndroidSchedulers.mainThread())
+                ?.subscribe({
                     insertItemsIntoDb(it)
                     Handler().postDelayed({
                         networkState.value = NetworkState.LOADED

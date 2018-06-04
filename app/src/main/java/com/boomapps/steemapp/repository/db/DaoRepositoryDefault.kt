@@ -22,10 +22,6 @@ class DaoRepositoryDefault(
         private val networkPageSize: Int = ServiceLocator.NETWORK_PAGE_SIZE) : DaoRepository {
 
 
-    override fun insertBlogEntities(blogEntities: ArrayList<StoryEntity>) {
-        db.storiesDao().insertStories(blogEntities.toTypedArray())
-    }
-
 
     override fun getStory(storyId: Long): LiveData<StoryEntity> {
         Timber.d("getStory($storyId)")
@@ -36,14 +32,6 @@ class DaoRepositoryDefault(
         Timber.d("getStorySync($storyId)")
         return db.storiesDao().loadStorySync(storyId)
     }
-
-    override fun insertFeedEntities(blogEntities: ArrayList<StoryEntity>) {
-        db.storiesDao().insertStories(blogEntities.toTypedArray())
-    }
-
-//    override fun getFeedShortEntities(): LiveData<Array<StoryShortEntity>> {
-//        return db.storiesDao().shortStoriesByType(FeedType.FEED.ordinal)
-//    }
 
     /**
      * Inserts the response into the database while also assigning position indices to items.
@@ -70,6 +58,10 @@ class DaoRepositoryDefault(
 
     @MainThread
     override fun refresh(type: FeedType): LiveData<NetworkState> {
+        // TODO modify to exclude additional type checking
+        if (type == FeedType.TRENDING || type == FeedType.NEW) {
+            return refreshUncommon(type)
+        }
         val networkState = MutableLiveData<NetworkState>()
         networkState.value = NetworkState.LOADING
         val discussions: ArrayList<DiscussionData> = arrayListOf()
@@ -126,6 +118,40 @@ class DaoRepositoryDefault(
         return networkState
     }
 
+    fun refreshUncommon(type: FeedType): LiveData<NetworkState> {
+        val networkState = MutableLiveData<NetworkState>()
+        networkState.value = NetworkState.LOADING
+        val discussions: ArrayList<DiscussionData> = arrayListOf()
+        val obs = if (type == FeedType.TRENDING) {
+            ServiceLocator.getSteemRepository().getTrendingDataList(0, ServiceLocator.NETWORK_PAGE_SIZE, "")
+        } else {
+            ServiceLocator.getSteemRepository().getNewDataList(0, ServiceLocator.NETWORK_PAGE_SIZE, "")
+        }
+        obs
+                ?.subscribeOn(Schedulers.io())
+                ?.observeOn(Schedulers.io())
+                ?.subscribe(
+                        {
+                            // process new discussions
+                            val result = discussions.map {
+                                return@map DiscussionToStoryMapper((it)).map()[0]
+                            }.toTypedArray()
+                            db.runInTransaction {
+                                // clear data for type
+                                db.storiesDao().deleteStoriesFor(type.ordinal)
+                                // save new data intoDB
+                                insertResultIntoDb(type, result)
+                            }
+                            // since we are in bg thread now, post the result.
+                            networkState.postValue(NetworkState.LOADED)
+                        },
+                        {
+                            networkState.value = NetworkState.error(it.message)
+                        }
+                )
+        return networkState
+    }
+
 
     /**
      * Returns a Listing for the given subreddit.
@@ -141,7 +167,11 @@ class DaoRepositoryDefault(
                 ioExecutor = ioExecutor,
                 networkPageSize = networkPageSize)
         // create a data source factory from Room
-        val dataSourceFactory = db.storiesDao().loadAllStories(type.ordinal)
+        val dataSourceFactory = if(type == FeedType.BLOG || type == FeedType.FEED){
+            db.storiesDao().loadAllStoriesRevertOrder(type.ordinal)
+        }else{
+            db.storiesDao().loadAllStoriesDefaultOrder(type.ordinal)
+        }
         val builder = LivePagedListBuilder(dataSourceFactory, pageSize)
                 .setBoundaryCallback(boundaryCallback)
 

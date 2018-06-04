@@ -42,10 +42,16 @@ class FeedsFragment : Fragment(), FeedListHolderCallback {
 
         val adapter = FeedsTabsAdapter(arrayOf(
                 FeedListHolder(FeedType.BLOG, "BLOG", View.inflate(context, R.layout.feed_list_view, null), viewModel, this),
-                FeedListHolder(FeedType.FEED, "FEED", View.inflate(context, R.layout.feed_list_view, null), viewModel, this)
+                FeedListHolder(FeedType.FEED, "FEED", View.inflate(context, R.layout.feed_list_view, null), viewModel, this),
+                FeedListHolder(FeedType.TRENDING, "TRENDING", View.inflate(context, R.layout.feed_list_view, null), viewModel, this),
+                FeedListHolder(FeedType.NEW, "NEW", View.inflate(context, R.layout.feed_list_view, null), viewModel, this)
         ))
         feedsPager.adapter = adapter
-        view.findViewById<TabLayout>(R.id.feedsTabs).setupWithViewPager(feedsPager)
+        view.findViewById<TabLayout>(R.id.feedsTabs).apply {
+            setupWithViewPager(feedsPager)
+            tabMode = TabLayout.MODE_SCROLLABLE
+        }
+
         feedsPager.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 view.getViewTreeObserver()
@@ -86,6 +92,10 @@ class FeedsFragment : Fragment(), FeedListHolderCallback {
                 viewModel.showList(FeedType.BLOG)
             1 ->
                 viewModel.showList(FeedType.FEED)
+            2 ->
+                viewModel.showList(FeedType.TRENDING)
+            3 ->
+                viewModel.showList(FeedType.NEW)
         }
 
     }
@@ -103,6 +113,13 @@ class FeedsFragment : Fragment(), FeedListHolderCallback {
             postIntent.putExtra(PostViewActivity.EXTRA_URL, story.url)
             postIntent.putExtra(PostViewActivity.EXTRA_TITLE, story.title)
             postIntent.putExtra(PostViewActivity.EXTRA_POST_ID, story.entityId)
+            postIntent.putExtra(PostViewActivity.EXTRA_AUTHOR, story.author)
+            postIntent.putExtra(PostViewActivity.EXTRA_DATE, story.created) // TODO change
+            postIntent.putExtra(PostViewActivity.EXTRA_COMMENTS_NUM, story.commentsNum)
+            postIntent.putExtra(PostViewActivity.EXTRA_LINK_NUM, story.linksNum)
+            postIntent.putExtra(PostViewActivity.EXTRA_VOTE_NUM, story.votesNum)
+            postIntent.putExtra(PostViewActivity.EXTRA_AMOUNT, story.price) // TODO cahange
+            postIntent.putExtra(PostViewActivity.EXTRA_AVATAR_URL, story.avatarUrl)
             startActivity(postIntent)
         }
     }
