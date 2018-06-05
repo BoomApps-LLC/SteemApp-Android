@@ -88,6 +88,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
     implementation 'androidx.core:core-ktx:0.3'
 
     // QR reader
@@ -127,17 +128,15 @@ dependencies {
 
     // ViewModel and LiveData
     implementation "android.arch.lifecycle:extensions:$architectureComponents"
-    annotationProcessor "android.arch.lifecycle:compiler:$architectureComponents"
-
+    kapt "android.arch.lifecycle:compiler:$architectureComponents"
     // Room
-    implementation 'android.arch.persistence.room:runtime:1.1.0'
-    kapt "android.arch.persistence.room:compiler:1.1.0"
-
+    implementation "android.arch.persistence.room:runtime:$room_version"
+    kapt "android.arch.persistence.room:compiler:$room_version"
     // Test helpers for Room
-    testImplementation 'android.arch.persistence.room:testing:1.1.0'
+    testImplementation "android.arch.persistence.room:testing:$room_version"
 
     // Paging
-    implementation 'android.arch.paging:runtime:1.0.0'
+    implementation "android.arch.paging:runtime:$paging_version"
 
     // markdown library
     compile 'com.commonsware.cwac:anddown:0.4.0'
