@@ -46,7 +46,7 @@ interface SteemRepository {
 
     fun getBlogStories(aName: AccountName?, start: Int, limit: Int): Single<ArrayList<DiscussionData>>
 
-    fun getTrendingDataList(start: Int, limit: Int, startPermlink: String): Single<ArrayList<DiscussionData>>?
+    fun getTrendingDataList(start: Int, limit: Int, storyEntity: StoryEntity?): Single<ArrayList<DiscussionData>>?
 
-    fun getNewDataList(start: Int, limit: Int, startPermlink: String): Single<ArrayList<DiscussionData>>?
+    fun getNewDataList(start: Int, limit: Int, storyEntity: StoryEntity?): Single<ArrayList<DiscussionData>>?
 }

@@ -5,6 +5,7 @@ import android.util.Log
 import com.boomapps.steemapp.BuildConfig
 import com.boomapps.steemapp.repository.FeedType
 import com.boomapps.steemapp.repository.ServiceLocator
+import com.boomapps.steemapp.repository.db.entities.StoryEntity
 import eu.bittrade.crypto.core.AddressFormatException
 import eu.bittrade.libs.steemj.SteemJ
 import eu.bittrade.libs.steemj.base.models.AccountName
@@ -50,13 +51,11 @@ class SteemRepositoryDefault : SteemRepository {
      *
      */
     override fun login(nickname: String, postingKey: String?): SteemWorkerResponse {
-        Timber.log(Log.INFO, "login($nickname, $postingKey")
         try {
             steemJConfig = SteemJConfig.getInstance()
             steemJConfig?.setAppName("SteemApp")
             steemJConfig?.setAppVersion(BuildConfig.VERSION_NAME)
 
-//        steemJConfig?.addEndpointURI(URI.create("https://api.steemit.com"))
             steemJConfig?.defaultAccount = AccountName(nickname)
             steemJConfig?.responseTimeout = 10000
             val privateKeys = arrayListOf<ImmutablePair<PrivateKeyType, String>>()
@@ -108,7 +107,6 @@ class SteemRepositoryDefault : SteemRepository {
                     val commentOperation: CommentOperation? = steemJ?.createPost(title, content, tags, rewardsPercent)
                     if (commentOperation != null) {
                         val metadata = commentOperation.jsonMetadata
-                        Timber.d("post answer >> ${metadata?.toString()}")
                     }
                 } else {
                     return SteemWorker.PostingResult("Posting key is empty.", false)
@@ -181,7 +179,6 @@ class SteemRepositoryDefault : SteemRepository {
         } else {
             steemJConfig?.defaultAccount
         }
-        Timber.d("getStoryDetails >> ${aName?.name}")
         return Observable.fromCallable { return@fromCallable FeedShortEntriesRequest(FeedType.FEED, steemJ, aName).load() }
     }
 
@@ -192,7 +189,6 @@ class SteemRepositoryDefault : SteemRepository {
         } else {
             steemJConfig?.defaultAccount
         }
-        Timber.d("getStoryDetails >> ${aName?.name}")
         return Observable.fromCallable { return@fromCallable FeedShortEntriesRequest(FeedType.FEED, steemJ, aName, start, limit).load() }
     }
 
@@ -202,7 +198,6 @@ class SteemRepositoryDefault : SteemRepository {
         } else {
             steemJConfig?.defaultAccount
         }
-        Timber.d("getStoryDetails >> ${aName?.name}")
         return Observable.fromCallable { return@fromCallable FeedShortEntriesRequest(FeedType.BLOG, steemJ, aName).load() }
     }
 
@@ -212,13 +207,11 @@ class SteemRepositoryDefault : SteemRepository {
         } else {
             steemJConfig?.defaultAccount
         }
-        Timber.d("getStoryDetails >> ${aName?.name}")
         return Observable.fromCallable { return@fromCallable FeedShortEntriesRequest(FeedType.BLOG, steemJ, aName, start, limit).load() }
     }
 
     override fun getStoryDetails(aName: AccountName?, pLink: Permlink, orderId: Int): Observable<DiscussionData> {
         val rqName = aName ?: steemJConfig?.defaultAccount
-        Timber.d("getStoryDetails >> ${rqName?.name} :: ${pLink.link}")
         return Observable.fromCallable { DiscussionData(orderId, steemJ?.getContent(rqName, pLink)) }
     }
 
@@ -270,14 +263,13 @@ class SteemRepositoryDefault : SteemRepository {
     }
 
 
-    private fun getDiscussionsDataList(sortType: DiscussionSortType, start: Int, limit: Int, startPermlink: String): Single<ArrayList<DiscussionData>>? {
-        Timber.d("getDiscussionsDataList($start, $limit, $startPermlink")
+    private fun getDiscussionsDataList(sortType: DiscussionSortType, start: Int, limit: Int, storyEntity: StoryEntity?): Single<ArrayList<DiscussionData>>? {
         val dQuery = DiscussionQuery()
         dQuery.limit = limit
-        if (start > 0 || startPermlink.isNotEmpty()) {
-            dQuery.startPermlink = Permlink(startPermlink)
+        if (start > 0 && storyEntity != null) {
+            dQuery.startPermlink = Permlink(storyEntity.permlink)
+            dQuery.startAuthor = AccountName(storyEntity.author)
         }
-
         val observable = Single.fromCallable {
             return@fromCallable steemJ?.getDiscussionsBy(dQuery, sortType)
         }
@@ -286,21 +278,18 @@ class SteemRepositoryDefault : SteemRepository {
                     val arrayList: ArrayList<DiscussionData> = arrayListOf()
                     for ((index, discussion) in it.withIndex()) {
                         arrayList.add(DiscussionData(start + index, discussion))
-                        Timber.d("mapToDiscussionData(${start + index}, ${discussion.permlink.link}")
                     }
                     return@map arrayList
                 }
         return observable
     }
 
-    override fun getTrendingDataList(start: Int, limit: Int, startPermlink: String): Single<ArrayList<DiscussionData>>? {
-        Timber.d("getTrendingDataList($start, $limit, $startPermlink)")
-        return getDiscussionsDataList(DiscussionSortType.GET_DISCUSSIONS_BY_TRENDING, start, limit, startPermlink)
+    override fun getTrendingDataList(start: Int, limit: Int, storyEntity: StoryEntity?): Single<ArrayList<DiscussionData>>? {
+        return getDiscussionsDataList(DiscussionSortType.GET_DISCUSSIONS_BY_TRENDING, start, limit, storyEntity)
     }
 
-    override fun getNewDataList(start: Int, limit: Int, startPermlink: String): Single<ArrayList<DiscussionData>>? {
-        Timber.d("getNewDataList($start, $limit, $startPermlink)")
-        return getDiscussionsDataList(DiscussionSortType.GET_DISCUSSIONS_BY_CREATED, start, limit, startPermlink)
+    override fun getNewDataList(start: Int, limit: Int, storyEntity: StoryEntity?): Single<ArrayList<DiscussionData>>? {
+        return getDiscussionsDataList(DiscussionSortType.GET_DISCUSSIONS_BY_CREATED, start, limit, storyEntity)
     }
 
 }
