@@ -292,4 +292,38 @@ class SteemRepositoryDefault : SteemRepository {
         return getDiscussionsDataList(DiscussionSortType.GET_DISCUSSIONS_BY_CREATED, start, limit, storyEntity)
     }
 
+
+
+    /*
+        * Upvote the post
+        * "steem-java-api-learned-to-speak-graphene-update-5" written by
+        * "dez1337" using 100% of the defaultAccounts voting power.
+        */
+    override fun vote(postPermLink: String, percentage: Int) {
+        try {
+            steemJ?.vote(steemJConfig?.apiUsername, Permlink(postPermLink),
+                    percentage.toShort())
+        } catch (communicationException: SteemCommunicationException) {
+
+        } catch (responseException: SteemResponseException) {
+
+        } catch (transactionException: SteemInvalidTransactionException) {
+
+        }
+    }
+
+    override fun cancelVote(postPermLink: String) {
+        try {
+            steemJ?.cancelVote(steemJConfig?.apiUsername,
+                    Permlink(postPermLink))
+        } catch (communicationException: SteemCommunicationException) {
+
+        } catch (responseException: SteemResponseException) {
+
+        } catch (transactionException: SteemInvalidTransactionException) {
+
+        }
+    }
+
+
 }

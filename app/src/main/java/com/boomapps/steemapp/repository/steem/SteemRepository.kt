@@ -1,6 +1,7 @@
 package com.boomapps.steemapp.repository.steem
 
 import android.net.Uri
+import com.boomapps.steemapp.repository.db.entities.StoryEntity
 import eu.bittrade.libs.steemj.apis.database.models.state.Discussion
 import eu.bittrade.libs.steemj.apis.follow.model.CommentFeedEntry
 import eu.bittrade.libs.steemj.base.models.AccountName
@@ -49,4 +50,8 @@ interface SteemRepository {
     fun getTrendingDataList(start: Int, limit: Int, storyEntity: StoryEntity?): Single<ArrayList<DiscussionData>>?
 
     fun getNewDataList(start: Int, limit: Int, storyEntity: StoryEntity?): Single<ArrayList<DiscussionData>>?
+
+    fun vote(postPermLink: String, percentage: Int)
+
+    fun cancelVote(postPermLink: String)
 }
