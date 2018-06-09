@@ -25,7 +25,8 @@ class FeedBoundaryCallback(
 
     private fun insertItemsIntoDb(items: ArrayList<DiscussionData>) {
         ioExecutor.execute {
-            handleResponse(type, DiscussionToStoryMapper(items).map().toTypedArray())
+            handleResponse(type, DiscussionToStoryMapper(items, ServiceLocator.getPreferencesRepository().loadUserData().nickname
+                    ?: "_").map().toTypedArray())
         }
     }
 

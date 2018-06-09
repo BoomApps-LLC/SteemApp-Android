@@ -1,10 +1,12 @@
 package com.boomapps.steemapp.ui.feeds
 
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import com.boomapps.steemapp.R
 import com.boomapps.steemapp.repository.db.entities.StoryEntity
@@ -17,7 +19,14 @@ class FeedViewHolder(itemView: View, callback: Callback) : RecyclerView.ViewHold
 
     interface Callback {
 
+        enum class Events {
+            VOTE,
+            MENU
+        }
+
         fun onHolderClick(position: Int)
+
+        fun onHolderActionEvent(event: Events, position: Int)
 
     }
 
@@ -29,7 +38,8 @@ class FeedViewHolder(itemView: View, callback: Callback) : RecyclerView.ViewHold
     val avatar: ImageView = itemView.findViewById(R.id.feedCard_ivAuthorAvatar)
     val lastTime: TextView = itemView.findViewById(R.id.feedCard_tvLastActivityTime)
     val reputation: TextView = itemView.findViewById(R.id.feedCard_tvReputation)
-    val fullPrice: TextView = itemView.findViewById(R.id.feedCard_tvFullPrice)
+    val votesPriceLayout : LinearLayout = itemView.findViewById(R.id.feedCard_priceLayout)
+    val votesPrice: TextView = itemView.findViewById(R.id.feedCard_tvVotesPrice)
     val commentsNumber: TextView = itemView.findViewById(R.id.feedCard_tvCommentNumber)
     val linksNumber: TextView = itemView.findViewById(R.id.feedCard_tvLinkNumber)
     val votesNumber: TextView = itemView.findViewById(R.id.feedCard_tvVotesNumber)
@@ -38,10 +48,7 @@ class FeedViewHolder(itemView: View, callback: Callback) : RecyclerView.ViewHold
 
     init {
         itemView.setOnClickListener {
-            if (callback != null) {
                 callback.onHolderClick(this@FeedViewHolder.layoutPosition)
-            }
-
         }
     }
 
@@ -68,7 +75,14 @@ class FeedViewHolder(itemView: View, callback: Callback) : RecyclerView.ViewHold
         commentsNumber.text = data?.commentsNum.toString()
         reputation.text = data?.reputation.toString()
         votesNumber.text = data?.votesNum.toString()
-        fullPrice.text = String.format("$ %.2f", data?.price ?: 0.0)
+        votesPrice.text = String.format("$ %.2f", data?.price ?: 0.0)
+        if (data?.isVoted == true) {
+            votesPriceLayout.setBackgroundResource(R.drawable.bg_feed_card_price_voted_selector)
+            votesPrice.setTextColor(ContextCompat.getColorStateList(votesPrice.context, R.color.feed_card_price_unvoted_text_selector))
+        }else{
+            votesPriceLayout.setBackgroundResource(R.drawable.bg_feed_card_price_unvoted_selector)
+            votesPrice.setTextColor(ContextCompat.getColorStateList(votesPrice.context, R.color.feed_card_price_voted_text_selector))
+        }
         val created = Calendar.getInstance()
         created.timeInMillis = data?.created ?: 0L
         var sCreated = "unknown"

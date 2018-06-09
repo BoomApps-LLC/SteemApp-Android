@@ -69,7 +69,17 @@ class FeedListHolder(val type: FeedType, val tabName: String, val feedView: View
         refreshLayout.isRefreshing = enabled
     }
 
+//    FeedItemHolder callback's methods
+
     override fun onHolderClick(position: Int) {
         callback.onItemClick(type, position)
+    }
+
+    override fun onHolderActionEvent(event: FeedViewHolder.Callback.Events, position: Int) {
+        if(event == FeedViewHolder.Callback.Events.VOTE){
+            // check state of vote
+            val story = feedViewModel.getStory(type, position)
+
+        }
     }
 }

@@ -10,7 +10,7 @@ class StoryEntity {
     var entityId: Long = 0
     var author: String = ""
     var permlink: String = ""
-    var url : String = ""
+    var url: String = ""
     var title: String = ""
     @ColumnInfo(name = "raw_body")
     var rawBody: String = ""
@@ -51,6 +51,14 @@ class StoryEntity {
     @ColumnInfo(name = "index_in")
     var indexInResponse = -1
 
+    @ColumnInfo(name = "is_voted")
+    var isVoted = false
+
+    @ColumnInfo(name = "vote_percent")
+    var votePervecnt = 0
+
+    @ColumnInfo(name = "vote_date")
+    var voteDate = 0L
 
     @Ignore
     var fullCounter = 0

@@ -98,7 +98,8 @@ class DaoRepositoryDefault(
 
                             // process new discussions
                             val result = discussions.map {
-                                return@map DiscussionToStoryMapper((it)).map()[0]
+                                return@map DiscussionToStoryMapper(it, ServiceLocator.getPreferencesRepository().loadUserData().nickname
+                                        ?: "_").map()[0]
                             }.toTypedArray()
                             db.runInTransaction {
                                 // clear data for type
@@ -128,7 +129,8 @@ class DaoRepositoryDefault(
                 ?.subscribe(
                         {
                             // process new discussions
-                            val result = DiscussionToStoryMapper(it).map().toTypedArray()
+                            val result = DiscussionToStoryMapper(it, ServiceLocator.getPreferencesRepository().loadUserData().nickname
+                                    ?: "_").map().toTypedArray()
                             db.runInTransaction {
                                 // clear data for type
                                 db.storiesDao().deleteStoriesFor(type.ordinal)

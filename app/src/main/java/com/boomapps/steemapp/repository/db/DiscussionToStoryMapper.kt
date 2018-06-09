@@ -7,8 +7,8 @@ import com.boomapps.steemapp.repository.steem.StoryMetadata
 import com.google.gson.GsonBuilder
 import timber.log.Timber
 
-class DiscussionToStoryMapper(val data: ArrayList<DiscussionData>) {
-    constructor(data: DiscussionData) : this(arrayListOf(data))
+class DiscussionToStoryMapper(val data: ArrayList<DiscussionData>, val accountName: String) {
+    constructor(data: DiscussionData, accountName: String) : this(arrayListOf(data), accountName)
 
     fun map(): ArrayList<StoryEntity> {
         val outData = arrayListOf<StoryEntity>()
@@ -71,6 +71,28 @@ class DiscussionToStoryMapper(val data: ArrayList<DiscussionData>) {
         outValue.created = inValue.created.dateTimeAsTimestamp
         outValue.lastUpdate = inValue.lastUpdate.dateTimeAsTimestamp
         outValue.active = inValue.active.dateTimeAsTimestamp
+        if (inValue.activeVotes.isNotEmpty()) {
+
+            val voter = inValue.activeVotes.filter {
+                it.voter.name == accountName
+            }
+            if (voter.isNotEmpty()) {
+                // get 1st
+                outValue.isVoted = true
+                outValue.votePervecnt = voter[0].percent
+                outValue.voteDate = voter[0].time.dateTimeAsTimestamp
+            }
+        }
+//        {
+//            "voter": "grevit",
+//            "weight": 0,
+//            "rshares": 0,
+//            "percent": 10000,
+//            "reputation": 293159394,
+//            "time": "2018-06-06T20:16:39"
+//        },
+
+
         return outValue
     }
 

@@ -4,5 +4,6 @@ enum class Actions {
 
     UNKNOWN,
     VOTE,
+    MENU,
     LINK
 }
