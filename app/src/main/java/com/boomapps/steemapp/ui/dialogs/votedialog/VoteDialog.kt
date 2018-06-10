@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import com.boomapps.steemapp.R
-import kotlinx.android.synthetic.main.dialog_vote.view.*
+import kotlinx.android.synthetic.main.dialog_vote_app.view.*
 
 class VoteDialog : DialogFragment() {
 
@@ -36,7 +36,7 @@ class VoteDialog : DialogFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         //setup dialog view
-        val view = inflater.inflate(R.layout.dialog_vote, container, false)
+        val view = inflater.inflate(R.layout.dialog_vote_app, container, false)
         dialog.window!!.requestFeature(Window.FEATURE_NO_TITLE)
         isCancelable = false
         view.dVote_ivClose.setOnClickListener({

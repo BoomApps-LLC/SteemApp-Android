@@ -22,6 +22,10 @@ class DaoRepositoryDefault(
         private val networkPageSize: Int = ServiceLocator.NETWORK_PAGE_SIZE) : DaoRepository {
 
 
+    override fun updateStorySync(story: StoryEntity) {
+        db.storiesDao().updateStory(story)
+    }
+
     override fun getStory(storyId: Long): LiveData<StoryEntity> {
         return db.storiesDao().loadStory(storyId)
     }

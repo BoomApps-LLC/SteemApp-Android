@@ -38,7 +38,7 @@ class FeedViewHolder(itemView: View, callback: Callback) : RecyclerView.ViewHold
     val avatar: ImageView = itemView.findViewById(R.id.feedCard_ivAuthorAvatar)
     val lastTime: TextView = itemView.findViewById(R.id.feedCard_tvLastActivityTime)
     val reputation: TextView = itemView.findViewById(R.id.feedCard_tvReputation)
-    val votesPriceLayout : LinearLayout = itemView.findViewById(R.id.feedCard_priceLayout)
+    val votesPriceLayout: LinearLayout = itemView.findViewById(R.id.feedCard_priceLayout)
     val votesPrice: TextView = itemView.findViewById(R.id.feedCard_tvVotesPrice)
     val commentsNumber: TextView = itemView.findViewById(R.id.feedCard_tvCommentNumber)
     val linksNumber: TextView = itemView.findViewById(R.id.feedCard_tvLinkNumber)
@@ -48,7 +48,10 @@ class FeedViewHolder(itemView: View, callback: Callback) : RecyclerView.ViewHold
 
     init {
         itemView.setOnClickListener {
-                callback.onHolderClick(this@FeedViewHolder.layoutPosition)
+            callback.onHolderClick(this@FeedViewHolder.layoutPosition)
+        }
+        votesPriceLayout.setOnClickListener {
+            callback.onHolderActionEvent(Callback.Events.VOTE, this@FeedViewHolder.layoutPosition)
         }
     }
 
@@ -79,7 +82,7 @@ class FeedViewHolder(itemView: View, callback: Callback) : RecyclerView.ViewHold
         if (data?.isVoted == true) {
             votesPriceLayout.setBackgroundResource(R.drawable.bg_feed_card_price_voted_selector)
             votesPrice.setTextColor(ContextCompat.getColorStateList(votesPrice.context, R.color.feed_card_price_unvoted_text_selector))
-        }else{
+        } else {
             votesPriceLayout.setBackgroundResource(R.drawable.bg_feed_card_price_unvoted_selector)
             votesPrice.setTextColor(ContextCompat.getColorStateList(votesPrice.context, R.color.feed_card_price_voted_text_selector))
         }

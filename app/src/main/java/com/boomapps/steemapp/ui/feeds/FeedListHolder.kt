@@ -7,13 +7,10 @@ import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
-import android.widget.AdapterView
 import com.boomapps.steemapp.R
 import com.boomapps.steemapp.repository.FeedType
 import com.boomapps.steemapp.repository.NetworkState
 import com.boomapps.steemapp.repository.db.entities.StoryEntity
-import android.os.Parcelable
-
 
 
 class FeedListHolder(val type: FeedType, val tabName: String, val feedView: View, val feedViewModel: FeedsViewModel, val callback: FeedListHolderCallback) : FeedViewHolder.Callback {
@@ -76,10 +73,8 @@ class FeedListHolder(val type: FeedType, val tabName: String, val feedView: View
     }
 
     override fun onHolderActionEvent(event: FeedViewHolder.Callback.Events, position: Int) {
-        if(event == FeedViewHolder.Callback.Events.VOTE){
-            // check state of vote
-            val story = feedViewModel.getStory(type, position)
-
+        if (event == FeedViewHolder.Callback.Events.VOTE) {
+            callback.onActionClick(type, position, Actions.VOTE)
         }
     }
 }

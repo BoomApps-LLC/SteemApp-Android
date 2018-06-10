@@ -4,16 +4,20 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
 import android.arch.paging.PagedList
+import android.content.Intent
 import com.boomapps.steemapp.repository.FeedType
 import com.boomapps.steemapp.repository.NetworkState
 import com.boomapps.steemapp.repository.ServiceLocator
+import com.boomapps.steemapp.repository.UserData
 import com.boomapps.steemapp.repository.db.entities.StoryEntity
+import com.boomapps.steemapp.repository.steem.SteemRepository
 import com.boomapps.steemapp.ui.BaseViewModel
+import timber.log.Timber
 
 
 class FeedsViewModel : BaseViewModel() {
 
-// BLOG
+    // BLOG
     private val blogType = MutableLiveData<FeedType>()
     private val blogRepoResult = Transformations.map(blogType, {
         ServiceLocator.getDaoRepository().storiesFor(it, ServiceLocator.DATABASE_PAGE_SIZE)
@@ -22,7 +26,7 @@ class FeedsViewModel : BaseViewModel() {
     val blogsNetworkState = Transformations.switchMap(blogRepoResult, { it.networkState })!!
     val blogsRefreshState = Transformations.switchMap(blogRepoResult, { it.refreshState })!!
 
-// FEED
+    // FEED
     private val feedType = MutableLiveData<FeedType>()
     private val feedRepoResult = Transformations.map(feedType, {
         ServiceLocator.getDaoRepository().storiesFor(it, ServiceLocator.DATABASE_PAGE_SIZE)
@@ -31,7 +35,7 @@ class FeedsViewModel : BaseViewModel() {
     val feedsNetworkState = Transformations.switchMap(feedRepoResult, { it.networkState })!!
     val feedsRefreshState = Transformations.switchMap(feedRepoResult, { it.refreshState })!!
 
-// TRENDING
+    // TRENDING
     private val trendingType = MutableLiveData<FeedType>()
     private val trendingRepoResult = Transformations.map(trendingType, {
         ServiceLocator.getDaoRepository().storiesFor(it, ServiceLocator.DATABASE_PAGE_SIZE)
@@ -40,7 +44,7 @@ class FeedsViewModel : BaseViewModel() {
     val trendingsNetworkState = Transformations.switchMap(trendingRepoResult, { it.networkState })!!
     val trendingsRefreshState = Transformations.switchMap(trendingRepoResult, { it.refreshState })!!
 
-// NEW
+    // NEW
     private val novicesType = MutableLiveData<FeedType>()
     private val novicesRepoResult = Transformations.map(novicesType, {
         ServiceLocator.getDaoRepository().storiesFor(it, ServiceLocator.DATABASE_PAGE_SIZE)
@@ -50,7 +54,7 @@ class FeedsViewModel : BaseViewModel() {
     val novicesRefreshState = Transformations.switchMap(novicesRepoResult, { it.refreshState })!!
 
     fun getListLiveData(type: FeedType): LiveData<PagedList<StoryEntity>> {
-        return when(type){
+        return when (type) {
             FeedType.BLOG -> blogs
             FeedType.TRENDING -> trendings
             FeedType.NEW -> novices
@@ -146,6 +150,50 @@ class FeedsViewModel : BaseViewModel() {
             FeedType.NEW -> novices.value == type
             else -> feedType.value == FeedType.FEED // FeedType.FEED
         }
+    }
+
+    fun unVote(story: StoryEntity, type: FeedType) {
+        ServiceLocator.getSteemRepository().unvoteWithUpdate(story, type, object : SteemRepository.Callback<Boolean> {
+            override fun onSuccess(result: Boolean) {
+                // TODO disable unvoting progress
+            }
+
+            override fun onError(error: Throwable) {
+                // TODO disable unvoting progress and show error
+            }
+        })
+    }
+
+    fun vote(story: StoryEntity, type: FeedType, percent: Int) {
+        ServiceLocator.getSteemRepository().voteWithUpdate(story, type, percent, object : SteemRepository.Callback<Boolean> {
+            override fun onSuccess(result: Boolean) {
+                // TODO disable unvoting progress
+                Timber.d("VOTE SUCCESS")
+            }
+
+            override fun onError(error: Throwable) {
+                // TODO disable unvoting progress and show error
+                Timber.d("VOTE ERROR >> ${error.message}")
+            }
+        })
+    }
+
+    fun hasPostingKey(): Boolean {
+        return ServiceLocator.getSteemRepository().hasPostingKey()
+    }
+
+    fun saveNewPostingKey(data: Intent?): Boolean {
+        if (data == null) {
+            return false
+        }
+        if (!data.hasExtra("POSTING_KEY")) {
+            return false
+        }
+        val repo = ServiceLocator.getPreferencesRepository()
+        val uData = repo.loadUserData()
+        val newUserData = UserData(uData.nickname, uData.userName, uData.photoUrl, data.getStringExtra("POSTING_KEY"))
+        repo.saveUserData(newUserData)
+        return true
     }
 
 }

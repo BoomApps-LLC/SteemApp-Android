@@ -245,7 +245,7 @@ class EditorViewModel : BaseViewModel() {
         getDelay()
     }
 
-    fun getDelay() : Long{
+    fun getDelay(): Long {
         postingDelay = if (lastPostingTime == 0L) {
             0L
         } else {
@@ -260,6 +260,7 @@ class EditorViewModel : BaseViewModel() {
         }
         return postingDelay
     }
+
 
 
 }

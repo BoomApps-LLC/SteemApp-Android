@@ -170,12 +170,6 @@ class EditorActivity : BaseActivity() {
             }
         })
 
-        // TODO remove after testing
-//        if (BuildConfig.TEST_VOTE) {
-//            val repo = RepositoryProvider.instance.getSharedRepository()
-//            val oldNum = repo.loadSuccessfulPostingNumber()
-//            repo.saveSuccessfulPostingNumber(oldNum + 1)
-//        }
     }
 
     private fun setActiveTab(position: Int) {
@@ -237,8 +231,6 @@ class EditorActivity : BaseActivity() {
     }
 
     override fun onDestroy() {
-        // save data
-//        viewModel.saveStoryData()
         viewPager.adapter = null
         super.onDestroy()
     }
