@@ -1,6 +1,8 @@
 package com.boomapps.steemapp.ui.feeds
 
 
+import android.app.Activity
+import android.app.AlertDialog
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
@@ -14,6 +16,8 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import com.boomapps.steemapp.R
 import com.boomapps.steemapp.repository.FeedType
+import com.boomapps.steemapp.ui.dialogs.VotePostDialog
+import com.boomapps.steemapp.ui.editor.inputpostingkey.InputNewPostingKeyActivity
 import com.boomapps.steemapp.ui.post.PostViewActivity
 import timber.log.Timber
 
@@ -24,6 +28,8 @@ import timber.log.Timber
  *
  */
 class FeedsFragment : Fragment(), FeedListHolderCallback {
+
+    private val INPUT_NEW_KEY_POST_ACTIVITY_CODE = 22
 
     lateinit var feedsPager: ViewPager
 
@@ -124,8 +130,64 @@ class FeedsFragment : Fragment(), FeedListHolderCallback {
         }
     }
 
-    override fun onActionClick(type: FeedType, position: Int, actions: Actions) {
 
+    private fun showInvalidReEnterPostingKeyDialog() {
+        val builder = AlertDialog.Builder(context);
+        builder
+                .setTitle("Oops!!")
+                .setMessage("Sorry. You can\'t vote, cause you didn't enter POSTING key before.\n Do you want enter it now?")
+                .setPositiveButton("Confirm", { dialog, id ->
+                    showScreenForEnterNewPostingKey()
+                }).create().show()
+    }
+
+    fun showScreenForEnterNewPostingKey() {
+        val intent = Intent(context, InputNewPostingKeyActivity::class.java)
+        startActivityForResult(intent, INPUT_NEW_KEY_POST_ACTIVITY_CODE)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK && requestCode == INPUT_NEW_KEY_POST_ACTIVITY_CODE) {
+            if (!viewModel.saveNewPostingKey(data)) {
+                showInvalidReEnterPostingKeyDialog()
+            }
+        }
+    }
+
+    override fun onActionClick(type: FeedType, position: Int, actions: Actions) {
+        val story = viewModel.getStory(type, position)
+        if (story == null) {
+            showInvalidReEnterPostingKeyDialog()
+            return
+        }
+        if (actions == Actions.VOTE) {
+            // check is key available
+            if (!viewModel.hasPostingKey()) {
+
+                return
+            }
+            if (story.isVoted) {
+                // show unvote confirmation dialog
+                val builder = AlertDialog.Builder(context);
+                builder
+                        .setTitle("Unvote")
+                        .setMessage("Are you sure to unvote this post?")
+                        .setPositiveButton("Confirm", { dialog, id ->
+                            viewModel.unVote(story, type)
+                        })
+                        .setNegativeButton("Cancel", { dialog, id ->
+
+                        })
+                builder.create().show()
+            } else {
+                VotePostDialog.newInstance(object : VotePostDialog.OnVotePercentSelectListener {
+                    override fun onSelect(value: Int) {
+                        viewModel.vote(story, type, value)
+                    }
+                }).show(activity?.supportFragmentManager, VotePostDialog.TAG)
+            }
+        }
     }
 
     companion object {

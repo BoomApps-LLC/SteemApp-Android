@@ -22,14 +22,15 @@ class DaoRepositoryDefault(
         private val networkPageSize: Int = ServiceLocator.NETWORK_PAGE_SIZE) : DaoRepository {
 
 
+    override fun updateStorySync(story: StoryEntity) {
+        db.storiesDao().updateStory(story)
+    }
 
     override fun getStory(storyId: Long): LiveData<StoryEntity> {
-        Timber.d("getStory($storyId)")
         return db.storiesDao().loadStory(storyId)
     }
 
     override fun getStorySync(storyId: Long): StoryEntity {
-        Timber.d("getStorySync($storyId)")
         return db.storiesDao().loadStorySync(storyId)
     }
 
@@ -38,9 +39,11 @@ class DaoRepositoryDefault(
      */
     fun insertResultIntoDb(type: FeedType, data: Array<StoryEntity>) {
         db.runInTransaction {
-            //            val start = db.storiesDao().getNextIndexInStories(type.ordinal)
+            val start = db.storiesDao().getNextIndexInStories(type.ordinal)
             val items = data.mapIndexed { index, storyEntity ->
-                //                storyEntity.indexInResponse = start + index
+                if (type.ordinal > 1) {
+                    storyEntity.indexInResponse = start + index
+                }
                 storyEntity.storyType = type.ordinal
                 storyEntity
             }.toTypedArray()
@@ -73,7 +76,6 @@ class DaoRepositoryDefault(
         obs.subscribeOn(Schedulers.io())
                 .take(networkPageSize.toLong())
                 .flatMap {
-                    Timber.d("Feed: call flat map")
                     return@flatMap Observable.fromIterable(it)
                             .doOnNext {
                                 Timber.d("Feed: First fromIterable >> permlink = ${it.permlink}")
@@ -90,20 +92,18 @@ class DaoRepositoryDefault(
                 .subscribe(
                         {
                             if (it != null && it.discussion != null) {
-                                Timber.d("Feed: OnNext(${it.discussion.title})")
                                 discussions.add(it)
-                            } else {
-                                Timber.w("Feed: OnNext result is %s", "null")
                             }
                         },
                         {
-                            networkState.value = NetworkState.error(it.message)
+                            networkState.postValue(NetworkState.error(it.message))
                         },
                         {
 
                             // process new discussions
                             val result = discussions.map {
-                                return@map DiscussionToStoryMapper((it)).map()[0]
+                                return@map DiscussionToStoryMapper(it, ServiceLocator.getPreferencesRepository().loadUserData().nickname
+                                        ?: "_").map()[0]
                             }.toTypedArray()
                             db.runInTransaction {
                                 // clear data for type
@@ -123,9 +123,9 @@ class DaoRepositoryDefault(
         networkState.value = NetworkState.LOADING
         val discussions: ArrayList<DiscussionData> = arrayListOf()
         val obs = if (type == FeedType.TRENDING) {
-            ServiceLocator.getSteemRepository().getTrendingDataList(0, ServiceLocator.NETWORK_PAGE_SIZE, "")
+            ServiceLocator.getSteemRepository().getTrendingDataList(0, ServiceLocator.NETWORK_PAGE_SIZE, null)
         } else {
-            ServiceLocator.getSteemRepository().getNewDataList(0, ServiceLocator.NETWORK_PAGE_SIZE, "")
+            ServiceLocator.getSteemRepository().getNewDataList(0, ServiceLocator.NETWORK_PAGE_SIZE, null)
         }
         obs
                 ?.subscribeOn(Schedulers.io())
@@ -133,9 +133,8 @@ class DaoRepositoryDefault(
                 ?.subscribe(
                         {
                             // process new discussions
-                            val result = discussions.map {
-                                return@map DiscussionToStoryMapper((it)).map()[0]
-                            }.toTypedArray()
+                            val result = DiscussionToStoryMapper(it, ServiceLocator.getPreferencesRepository().loadUserData().nickname
+                                    ?: "_").map().toTypedArray()
                             db.runInTransaction {
                                 // clear data for type
                                 db.storiesDao().deleteStoriesFor(type.ordinal)
@@ -146,7 +145,7 @@ class DaoRepositoryDefault(
                             networkState.postValue(NetworkState.LOADED)
                         },
                         {
-                            networkState.value = NetworkState.error(it.message)
+                            networkState.postValue(NetworkState.error(it.message))
                         }
                 )
         return networkState
@@ -167,9 +166,9 @@ class DaoRepositoryDefault(
                 ioExecutor = ioExecutor,
                 networkPageSize = networkPageSize)
         // create a data source factory from Room
-        val dataSourceFactory = if(type == FeedType.BLOG || type == FeedType.FEED){
+        val dataSourceFactory = if (type == FeedType.BLOG || type == FeedType.FEED) {
             db.storiesDao().loadAllStoriesRevertOrder(type.ordinal)
-        }else{
+        } else {
             db.storiesDao().loadAllStoriesDefaultOrder(type.ordinal)
         }
         val builder = LivePagedListBuilder(dataSourceFactory, pageSize)

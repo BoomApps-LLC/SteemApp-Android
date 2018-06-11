@@ -12,6 +12,7 @@ interface DaoRepository {
 
     fun refresh(type: FeedType): LiveData<NetworkState>
 
+    fun updateStorySync(story: StoryEntity)
 
     fun storiesFor(type: FeedType, pageSize: Int): Listing<StoryEntity>
 
@@ -24,7 +25,7 @@ interface DaoRepository {
 
     fun getPost(postId: Long): PostEntity
 
-    fun getPostLiveData(postId : Long) : LiveData<PostEntity>
+    fun getPostLiveData(postId: Long): LiveData<PostEntity>
 
     fun updatePost(postEntity: PostEntity)
 

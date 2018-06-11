@@ -10,7 +10,7 @@
     <string name="a_editor_story_text_hint">Your Story</string>
     <string name="a_editor_hashtag_input_title">Add your favorite categories</string>
     <string name="title_activity_main">MainActivity</string>
-    <string name="title_wallet">Wallet</string>
+    <string name="title_feeds">Feeds</string>
     <string name="title_edit">Create Post</string>
     <string name="title_profile">Profile</string>
 

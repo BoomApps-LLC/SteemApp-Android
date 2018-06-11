@@ -4,7 +4,7 @@
     <item
         android:id="@+id/navigation_feeds"
         android:icon="@drawable/ic_bn_feed_selector"
-        android:title="@string/title_wallet" />
+        android:title="@string/title_feeds" />
 
     <item
         android:id="@+id/navigation_edit"

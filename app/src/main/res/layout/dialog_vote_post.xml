@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <SeekBar
+        android:id="@+id/dialogVotePost_sbPercent"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:progress="50"
+        app:layout_constraintBottom_toTopOf="@id/dialogVotePost_tvValue"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintVertical_bias="1.0"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/dialogVotePost_tvValue"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:gravity="end|center_vertical"
+        app:layout_constraintBottom_toTopOf="@id/dialogVotePost_llButtons"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
+        tools:text="50%" />
+
+
+    <RelativeLayout
+        android:id="@+id/dialogVotePost_llButtons"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:orientation="horizontal"
+        android:paddingRight="24dp"
+        android:paddingLeft="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0">
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/dialogVotePost_btnConfirm"
+            style="@style/DialogButton"
+            android:layout_width="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginLeft="4dp"
+            android:text="@string/dialog_positive_button" />
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/dialogVotePost_btnCancel"
+            style="@style/DialogButton"
+            android:layout_marginRight="4dp"
+            android:layout_toLeftOf="@id/dialogSingleLineInput_btnConfirm"
+            android:text="@string/dialog_negative_button" />
+
+
+    </RelativeLayout>
+
+</android.support.constraint.ConstraintLayout>

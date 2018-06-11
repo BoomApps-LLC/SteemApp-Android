@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@drawable/bckg_feed_card_price_pressed" android:state_pressed="true" />
-    <item android:drawable="@drawable/bckg_feed_card_price_default" />
-</selector>

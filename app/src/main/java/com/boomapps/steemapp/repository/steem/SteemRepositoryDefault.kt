@@ -1,16 +1,16 @@
 package com.boomapps.steemapp.repository.steem
 
 import android.net.Uri
-import android.util.Log
 import com.boomapps.steemapp.BuildConfig
 import com.boomapps.steemapp.repository.FeedType
 import com.boomapps.steemapp.repository.ServiceLocator
+import com.boomapps.steemapp.repository.db.DiscussionToStoryMapper
+import com.boomapps.steemapp.repository.db.entities.StoryEntity
 import eu.bittrade.crypto.core.AddressFormatException
 import eu.bittrade.libs.steemj.SteemJ
 import eu.bittrade.libs.steemj.base.models.AccountName
 import eu.bittrade.libs.steemj.base.models.DiscussionQuery
 import eu.bittrade.libs.steemj.base.models.Permlink
-import eu.bittrade.libs.steemj.base.models.operations.CommentOperation
 import eu.bittrade.libs.steemj.configuration.SteemJConfig
 import eu.bittrade.libs.steemj.enums.DiscussionSortType
 import eu.bittrade.libs.steemj.enums.PrivateKeyType
@@ -46,17 +46,29 @@ class SteemRepositoryDefault : SteemRepository {
         steemJ = null
     }
 
+    override fun hasPostingKey(): Boolean {
+        if (steemJ == null) {
+            return false
+        }
+        if (steemJConfig?.privateKeyStorage != null) {
+            val accountName = steemJConfig?.defaultAccount
+            if (accountName != null) {
+                val key = steemJConfig?.privateKeyStorage?.getKeyForAccount(PrivateKeyType.POSTING, accountName)
+                return key != null
+            }
+        }
+        return false
+    }
+
     /**
      *
      */
     override fun login(nickname: String, postingKey: String?): SteemWorkerResponse {
-        Timber.log(Log.INFO, "login($nickname, $postingKey")
         try {
             steemJConfig = SteemJConfig.getInstance()
             steemJConfig?.setAppName("SteemApp")
             steemJConfig?.setAppVersion(BuildConfig.VERSION_NAME)
 
-//        steemJConfig?.addEndpointURI(URI.create("https://api.steemit.com"))
             steemJConfig?.defaultAccount = AccountName(nickname)
             steemJConfig?.responseTimeout = 10000
             val privateKeys = arrayListOf<ImmutablePair<PrivateKeyType, String>>()
@@ -98,33 +110,36 @@ class SteemRepositoryDefault : SteemRepository {
         return SteemWorkerResponse(true, SteemErrorCodes.EMPTY_ERROR, null)
     }
 
+    private fun addNewPostingKey(key: String) {
+        steemJConfig?.privateKeyStorage?.addPrivateKeyToAccount(steemJConfig?.defaultAccount, ImmutablePair(PrivateKeyType.POSTING, key))
+    }
 
     override fun post(title: String, content: String, tags: Array<String>, postingKey: String, rewardsPercent: Short, upvote: Boolean): SteemWorker.PostingResult {
         try {
-            steemJConfig?.privateKeyStorage
+//            steemJConfig?.privateKeyStorage
             if (steemJConfig?.privateKeyStorage?.privateKeysPerAccounts == null || steemJConfig?.privateKeyStorage?.privateKeysPerAccounts?.size == 0) {
+
+                var withKey = false
                 if (postingKey.isNotEmpty()) {
                     steemJConfig?.privateKeyStorage?.addPrivateKeyToAccount(steemJConfig?.defaultAccount, ImmutablePair(PrivateKeyType.POSTING, postingKey))
-                    val commentOperation: CommentOperation? = steemJ?.createPost(title, content, tags, rewardsPercent)
-                    if (commentOperation != null) {
-                        val metadata = commentOperation.jsonMetadata
-                        Timber.d("post answer >> ${metadata?.toString()}")
+                    withKey = true
+                }
+
+                if (!withKey) {
+                    val uData = ServiceLocator.getPreferencesRepository().loadUserData()
+                    if (uData.postKey != null) {
+                        addNewPostingKey(uData.postKey)
+                        withKey = true
                     }
+                }
+                if (withKey) {
+                    return postWithKey(title, content, tags, rewardsPercent, upvote)
                 } else {
                     return SteemWorker.PostingResult("Posting key is empty.", false)
                 }
+
             } else {
-                val commentOperation = steemJ?.createPostSynchronous(title, content, tags, rewardsPercent)
-                if (!upvote) {
-                    return SteemWorker.PostingResult()
-                }
-                if (commentOperation != null) {
-                    val permlink = commentOperation.permlink.link
-                    steemJ?.vote(steemJConfig?.defaultAccount, Permlink(permlink), 100.toShort())
-                    return SteemWorker.PostingResult()
-                } else {
-                    return SteemWorker.PostingResult("No comment operation.", false)
-                }
+                return postWithKey(title, content, tags, rewardsPercent, upvote)
             }
         } catch (communicationException: SteemCommunicationException) {
             Timber.e(communicationException)
@@ -140,6 +155,20 @@ class SteemRepositoryDefault : SteemRepository {
             return SteemWorker.PostingResult(parameterException.localizedMessage, false)
         }
         return SteemWorker.PostingResult()
+    }
+
+    private fun postWithKey(title: String, content: String, tags: Array<String>, rewardsPercent: Short, upvote: Boolean): SteemWorker.PostingResult {
+        val commentOperation = steemJ?.createPostSynchronous(title, content, tags, rewardsPercent)
+        if (!upvote) {
+            return SteemWorker.PostingResult()
+        }
+        if (commentOperation != null) {
+            val permlink = commentOperation.permlink.link
+            steemJ?.vote(steemJConfig?.defaultAccount, Permlink(permlink), 100.toShort())
+            return SteemWorker.PostingResult()
+        } else {
+            return SteemWorker.PostingResult("No comment operation.", false)
+        }
     }
 
     override fun uploadImage(uri: Uri): URL? {
@@ -181,7 +210,6 @@ class SteemRepositoryDefault : SteemRepository {
         } else {
             steemJConfig?.defaultAccount
         }
-        Timber.d("getStoryDetails >> ${aName?.name}")
         return Observable.fromCallable { return@fromCallable FeedShortEntriesRequest(FeedType.FEED, steemJ, aName).load() }
     }
 
@@ -192,7 +220,6 @@ class SteemRepositoryDefault : SteemRepository {
         } else {
             steemJConfig?.defaultAccount
         }
-        Timber.d("getStoryDetails >> ${aName?.name}")
         return Observable.fromCallable { return@fromCallable FeedShortEntriesRequest(FeedType.FEED, steemJ, aName, start, limit).load() }
     }
 
@@ -202,7 +229,6 @@ class SteemRepositoryDefault : SteemRepository {
         } else {
             steemJConfig?.defaultAccount
         }
-        Timber.d("getStoryDetails >> ${aName?.name}")
         return Observable.fromCallable { return@fromCallable FeedShortEntriesRequest(FeedType.BLOG, steemJ, aName).load() }
     }
 
@@ -212,13 +238,11 @@ class SteemRepositoryDefault : SteemRepository {
         } else {
             steemJConfig?.defaultAccount
         }
-        Timber.d("getStoryDetails >> ${aName?.name}")
         return Observable.fromCallable { return@fromCallable FeedShortEntriesRequest(FeedType.BLOG, steemJ, aName, start, limit).load() }
     }
 
     override fun getStoryDetails(aName: AccountName?, pLink: Permlink, orderId: Int): Observable<DiscussionData> {
         val rqName = aName ?: steemJConfig?.defaultAccount
-        Timber.d("getStoryDetails >> ${rqName?.name} :: ${pLink.link}")
         return Observable.fromCallable { DiscussionData(orderId, steemJ?.getContent(rqName, pLink)) }
     }
 
@@ -270,14 +294,13 @@ class SteemRepositoryDefault : SteemRepository {
     }
 
 
-    private fun getDiscussionsDataList(sortType: DiscussionSortType, start: Int, limit: Int, startPermlink: String): Single<ArrayList<DiscussionData>>? {
-        Timber.d("getDiscussionsDataList($start, $limit, $startPermlink")
+    private fun getDiscussionsDataList(sortType: DiscussionSortType, start: Int, limit: Int, storyEntity: StoryEntity?): Single<ArrayList<DiscussionData>>? {
         val dQuery = DiscussionQuery()
         dQuery.limit = limit
-        if (start > 0 || startPermlink.isNotEmpty()) {
-            dQuery.startPermlink = Permlink(startPermlink)
+        if (start > 0 && storyEntity != null) {
+            dQuery.startPermlink = Permlink(storyEntity.permlink)
+            dQuery.startAuthor = AccountName(storyEntity.author)
         }
-
         val observable = Single.fromCallable {
             return@fromCallable steemJ?.getDiscussionsBy(dQuery, sortType)
         }
@@ -286,21 +309,143 @@ class SteemRepositoryDefault : SteemRepository {
                     val arrayList: ArrayList<DiscussionData> = arrayListOf()
                     for ((index, discussion) in it.withIndex()) {
                         arrayList.add(DiscussionData(start + index, discussion))
-                        Timber.d("mapToDiscussionData(${start + index}, ${discussion.permlink.link}")
                     }
                     return@map arrayList
                 }
         return observable
     }
 
-    override fun getTrendingDataList(start: Int, limit: Int, startPermlink: String): Single<ArrayList<DiscussionData>>? {
-        Timber.d("getTrendingDataList($start, $limit, $startPermlink)")
-        return getDiscussionsDataList(DiscussionSortType.GET_DISCUSSIONS_BY_TRENDING, start, limit, startPermlink)
+    override fun getTrendingDataList(start: Int, limit: Int, storyEntity: StoryEntity?): Single<ArrayList<DiscussionData>>? {
+        return getDiscussionsDataList(DiscussionSortType.GET_DISCUSSIONS_BY_TRENDING, start, limit, storyEntity)
     }
 
-    override fun getNewDataList(start: Int, limit: Int, startPermlink: String): Single<ArrayList<DiscussionData>>? {
-        Timber.d("getNewDataList($start, $limit, $startPermlink)")
-        return getDiscussionsDataList(DiscussionSortType.GET_DISCUSSIONS_BY_CREATED, start, limit, startPermlink)
+    override fun getNewDataList(start: Int, limit: Int, storyEntity: StoryEntity?): Single<ArrayList<DiscussionData>>? {
+        return getDiscussionsDataList(DiscussionSortType.GET_DISCUSSIONS_BY_CREATED, start, limit, storyEntity)
     }
 
+
+    /*
+        * Upvote the post
+        * "steem-java-api-learned-to-speak-graphene-update-5" written by
+        * "dez1337" using 100% of the defaultAccounts voting power.
+        */
+    override fun vote(postPermLink: String, percentage: Int) {
+        try {
+            steemJ?.vote(steemJConfig?.apiUsername, Permlink(postPermLink),
+                    percentage.toShort())
+        } catch (communicationException: SteemCommunicationException) {
+
+        } catch (responseException: SteemResponseException) {
+
+        } catch (transactionException: SteemInvalidTransactionException) {
+
+        }
+    }
+
+
+    /*
+        * Upvote the post
+        * "steem-java-api-learned-to-speak-graphene-update-5" written by
+        * "dez1337" using 100% of the defaultAccounts voting power.
+        */
+    override fun vote(author: String, postPermLink: String, percentage: Int) {
+        try {
+            steemJ?.vote(AccountName(author), Permlink(postPermLink),
+                    percentage.toShort())
+        } catch (communicationException: SteemCommunicationException) {
+
+        } catch (responseException: SteemResponseException) {
+
+        } catch (transactionException: SteemInvalidTransactionException) {
+
+        }
+    }
+
+    override fun cancelVote(postPermLink: String) {
+        try {
+            steemJ?.cancelVote(steemJConfig?.apiUsername,
+                    Permlink(postPermLink))
+        } catch (communicationException: SteemCommunicationException) {
+
+        } catch (responseException: SteemResponseException) {
+
+        } catch (transactionException: SteemInvalidTransactionException) {
+
+        }
+    }
+
+    override fun cancelVote(author: String, postPermLink: String) {
+        try {
+            steemJ?.cancelVote(AccountName(author),
+                    Permlink(postPermLink))
+        } catch (communicationException: SteemCommunicationException) {
+
+        } catch (responseException: SteemResponseException) {
+
+        } catch (transactionException: SteemInvalidTransactionException) {
+
+        }
+    }
+
+    override fun unvoteWithUpdate(story: StoryEntity, type: FeedType, callback: SteemRepository.Callback<Boolean>) {
+        Observable.fromCallable {
+            return@fromCallable cancelVote(story.author, story.permlink)
+        }
+                .subscribeOn(Schedulers.io())
+                .flatMap {
+                    return@flatMap getStoryDetails(AccountName(story.author), Permlink(story.permlink), story.indexInResponse)
+                }
+                .observeOn(Schedulers.io())
+                .subscribe(
+                        {
+                            val result = it
+                            if (result?.discussion != null) {
+                                val mapped = DiscussionToStoryMapper(result, steemJConfig?.apiUsername?.name
+                                        ?: "_").map()
+                                if (mapped.isNotEmpty()) {
+                                    mapped[0].storyType = type.ordinal
+                                    ServiceLocator.getDaoRepository().updateStorySync(mapped[0])
+                                    callback.onSuccess(true)
+                                    return@subscribe
+                                }
+                            }
+                            callback.onSuccess(false)
+
+                        },
+                        {
+                            callback.onError(it)
+                        }
+                )
+    }
+
+    override fun voteWithUpdate(story: StoryEntity, type: FeedType, percent: Int, callback: SteemRepository.Callback<Boolean>) {
+        Observable.fromCallable {
+            return@fromCallable vote(story.author, story.permlink, percent)
+        }
+                .subscribeOn(Schedulers.io())
+                .flatMap {
+                    return@flatMap getStoryDetails(AccountName(story.author), Permlink(story.permlink), story.indexInResponse)
+                }
+                .observeOn(Schedulers.io())
+                .subscribe(
+                        {
+                            val result = it
+                            if (result?.discussion != null) {
+                                val mapped = DiscussionToStoryMapper(result, steemJConfig?.apiUsername?.name
+                                        ?: "_").map()
+                                if (mapped.isNotEmpty()) {
+                                    mapped[0].storyType = type.ordinal
+                                    ServiceLocator.getDaoRepository().updateStorySync(mapped[0])
+                                    callback.onSuccess(true)
+                                    return@subscribe
+                                }
+                            }
+                            callback.onSuccess(false)
+
+                        },
+                        {
+                            callback.onError(it)
+                        }
+                )
+    }
 }

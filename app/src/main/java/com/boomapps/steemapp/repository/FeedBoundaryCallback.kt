@@ -2,7 +2,6 @@ package com.boomapps.steemapp.repository
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.paging.PagedList
-import android.os.Handler
 import android.support.annotation.MainThread
 import com.boomapps.steemapp.repository.db.DiscussionToStoryMapper
 import com.boomapps.steemapp.repository.db.entities.StoryEntity
@@ -26,7 +25,8 @@ class FeedBoundaryCallback(
 
     private fun insertItemsIntoDb(items: ArrayList<DiscussionData>) {
         ioExecutor.execute {
-            handleResponse(type, DiscussionToStoryMapper(items).map().toTypedArray())
+            handleResponse(type, DiscussionToStoryMapper(items, ServiceLocator.getPreferencesRepository().loadUserData().nickname
+                    ?: "_").map().toTypedArray())
         }
     }
 
@@ -39,18 +39,18 @@ class FeedBoundaryCallback(
         Timber.d("onZeroItemsLoaded()")
         val observable = when (type) {
             FeedType.BLOG -> ServiceLocator.getSteemRepository().getBlogStories(null, 0, networkPageSize)
-            FeedType.TRENDING -> ServiceLocator.getSteemRepository().getTrendingDataList(0, networkPageSize, "")
-            FeedType.NEW -> ServiceLocator.getSteemRepository().getNewDataList(0, networkPageSize, "")
+            FeedType.TRENDING -> ServiceLocator.getSteemRepository().getTrendingDataList(0, networkPageSize, null)
+            FeedType.NEW -> ServiceLocator.getSteemRepository().getNewDataList(0, networkPageSize, null)
             else -> /*FeedType.FEED*/ ServiceLocator.getSteemRepository().getFeedStories(null, 0, networkPageSize)
         }
 
         observable?.observeOn(AndroidSchedulers.mainThread())
                 ?.subscribe({
                     insertItemsIntoDb(it)
-                    networkState.value = NetworkState.LOADED
+                    networkState.postValue(NetworkState.LOADED)
                 }, {
                     Timber.e(it)
-                    networkState.value = NetworkState.error("Loading data error for " + type.name)
+                    networkState.postValue(NetworkState.error("Loading data error for " + type.name))
                 })
 
 
@@ -66,22 +66,19 @@ class FeedBoundaryCallback(
     @MainThread
     override fun onItemAtEndLoaded(itemAtEnd: StoryEntity) {
         networkState.value = NetworkState.LOADING
-        Timber.d("onItemAtEndLoaded(itemAtEnd=[%d, %s])", itemAtEnd.indexInResponse, itemAtEnd.permlink)
         val single = when (type) {
             FeedType.BLOG -> ServiceLocator.getSteemRepository().getBlogStories(null, itemAtEnd.indexInResponse, networkPageSize)
-            FeedType.TRENDING -> ServiceLocator.getSteemRepository().getTrendingDataList(itemAtEnd.indexInResponse, networkPageSize, itemAtEnd.permlink)
-            FeedType.NEW -> ServiceLocator.getSteemRepository().getNewDataList(itemAtEnd.indexInResponse, networkPageSize, itemAtEnd.permlink)
+            FeedType.TRENDING -> ServiceLocator.getSteemRepository().getTrendingDataList(itemAtEnd.indexInResponse, networkPageSize, itemAtEnd)
+            FeedType.NEW -> ServiceLocator.getSteemRepository().getNewDataList(itemAtEnd.indexInResponse, networkPageSize, itemAtEnd)
             else -> /*FeedType.FEED*/ ServiceLocator.getSteemRepository().getFeedStories(null, itemAtEnd.indexInResponse, networkPageSize)
         }
         single?.observeOn(AndroidSchedulers.mainThread())
                 ?.subscribe({
                     insertItemsIntoDb(it)
-                    Handler().postDelayed({
-                        networkState.value = NetworkState.LOADED
-                    }, 2000)
+                    networkState.postValue(NetworkState.LOADED)
                 }, {
                     Timber.e(it)
-                    networkState.value = NetworkState.error("Loading data error for " + type.name)
+                    networkState.postValue(NetworkState.error("Loading data error for " + type.name))
                 })
     }
 
