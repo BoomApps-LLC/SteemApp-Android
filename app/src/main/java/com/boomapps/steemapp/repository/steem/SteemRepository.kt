@@ -63,11 +63,11 @@ interface SteemRepository {
 
     fun vote(postPermLink: String, percentage: Int)
 
-    fun vote(authorFor: String, postPermLink: String, percentage: Int)
+    fun vote(authorFor: String, postPermLink: String, percentage: Int) : Boolean
 
     fun cancelVote(postPermLink: String)
 
-    fun cancelVote(author: String, postPermLink: String)
+    fun cancelVote(author: String, postPermLink: String) : Boolean
 
     fun unvoteWithUpdate(story: StoryEntity, type: FeedType, callback: Callback<Boolean>)
 

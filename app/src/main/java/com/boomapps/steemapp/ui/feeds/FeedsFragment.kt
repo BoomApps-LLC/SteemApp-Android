@@ -3,6 +3,7 @@ package com.boomapps.steemapp.ui.feeds
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
@@ -16,7 +17,10 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import com.boomapps.steemapp.R
 import com.boomapps.steemapp.repository.FeedType
+import com.boomapps.steemapp.ui.ViewState
+import com.boomapps.steemapp.ui.dialogs.ProgressFragmentDialog
 import com.boomapps.steemapp.ui.dialogs.VotePostDialog
+import com.boomapps.steemapp.ui.dialogs.WarningDialog
 import com.boomapps.steemapp.ui.editor.inputpostingkey.InputNewPostingKeyActivity
 import com.boomapps.steemapp.ui.post.PostViewActivity
 import timber.log.Timber
@@ -28,6 +32,15 @@ import timber.log.Timber
  *
  */
 class FeedsFragment : Fragment(), FeedListHolderCallback {
+
+
+    private enum class LastActions {
+        VOTE,
+        UNVOTE,
+        FLAG
+    }
+
+    private var lastAction = LastActions.VOTE
 
     private val INPUT_NEW_KEY_POST_ACTIVITY_CODE = 22
 
@@ -69,6 +82,35 @@ class FeedsFragment : Fragment(), FeedListHolderCallback {
                 Handler().postDelayed({ updatePage(0) }, 1000)
             }
         })
+
+        viewModel.state.observe(this, Observer<ViewState> { t ->
+            when (t) {
+                ViewState.COMMON -> {
+                    dismissProgress()
+                }
+                ViewState.PROGRESS -> {
+                    showProgress(when (lastAction) {
+                        LastActions.VOTE -> "Sending vote ..."
+                        LastActions.UNVOTE -> "Canceling vote ..."
+                        else -> "Proceed ..."
+                    })
+                }
+                ViewState.FAULT_RESULT -> {
+                    viewModel.viewStateProceeded()
+                    dismissProgress()
+                    if (viewModel.stringError.isNotEmpty()) {
+                        val curContext = context
+                        if (curContext != null) {
+                            WarningDialog.getInstance().showSpecial(curContext, null, viewModel.stringError, "Ok", null, null)
+                        }
+                    }
+                }
+                ViewState.SUCCESS_RESULT -> {
+                    dismissProgress()
+                }
+            }
+        })
+
         return view
     }
 
@@ -174,7 +216,9 @@ class FeedsFragment : Fragment(), FeedListHolderCallback {
                         .setTitle("Unvote")
                         .setMessage("Are you sure to unvote this post?")
                         .setPositiveButton("Confirm", { dialog, id ->
+                            lastAction = LastActions.UNVOTE
                             viewModel.unVote(story, type)
+
                         })
                         .setNegativeButton("Cancel", { dialog, id ->
 
@@ -183,10 +227,33 @@ class FeedsFragment : Fragment(), FeedListHolderCallback {
             } else {
                 VotePostDialog.newInstance(object : VotePostDialog.OnVotePercentSelectListener {
                     override fun onSelect(value: Int) {
+                        lastAction = LastActions.VOTE
                         viewModel.vote(story, type, value)
                     }
                 }).show(activity?.supportFragmentManager, VotePostDialog.TAG)
             }
+        }
+    }
+
+
+    private fun showProgress(message: String) {
+        if (isProgressShowed()) return
+        ProgressFragmentDialog.newInstance(message).show(activity?.supportFragmentManager, ProgressFragmentDialog.TAG)
+    }
+
+    private fun showProgress(resId: Int) {
+        showProgress(getString(resId))
+    }
+
+    private fun isProgressShowed(): Boolean {
+        val f = activity?.supportFragmentManager?.findFragmentByTag(ProgressFragmentDialog.TAG)
+        return f != null && (f.isVisible || f.isAdded)
+    }
+
+    private fun dismissProgress() {
+        val fragment = activity?.supportFragmentManager?.findFragmentByTag(ProgressFragmentDialog.TAG)
+        if (fragment != null) {
+            (fragment as ProgressFragmentDialog).dismiss()
         }
     }
 

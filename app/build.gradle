@@ -80,7 +80,7 @@ dependencies {
     implementation "com.android.support:design:$supportVersion"
     implementation "com.android.support:appcompat-v7:$supportVersion"
     implementation "com.android.support:customtabs:$supportVersion"
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.1'
     implementation "com.android.support:design:$supportVersion"
     implementation "com.android.support:cardview-v7:$supportVersion"
     implementation 'com.google.firebase:firebase-crash:16.0.0'

@@ -12,6 +12,7 @@ import com.boomapps.steemapp.repository.UserData
 import com.boomapps.steemapp.repository.db.entities.StoryEntity
 import com.boomapps.steemapp.repository.steem.SteemRepository
 import com.boomapps.steemapp.ui.BaseViewModel
+import com.boomapps.steemapp.ui.ViewState
 import timber.log.Timber
 
 
@@ -153,26 +154,30 @@ class FeedsViewModel : BaseViewModel() {
     }
 
     fun unVote(story: StoryEntity, type: FeedType) {
+        state.value = ViewState.PROGRESS
         ServiceLocator.getSteemRepository().unvoteWithUpdate(story, type, object : SteemRepository.Callback<Boolean> {
             override fun onSuccess(result: Boolean) {
-                // TODO disable unvoting progress
+                state.postValue(ViewState.COMMON)
             }
 
             override fun onError(error: Throwable) {
-                // TODO disable unvoting progress and show error
+                stringError = "Canceling vote error\n${error.message}"
+                state.postValue(ViewState.FAULT_RESULT)
             }
         })
     }
 
     fun vote(story: StoryEntity, type: FeedType, percent: Int) {
+        state.value = ViewState.PROGRESS
         ServiceLocator.getSteemRepository().voteWithUpdate(story, type, percent, object : SteemRepository.Callback<Boolean> {
             override fun onSuccess(result: Boolean) {
-                // TODO disable unvoting progress
+                state.postValue(ViewState.COMMON)
                 Timber.d("VOTE SUCCESS")
             }
 
             override fun onError(error: Throwable) {
-                // TODO disable unvoting progress and show error
+                stringError = "Sending vote Error\n${error.message}"
+                state.postValue(ViewState.FAULT_RESULT)
                 Timber.d("VOTE ERROR >> ${error.message}")
             }
         })

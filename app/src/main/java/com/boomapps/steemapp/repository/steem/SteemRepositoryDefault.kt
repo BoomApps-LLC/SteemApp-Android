@@ -348,17 +348,19 @@ class SteemRepositoryDefault : SteemRepository {
         * "steem-java-api-learned-to-speak-graphene-update-5" written by
         * "dez1337" using 100% of the defaultAccounts voting power.
         */
-    override fun vote(author: String, postPermLink: String, percentage: Int) {
+    override fun vote(author: String, postPermLink: String, percentage: Int): Boolean {
         try {
             steemJ?.vote(AccountName(author), Permlink(postPermLink),
                     percentage.toShort())
+            return true
         } catch (communicationException: SteemCommunicationException) {
-
+            return false
         } catch (responseException: SteemResponseException) {
-
+            return false
         } catch (transactionException: SteemInvalidTransactionException) {
-
+            return false
         }
+        return false
     }
 
     override fun cancelVote(postPermLink: String) {
@@ -374,24 +376,36 @@ class SteemRepositoryDefault : SteemRepository {
         }
     }
 
-    override fun cancelVote(author: String, postPermLink: String) {
+    override fun cancelVote(author: String, postPermLink: String): Boolean {
         try {
             steemJ?.cancelVote(AccountName(author),
                     Permlink(postPermLink))
+            return true
         } catch (communicationException: SteemCommunicationException) {
-
+            return false
         } catch (responseException: SteemResponseException) {
-
+            return false
         } catch (transactionException: SteemInvalidTransactionException) {
-
+            return false
         }
+        return false
     }
 
     override fun unvoteWithUpdate(story: StoryEntity, type: FeedType, callback: SteemRepository.Callback<Boolean>) {
         Observable.fromCallable {
-            return@fromCallable cancelVote(story.author, story.permlink)
+            val result = cancelVote(story.author, story.permlink)
+            if (result) {
+                return@fromCallable result
+            } else {
+                throw error("")
+            }
         }
                 .subscribeOn(Schedulers.io())
+                .doOnNext {
+                    if (!it) {
+                        Observable.empty<Boolean>()
+                    }
+                }
                 .flatMap {
                     return@flatMap getStoryDetails(AccountName(story.author), Permlink(story.permlink), story.indexInResponse)
                 }
