@@ -1,10 +1,14 @@
 package com.boomapps.steemapp.ui.post
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.app.AlertDialog
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Intent
 import android.os.Bundle
 import android.support.constraint.ConstraintLayout
+import android.support.v4.content.ContextCompat
 import android.view.MenuItem
 import android.view.View
 import android.webkit.WebChromeClient
@@ -12,6 +16,10 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.boomapps.steemapp.R
 import com.boomapps.steemapp.ui.BaseActivity
+import com.boomapps.steemapp.ui.ViewState
+import com.boomapps.steemapp.ui.dialogs.VotePostDialog
+import com.boomapps.steemapp.ui.dialogs.WarningDialog
+import com.boomapps.steemapp.ui.editor.inputpostingkey.InputNewPostingKeyActivity
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
@@ -34,9 +42,11 @@ class PostViewActivity : BaseActivity() {
 
     }
 
+    private val INPUT_NEW_KEY_POST_ACTIVITY_CODE = 32
+
     lateinit var viewModel: PostViewModel
     var pFullWidth = 0
-    private lateinit var progressParams: ConstraintLayout.LayoutParams
+
     lateinit var extraUrl: String
     var extraPostId: Long = -1
     var extraTitle = ""
@@ -47,6 +57,9 @@ class PostViewActivity : BaseActivity() {
     var extraCommentNum = 0
     var extraLinksNum = 0
     var extraVoteNum = 0
+
+
+    private lateinit var progressParams: ConstraintLayout.LayoutParams
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,6 +74,67 @@ class PostViewActivity : BaseActivity() {
         title = "FEED"
         viewModel = ViewModelProviders.of(this, PostViewModelFactory(extraPostId, extraUrl, extraTitle)).get(PostViewModel::class.java)
         progressParams = postWebViewProgress.layoutParams as ConstraintLayout.LayoutParams
+        initWebView()
+        observeState()
+        viewModel.fullStoryData.observe(this, Observer {
+            if (it?.isVoted == true) {
+                aPost_votePriceLayout.setBackgroundResource(R.drawable.bg_feed_card_price_voted_selector)
+                aPost_tvFullPrice.setTextColor(ContextCompat.getColorStateList(this, R.color.feed_card_price_unvoted_text_selector))
+            } else {
+                aPost_votePriceLayout.setBackgroundResource(R.drawable.bg_feed_card_price_unvoted_selector)
+                aPost_tvFullPrice.setTextColor(ContextCompat.getColorStateList(this, R.color.feed_card_price_voted_text_selector))
+            }
+        })
+        aPost_votePriceLayout.setOnClickListener {
+            if (!viewModel.hasPostingKey()) {
+                showInvalidReEnterPostingKeyDialog()
+            } else {
+                val isVoted = viewModel.isVoted() ?: return@setOnClickListener
+                if (isVoted) {
+                    showUnVoteConfirmDialog()
+                } else {
+                    showVoteDialog()
+                }
+
+            }
+
+        }
+
+    }
+
+    private fun observeState() {
+        viewModel.state.observe(this, Observer<ViewState> { t ->
+            when (t) {
+                ViewState.COMMON -> {
+                    dismissProgress()
+                }
+                ViewState.PROGRESS -> {
+                    val isVoted = viewModel.isVoted() == null ?: return@Observer
+                    showProgress(
+                            if (isVoted) {
+                                "Canceling vote ..."
+                            } else {
+                                "Sending vote ..."
+                            }
+                    )
+                }
+                ViewState.FAULT_RESULT -> {
+                    viewModel.viewStateProceeded()
+                    dismissProgress()
+                    if (viewModel.stringError.isNotEmpty()) {
+
+                        WarningDialog.getInstance().showSpecial(this, null, viewModel.stringError, "Ok", null, null)
+                    }
+                }
+                ViewState.SUCCESS_RESULT -> {
+                    dismissProgress()
+                }
+            }
+        })
+    }
+
+
+    private fun initWebView() {
         postWebView.addOnLayoutChangeListener(object : View.OnLayoutChangeListener {
 
             override fun onLayoutChange(v: View?, left: Int, top: Int, right: Int, bottom: Int, oldLeft: Int, oldTop: Int, oldRight: Int, oldBottom: Int) {
@@ -237,6 +311,53 @@ class PostViewActivity : BaseActivity() {
             postWebView.goBack()
         } else {
             finish()
+        }
+    }
+
+    private fun showVoteDialog() {
+        VotePostDialog.newInstance(object : VotePostDialog.OnVotePercentSelectListener {
+            override fun onSelect(value: Int) {
+                viewModel.vote(value)
+            }
+        }).show(supportFragmentManager, VotePostDialog.TAG)
+    }
+
+    private fun showUnVoteConfirmDialog() {
+        // show unvote confirmation dialog
+        val builder = AlertDialog.Builder(this);
+        builder
+                .setTitle("Unvote")
+                .setMessage("Are you sure to unvote this post?")
+                .setPositiveButton("Confirm", { dialog, id ->
+                    viewModel.unVote()
+                })
+                .setNegativeButton("Cancel", { dialog, id ->
+
+                })
+        builder.create().show()
+    }
+
+    private fun showInvalidReEnterPostingKeyDialog() {
+        val builder = AlertDialog.Builder(this);
+        builder
+                .setTitle("Oops!!")
+                .setMessage("Sorry. You can\'t vote, cause you didn't enter POSTING key before.\n Do you want enter it now?")
+                .setPositiveButton("Confirm", { dialog, id ->
+                    showScreenForEnterNewPostingKey()
+                }).create().show()
+    }
+
+    fun showScreenForEnterNewPostingKey() {
+        val intent = Intent(this, InputNewPostingKeyActivity::class.java)
+        startActivityForResult(intent, INPUT_NEW_KEY_POST_ACTIVITY_CODE)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK && requestCode == INPUT_NEW_KEY_POST_ACTIVITY_CODE) {
+            if (!viewModel.saveNewPostingKey(data)) {
+                showInvalidReEnterPostingKeyDialog()
+            }
         }
     }
 

@@ -101,6 +101,13 @@ class SharedRepositoryDefault : SharedRepository {
         return UserData(nick, username, photoUrl, postingKey)
     }
 
+
+    override fun updatePostingKey(newKey: String?) {
+        val uData = loadUserData()
+        val newUserData = UserData(uData.nickname, uData.userName, uData.photoUrl, newKey)
+        saveUserData(newUserData)
+    }
+
     private fun isUserSaved(): Boolean {
         return getReadableSharedPreferences().getString("nickname", "") != ""
     }

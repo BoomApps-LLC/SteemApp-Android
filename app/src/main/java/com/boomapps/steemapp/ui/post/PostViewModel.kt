@@ -1,10 +1,14 @@
 package com.boomapps.steemapp.ui.post
 
 import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MutableLiveData
+import android.content.Intent
+import com.boomapps.steemapp.repository.FeedType
 import com.boomapps.steemapp.repository.ServiceLocator
 import com.boomapps.steemapp.repository.db.entities.PostEntity
+import com.boomapps.steemapp.repository.db.entities.StoryEntity
+import com.boomapps.steemapp.repository.steem.SteemRepository
 import com.boomapps.steemapp.ui.BaseViewModel
+import com.boomapps.steemapp.ui.ViewState
 import com.commonsware.cwac.anddown.AndDown
 import com.commonsware.cwac.anddown.AndDown.*
 import io.reactivex.Observable
@@ -17,40 +21,11 @@ class PostViewModel(val postId: Long, val postUrl: String, val title: String) : 
 
     var postData: LiveData<PostEntity>
 
+    var fullStoryData: LiveData<StoryEntity>
+
     init {
         postData = ServiceLocator.getDaoRepository().getPostLiveData(postId)
-    }
-
-    fun getPost(storyId: Long) {
-        Timber.d("getPost for $storyId")
-        if (postData.value != null) {
-            return
-        }
-
-        Observable.fromCallable {
-            ServiceLocator.getDaoRepository().getStorySync(storyId)
-        }
-                .subscribeOn(Schedulers.io())
-                .doOnNext {
-                    if (it != null) {
-                        Timber.d("story has been found : ${it.title}")
-                    } else {
-                        Timber.d("story hasn't been found")
-                    }
-                }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    if (it != null) {
-                        val andDown = AndDown()
-                        val html = andDown.markdownToHtml(it.rawBody, HOEDOWN_EXT_AUTOLINK and HOEDOWN_EXT_HIGHLIGHT and HOEDOWN_EXT_QUOTE and HOEDOWN_EXT_SPACE_HEADERS, 0)
-                        Timber.d("transormed markdown to html = $html")
-//                        postData.value = PostData(it.title, html)
-                    }
-                }, {
-                    Timber.e(it, "error getting StoryEntityById")
-                }, {
-
-                })
+        fullStoryData = ServiceLocator.getDaoRepository().getStory(postId)
     }
 
     fun loadPost() {
@@ -89,6 +64,57 @@ class PostViewModel(val postId: Long, val postUrl: String, val title: String) : 
             return html.body().html()
         }
 
+    }
+
+    fun isVoted(): Boolean? {
+        return fullStoryData.value?.isVoted
+    }
+
+    fun unVote() {
+        val fullStory = fullStoryData.value ?: return
+        state.value = ViewState.PROGRESS
+        ServiceLocator.getSteemRepository().unvoteWithUpdate(fullStory, FeedType.getByPosition(fullStory.storyType), object : SteemRepository.Callback<Boolean> {
+            override fun onSuccess(result: Boolean) {
+                state.postValue(ViewState.COMMON)
+            }
+
+            override fun onError(error: Throwable) {
+                stringError = "Canceling vote error\n${error.message}"
+                state.postValue(ViewState.FAULT_RESULT)
+            }
+        })
+    }
+
+    fun vote(percent: Int) {
+        val fullStory = fullStoryData.value ?: return
+        state.value = ViewState.PROGRESS
+        ServiceLocator.getSteemRepository().voteWithUpdate(fullStory, FeedType.getByPosition(fullStory.storyType), percent, object : SteemRepository.Callback<Boolean> {
+            override fun onSuccess(result: Boolean) {
+                state.postValue(ViewState.COMMON)
+                Timber.d("VOTE SUCCESS")
+            }
+
+            override fun onError(error: Throwable) {
+                stringError = "Sending vote Error\n${error.message}"
+                state.postValue(ViewState.FAULT_RESULT)
+                Timber.d("VOTE ERROR >> ${error.message}")
+            }
+        })
+    }
+
+    fun hasPostingKey(): Boolean {
+        return ServiceLocator.getSteemRepository().hasPostingKey()
+    }
+
+    fun saveNewPostingKey(data: Intent?): Boolean {
+        if (data == null) {
+            return false
+        }
+        if (!data.hasExtra("POSTING_KEY")) {
+            return false
+        }
+        ServiceLocator.getPreferencesRepository().updatePostingKey(data.getStringExtra("POSTING_KEY"))
+        return true
     }
 
 }

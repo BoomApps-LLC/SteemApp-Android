@@ -198,15 +198,12 @@ class FeedsFragment : Fragment(), FeedListHolderCallback {
     }
 
     override fun onActionClick(type: FeedType, position: Int, actions: Actions) {
-        val story = viewModel.getStory(type, position)
-        if (story == null) {
-            showInvalidReEnterPostingKeyDialog()
-            return
-        }
+        // return if cannot find story in DB -> it shouldn't happened ever
+        val story = viewModel.getStory(type, position) ?: return
         if (actions == Actions.VOTE) {
             // check is key available
             if (!viewModel.hasPostingKey()) {
-
+                showInvalidReEnterPostingKeyDialog()
                 return
             }
             if (story.isVoted) {

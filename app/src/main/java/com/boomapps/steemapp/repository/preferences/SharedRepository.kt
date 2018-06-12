@@ -16,6 +16,8 @@ interface SharedRepository {
 
     fun updateUserData(userData: UserData)
 
+    fun updatePostingKey(newKey: String?)
+
     fun loadUserData(): UserData
 
     fun isUserLogged(): Boolean

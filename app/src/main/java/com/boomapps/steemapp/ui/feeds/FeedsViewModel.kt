@@ -194,10 +194,7 @@ class FeedsViewModel : BaseViewModel() {
         if (!data.hasExtra("POSTING_KEY")) {
             return false
         }
-        val repo = ServiceLocator.getPreferencesRepository()
-        val uData = repo.loadUserData()
-        val newUserData = UserData(uData.nickname, uData.userName, uData.photoUrl, data.getStringExtra("POSTING_KEY"))
-        repo.saveUserData(newUserData)
+        ServiceLocator.getPreferencesRepository().updatePostingKey(data.getStringExtra("POSTING_KEY"))
         return true
     }
 

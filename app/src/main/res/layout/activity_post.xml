@@ -72,7 +72,7 @@
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/aPost_guidelineLeft"
-            app:layout_constraintTop_toBottomOf="@id/aPost_priceLayout"
+            app:layout_constraintTop_toBottomOf="@id/aPost_votePriceLayout"
             tools:text="20" />
 
         <ImageView
@@ -84,7 +84,7 @@
             android:src="@drawable/ic_feed_card_votes"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/aPost_guidelineLeft"
-            app:layout_constraintTop_toBottomOf="@id/aPost_priceLayout" />
+            app:layout_constraintTop_toBottomOf="@id/aPost_votePriceLayout" />
 
 
         <TextView
@@ -99,7 +99,7 @@
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/aPost_guidelineCenter"
-            app:layout_constraintTop_toBottomOf="@id/aPost_priceLayout"
+            app:layout_constraintTop_toBottomOf="@id/aPost_votePriceLayout"
             tools:text="120" />
 
         <ImageView
@@ -111,7 +111,7 @@
             android:src="@drawable/ic_feed_card_comments"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/aPost_guidelineCenter"
-            app:layout_constraintTop_toBottomOf="@id/aPost_priceLayout" />
+            app:layout_constraintTop_toBottomOf="@id/aPost_votePriceLayout" />
 
         <TextView
             android:id="@+id/aPost_tvLinkNumber"
@@ -125,7 +125,7 @@
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/aPost_guidelineRight"
-            app:layout_constraintTop_toBottomOf="@id/aPost_priceLayout"
+            app:layout_constraintTop_toBottomOf="@id/aPost_votePriceLayout"
             tools:text="95" />
 
         <ImageView
@@ -137,7 +137,7 @@
             android:src="@drawable/ic_feed_card_linked"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/aPost_guidelineRight"
-            app:layout_constraintTop_toBottomOf="@id/aPost_priceLayout" />
+            app:layout_constraintTop_toBottomOf="@id/aPost_votePriceLayout" />
 
 
         <ImageView
@@ -212,7 +212,7 @@
             tools:text="59" />
 
         <LinearLayout
-            android:id="@+id/aPost_priceLayout"
+            android:id="@+id/aPost_votePriceLayout"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_marginRight="16dp"
