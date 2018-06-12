@@ -3,7 +3,7 @@ package com.boomapps.steemapp.ui.splash
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
-import com.boomapps.steemapp.repository.ServiceLocator
+import com.boomapps.steemapp.repository.RepositoryProvider
 import com.boomapps.steemapp.repository.network.NetworkRepository
 import com.boomapps.steemapp.repository.steem.SteemWorker
 import com.boomapps.steemapp.ui.BaseViewModel
@@ -31,7 +31,7 @@ class SplashViewModel : BaseViewModel() {
     }
 
     fun getLoginState(): LiveData<LoginState> {
-        loginState.value = if (ServiceLocator.getPreferencesRepository().isUserLogged() || !SteemWorker().isLogged()) {
+        loginState.value = if (RepositoryProvider.getPreferencesRepository().isUserLogged() || !SteemWorker().isLogged()) {
             LoginState.NOT_LOGGED
         } else {
             LoginState.LOGGED
@@ -44,14 +44,14 @@ class SplashViewModel : BaseViewModel() {
 
     private fun login() {
         Log.d("SplashViewModel", "login()")
-        val userData = ServiceLocator.getPreferencesRepository().loadUserData()
+        val userData = RepositoryProvider.getPreferencesRepository().loadUserData()
         if (userData.nickname.isNullOrEmpty()) {
             loginState.value = LoginState.NO_NICK
             return
         }
         Log.d("SplashViewModel", "userData{${userData.nickname}, ${userData.postKey}}")
         Observable.fromCallable {
-            return@fromCallable ServiceLocator.getSteemRepository().login(userData.nickname!!, userData.postKey)
+            return@fromCallable RepositoryProvider.getSteemRepository().login(userData.nickname!!, userData.postKey)
         }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -78,11 +78,11 @@ class SplashViewModel : BaseViewModel() {
     }
 
     private fun loadFullAdditionalData(nick: String) {
-        if (ServiceLocator.getPreferencesRepository().loadUserData().userName != null) {
+        if (RepositoryProvider.getPreferencesRepository().loadUserData().userName != null) {
             loginState.value = LoginState.LOGGED_WITHOUT_BALANCE;
             return
         }
-        ServiceLocator.getNetworkRepository().loadFullStartData(nick, object : NetworkRepository.OnRequestFinishCallback {
+        RepositoryProvider.getNetworkRepository().loadFullStartData(nick, object : NetworkRepository.OnRequestFinishCallback {
 
             override fun onSuccessRequestFinish() {
                 loginState.value = LoginState.LOGGED

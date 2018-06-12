@@ -1,13 +1,17 @@
 package com.boomapps.steemapp.ui.editor.inputpostingkey
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.PointF
 import android.os.Bundle
+import android.support.v4.app.ActivityCompat
 import android.view.View
 import android.widget.Button
+import android.widget.Toast
 import com.boomapps.steemapp.R
-import com.boomapps.steemapp.repository.ServiceLocator
+import com.boomapps.steemapp.repository.RepositoryProvider
 import com.boomapps.steemapp.ui.BaseActivity
 import com.boomapps.steemapp.ui.help.HelpActivity
 import com.boomapps.steemapp.ui.qrreader.PointsOverlayView
@@ -19,6 +23,7 @@ import kotlinx.android.synthetic.main.activity_input_new_key.*
  */
 class InputNewPostingKeyActivity : BaseActivity(), QRCodeReaderView.OnQRCodeReadListener {
 
+    private val PERMISSION_REQUEST_CAMERA = 3546
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,7 +34,7 @@ class InputNewPostingKeyActivity : BaseActivity(), QRCodeReaderView.OnQRCodeRead
 
         qrInInfo.setOnClickListener({
             openLocalHelpScreen()
-            ServiceLocator.getPreferencesRepository().setFirstLaunchState(false)
+            RepositoryProvider.getPreferencesRepository().setFirstLaunchState(false)
         })
     }
 
@@ -38,6 +43,10 @@ class InputNewPostingKeyActivity : BaseActivity(), QRCodeReaderView.OnQRCodeRead
     }
 
     private fun enableQRreader() {
+        if (!hasCameraPermissions()) {
+            requestCameraPermission()
+            return
+        }
         aNewKey_qrdecoderview.visibility = View.VISIBLE
         aNewKey_points_overlay_view.visibility = View.VISIBLE
         aNewKey_qrdecoderview.setOnQRCodeReadListener(this)
@@ -80,5 +89,31 @@ class InputNewPostingKeyActivity : BaseActivity(), QRCodeReaderView.OnQRCodeRead
             setResult(Activity.RESULT_CANCELED)
         }
         finish()
+    }
+
+
+    private fun hasCameraPermissions(): Boolean {
+        return ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun requestCameraPermission() {
+        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), PERMISSION_REQUEST_CAMERA)
+    }
+
+
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>, grantResults: IntArray) {
+        when (requestCode) {
+            PERMISSION_REQUEST_CAMERA -> {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    enableQRreader()
+                } else {
+                    Toast.makeText(this@InputNewPostingKeyActivity, "You have to input POSTING KEY manual", Toast.LENGTH_LONG).show()
+                }
+                return
+            }
+        }// other 'case' lines to check for other
+        // permissions this app might request
     }
 }

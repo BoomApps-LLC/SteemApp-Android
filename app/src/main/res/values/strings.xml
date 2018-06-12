@@ -71,6 +71,11 @@ Do you want to enter correct key and try to post again?</string>
     <string name="btn_posting_timer">POST available after    %1$d:%2$s</string>
     <string name="d_publish_success_message">Your article was successfully\npublished</string>
 
+    <string name="d_wron_post_key_title">Oops!!</string>
+    <string name="d_wron_post_key_message">Sorry. You can\'t vote, cause you didn\'t enter POSTING key before.\nDo you want enter it now?</string>
+    <string name="d_wron_post_key_btn_ok">Confirm</string>
+    <string name="d_wron_post_key_btn_cancel">Cancel</string>
+
     <!--  ONBOARDING -->
     <string name="onboarding_title">A Quick Guide to Log In</string>
     <string name="onboarding_message_1">Go to <b>My Wallet</b> tab</string>
@@ -117,5 +122,10 @@ Do you want to enter correct key and try to post again?</string>
     <!-- FEEDS-->
     <string name="feed_card_date_format_common">%d %s ago</string>
     <string name="feed_card_date_format_yesterday">yesterday</string>
+
+    <string name="d_cancel_vote_title">Cancel vote</string>
+    <string name="d_cancel_vote_message">Are you sure to cancel vote this post?</string>
+    <string name="d_cancel_vote_btn_ok">Confirm</string>
+    <string name="d_cancel_vote_btn_cancel">Cancel</string>
 
 </resources>

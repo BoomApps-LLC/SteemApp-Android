@@ -8,7 +8,7 @@ import android.support.v7.app.AppCompatActivity
 import android.widget.Button
 import android.widget.TextView
 import com.boomapps.steemapp.R
-import com.boomapps.steemapp.repository.ServiceLocator
+import com.boomapps.steemapp.repository.RepositoryProvider
 import com.boomapps.steemapp.ui.help.HelpActivity
 import com.dlazaro66.qrcodereaderview.QRCodeReaderView
 import kotlinx.android.synthetic.main.activity_input_new_key.*
@@ -54,7 +54,7 @@ class BarcodeReadActivity : AppCompatActivity(), QRCodeReaderView.OnQRCodeReadLi
 
         qrInInfo.setOnClickListener({
             openLocalHelpScreen()
-            ServiceLocator.getPreferencesRepository().setFirstLaunchState(false)
+            RepositoryProvider.getPreferencesRepository().setFirstLaunchState(false)
         })
     }
 

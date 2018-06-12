@@ -16,7 +16,7 @@ import android.view.View
 import android.widget.EditText
 import android.widget.Toast
 import com.boomapps.steemapp.R
-import com.boomapps.steemapp.repository.ServiceLocator
+import com.boomapps.steemapp.repository.RepositoryProvider
 import com.boomapps.steemapp.ui.BaseActivity
 import com.boomapps.steemapp.ui.ViewState
 import com.boomapps.steemapp.ui.dialogs.WarningDialog
@@ -133,7 +133,7 @@ class SignInActivity : BaseActivity() {
             startActivity(intent)
         })
 
-        val sr = ServiceLocator.getPreferencesRepository()
+        val sr = RepositoryProvider.getPreferencesRepository()
         if (sr.isFirstLaunch()) {
             signInInputPostingKey.onFocusChangeListener = object : View.OnFocusChangeListener {
                 override fun onFocusChange(v: View?, hasFocus: Boolean) {
@@ -152,7 +152,7 @@ class SignInActivity : BaseActivity() {
 
         signInInfo.setOnClickListener({
             openLocalHelpScreen()
-            ServiceLocator.getPreferencesRepository().setFirstLaunchState(false)
+            RepositoryProvider.getPreferencesRepository().setFirstLaunchState(false)
         })
     }
 

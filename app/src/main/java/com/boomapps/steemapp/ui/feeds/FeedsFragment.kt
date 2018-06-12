@@ -176,10 +176,14 @@ class FeedsFragment : Fragment(), FeedListHolderCallback {
     private fun showInvalidReEnterPostingKeyDialog() {
         val builder = AlertDialog.Builder(context);
         builder
-                .setTitle("Oops!!")
-                .setMessage("Sorry. You can\'t vote, cause you didn't enter POSTING key before.\n Do you want enter it now?")
-                .setPositiveButton("Confirm", { dialog, id ->
+                .setTitle(getString(R.string.d_wron_post_key_title))
+                .setMessage(getString(R.string.d_wron_post_key_message))
+                .setPositiveButton(getString(R.string.d_wron_post_key_btn_ok), { dialog, id ->
                     showScreenForEnterNewPostingKey()
+
+                })
+                .setNegativeButton(getString(R.string.d_wron_post_key_btn_cancel), { dialog, id ->
+                    // do nothing
                 }).create().show()
     }
 
@@ -210,14 +214,14 @@ class FeedsFragment : Fragment(), FeedListHolderCallback {
                 // show unvote confirmation dialog
                 val builder = AlertDialog.Builder(context);
                 builder
-                        .setTitle("Unvote")
-                        .setMessage("Are you sure to unvote this post?")
-                        .setPositiveButton("Confirm", { dialog, id ->
+                        .setTitle(getString(R.string.d_cancel_vote_title))
+                        .setMessage(getString(R.string.d_cancel_vote_message))
+                        .setPositiveButton(getString(R.string.d_cancel_vote_btn_ok), { dialog, id ->
                             lastAction = LastActions.UNVOTE
                             viewModel.unVote(story, type)
 
                         })
-                        .setNegativeButton("Cancel", { dialog, id ->
+                        .setNegativeButton(getString(R.string.d_cancel_vote_btn_cancel), { dialog, id ->
 
                         })
                 builder.create().show()

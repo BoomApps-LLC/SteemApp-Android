@@ -16,13 +16,13 @@ import com.boomapps.steemapp.repository.steem.SteemRepository
 import com.boomapps.steemapp.repository.steem.SteemRepositoryDefault
 import java.util.concurrent.Executors
 
-interface ServiceLocator {
+interface RepositoryProvider {
     companion object {
         const val NETWORK_PAGE_SIZE = 12
         const val DATABASE_PAGE_SIZE = 10
 
-        val locator: ServiceLocator by lazy {
-            DefaultServiceLocator(
+        val locator: RepositoryProvider by lazy {
+            DefaultRepositoryProvider(
                     SteemApplication.instance as Application)
         }
 
@@ -52,7 +52,7 @@ interface ServiceLocator {
 //     * Allows tests to replace the default implementations.
 //     */
 //    @VisibleForTesting
-//    fun swap(newLocator: ServiceLocator) {
+//    fun swap(newLocator: RepositoryProvider) {
 //        locator = newLocator
 //    }
 
@@ -68,7 +68,7 @@ interface ServiceLocator {
 
 }
 
-open class DefaultServiceLocator(val app: Application) : ServiceLocator {
+open class DefaultRepositoryProvider(val app: Application) : RepositoryProvider {
     private val dbRepo by lazy {
         DaoRepositoryDefault(
                 Room.databaseBuilder(app, AppDatabase::class.java, "steem_app_db").build(),

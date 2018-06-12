@@ -3,7 +3,7 @@ package com.boomapps.steemapp.ui.main
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
 import com.boomapps.steemapp.repository.Balance
-import com.boomapps.steemapp.repository.ServiceLocator
+import com.boomapps.steemapp.repository.RepositoryProvider
 import com.boomapps.steemapp.repository.UserData
 import com.boomapps.steemapp.repository.entity.VoteState
 import com.boomapps.steemapp.repository.network.NetworkRepository
@@ -33,22 +33,22 @@ class MainViewModel : BaseViewModel() {
 
     fun getUserProfile(): MutableLiveData<UserData> {
         if (userData.value == null) {
-            userData.value = ServiceLocator.getPreferencesRepository().loadUserData()
+            userData.value = RepositoryProvider.getPreferencesRepository().loadUserData()
             loadUserProfile()
         }
         return userData
     }
 
     fun signOut() {
-        ServiceLocator.getPreferencesRepository().clearAllData()
-        ServiceLocator.getSteemRepository().signOut()
+        RepositoryProvider.getPreferencesRepository().clearAllData()
+        RepositoryProvider.getSteemRepository().signOut()
 
     }
 
 
     private fun loadUserProfile() {
         if (userData.value?.nickname.isNullOrEmpty()) {
-            userData.value = ServiceLocator.getPreferencesRepository().loadUserData()
+            userData.value = RepositoryProvider.getPreferencesRepository().loadUserData()
         }
         if (!userData.value?.userName.isNullOrEmpty()) {
             state.value = ViewState.COMMON
@@ -61,15 +61,15 @@ class MainViewModel : BaseViewModel() {
             return
         } else {
             state.value = ViewState.PROGRESS
-            ServiceLocator.getNetworkRepository().loadExtendedUserProfile(nickName!!, object : NetworkRepository.OnRequestFinishCallback {
+            RepositoryProvider.getNetworkRepository().loadExtendedUserProfile(nickName!!, object : NetworkRepository.OnRequestFinishCallback {
 
                 override fun onSuccessRequestFinish() {
                     Log.d("MainViewModel", "onSuccessRequestFinish")
-                    val exUserData = ServiceLocator.getNetworkRepository().extendedProfileResponse?.userExtended
+                    val exUserData = RepositoryProvider.getNetworkRepository().extendedProfileResponse?.userExtended
                     if (exUserData != null) {
                         val newUserData = UserData(nickName, exUserData.profileMetadata.userName, exUserData.profileMetadata.photoUrl, userData.value?.postKey)
                         userData.value = newUserData
-                        ServiceLocator.getPreferencesRepository().updateUserData(newUserData)
+                        RepositoryProvider.getPreferencesRepository().updateUserData(newUserData)
                     }
                     if (userData.value?.userName.isNullOrEmpty()) {
                         stringError = "UserExtended profile loading error."
@@ -99,7 +99,7 @@ class MainViewModel : BaseViewModel() {
     }
 
     private fun loadBalance() {
-        balanceData.value = ServiceLocator.getPreferencesRepository().loadBalance(false)
+        balanceData.value = RepositoryProvider.getPreferencesRepository().loadBalance(false)
         val fullBalance = balanceData.value?.fullBalance
         if (fullBalance != null && fullBalance >= 0) {
             return
@@ -116,7 +116,7 @@ class MainViewModel : BaseViewModel() {
 
     fun updateData() {
         if (userData.value?.nickname.isNullOrEmpty()) {
-            userData.value = ServiceLocator.getPreferencesRepository().loadUserData()
+            userData.value = RepositoryProvider.getPreferencesRepository().loadUserData()
         }
         val nick = userData.value?.nickname
         if (nick.isNullOrEmpty()) {
@@ -126,11 +126,11 @@ class MainViewModel : BaseViewModel() {
             return
         }
         isDataUpdating = true
-        ServiceLocator.getNetworkRepository().loadFullStartData(nick!!, object : NetworkRepository.OnRequestFinishCallback {
+        RepositoryProvider.getNetworkRepository().loadFullStartData(nick!!, object : NetworkRepository.OnRequestFinishCallback {
 
             override fun onSuccessRequestFinish() {
-                userData.value = ServiceLocator.getPreferencesRepository().loadUserData()
-                balanceData.value = ServiceLocator.getPreferencesRepository().loadBalance(true)
+                userData.value = RepositoryProvider.getPreferencesRepository().loadUserData()
+                balanceData.value = RepositoryProvider.getPreferencesRepository().loadBalance(true)
                 state.value = ViewState.SUCCESS_RESULT
                 isDataUpdating = false
             }
@@ -148,16 +148,16 @@ class MainViewModel : BaseViewModel() {
     }
 
     fun shouldShowVoteDialog(): Boolean {
-        successfulPostingNumber = ServiceLocator.getPreferencesRepository().loadSuccessfulPostingNumber()
+        successfulPostingNumber = RepositoryProvider.getPreferencesRepository().loadSuccessfulPostingNumber()
         when (successfulPostingNumber) {
-            1 -> return ServiceLocator.getPreferencesRepository().loadVotingState() == VoteState.UNDEFINED
-            3 -> return ServiceLocator.getPreferencesRepository().loadVotingState() in arrayOf(VoteState.REJECTED, VoteState.UNDEFINED)
+            1 -> return RepositoryProvider.getPreferencesRepository().loadVotingState() == VoteState.UNDEFINED
+            3 -> return RepositoryProvider.getPreferencesRepository().loadVotingState() in arrayOf(VoteState.REJECTED, VoteState.UNDEFINED)
         }
         return false
     }
 
     fun updateVotingState(isRejected: Boolean) {
-        ServiceLocator.getPreferencesRepository().saveVotingState(
+        RepositoryProvider.getPreferencesRepository().saveVotingState(
                 if (isRejected) {
                     VoteState.REJECTED
                 } else {

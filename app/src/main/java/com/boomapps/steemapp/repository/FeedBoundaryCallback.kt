@@ -25,7 +25,7 @@ class FeedBoundaryCallback(
 
     private fun insertItemsIntoDb(items: ArrayList<DiscussionData>) {
         ioExecutor.execute {
-            handleResponse(type, DiscussionToStoryMapper(items, ServiceLocator.getPreferencesRepository().loadUserData().nickname
+            handleResponse(type, DiscussionToStoryMapper(items, RepositoryProvider.getPreferencesRepository().loadUserData().nickname
                     ?: "_").map().toTypedArray())
         }
     }
@@ -38,10 +38,10 @@ class FeedBoundaryCallback(
         networkState.value = NetworkState.LOADING
         Timber.d("onZeroItemsLoaded()")
         val observable = when (type) {
-            FeedType.BLOG -> ServiceLocator.getSteemRepository().getBlogStories(null, 0, networkPageSize)
-            FeedType.TRENDING -> ServiceLocator.getSteemRepository().getTrendingDataList(0, networkPageSize, null)
-            FeedType.NEW -> ServiceLocator.getSteemRepository().getNewDataList(0, networkPageSize, null)
-            else -> /*FeedType.FEED*/ ServiceLocator.getSteemRepository().getFeedStories(null, 0, networkPageSize)
+            FeedType.BLOG -> RepositoryProvider.getSteemRepository().getBlogStories(null, 0, networkPageSize)
+            FeedType.TRENDING -> RepositoryProvider.getSteemRepository().getTrendingDataList(0, networkPageSize, null)
+            FeedType.NEW -> RepositoryProvider.getSteemRepository().getNewDataList(0, networkPageSize, null)
+            else -> /*FeedType.FEED*/ RepositoryProvider.getSteemRepository().getFeedStories(null, 0, networkPageSize)
         }
 
         observable?.observeOn(AndroidSchedulers.mainThread())
@@ -67,10 +67,10 @@ class FeedBoundaryCallback(
     override fun onItemAtEndLoaded(itemAtEnd: StoryEntity) {
         networkState.value = NetworkState.LOADING
         val single = when (type) {
-            FeedType.BLOG -> ServiceLocator.getSteemRepository().getBlogStories(null, itemAtEnd.indexInResponse, networkPageSize)
-            FeedType.TRENDING -> ServiceLocator.getSteemRepository().getTrendingDataList(itemAtEnd.indexInResponse, networkPageSize, itemAtEnd)
-            FeedType.NEW -> ServiceLocator.getSteemRepository().getNewDataList(itemAtEnd.indexInResponse, networkPageSize, itemAtEnd)
-            else -> /*FeedType.FEED*/ ServiceLocator.getSteemRepository().getFeedStories(null, itemAtEnd.indexInResponse, networkPageSize)
+            FeedType.BLOG -> RepositoryProvider.getSteemRepository().getBlogStories(null, itemAtEnd.indexInResponse, networkPageSize)
+            FeedType.TRENDING -> RepositoryProvider.getSteemRepository().getTrendingDataList(itemAtEnd.indexInResponse, networkPageSize, itemAtEnd)
+            FeedType.NEW -> RepositoryProvider.getSteemRepository().getNewDataList(itemAtEnd.indexInResponse, networkPageSize, itemAtEnd)
+            else -> /*FeedType.FEED*/ RepositoryProvider.getSteemRepository().getFeedStories(null, itemAtEnd.indexInResponse, networkPageSize)
         }
         single?.observeOn(AndroidSchedulers.mainThread())
                 ?.subscribe({

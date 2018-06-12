@@ -72,4 +72,6 @@ interface SteemRepository {
     fun unvoteWithUpdate(story: StoryEntity, type: FeedType, callback: Callback<Boolean>)
 
     fun voteWithUpdate(story: StoryEntity, type: FeedType, percent: Int, callback: Callback<Boolean>)
+
+    fun updatePostingKey(stringExtra: String?)
 }

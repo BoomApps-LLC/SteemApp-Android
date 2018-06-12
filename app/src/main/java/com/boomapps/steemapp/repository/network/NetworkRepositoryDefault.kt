@@ -4,7 +4,7 @@ import android.net.Uri
 import android.util.Log
 import com.boomapps.steemapp.repository.HeadersInterceptor
 import com.boomapps.steemapp.repository.RequestsApi
-import com.boomapps.steemapp.repository.ServiceLocator
+import com.boomapps.steemapp.repository.RepositoryProvider
 import com.boomapps.steemapp.repository.currency.CoinmarketcapCurrency
 import com.boomapps.steemapp.repository.entity.UserDataEntity
 import com.boomapps.steemapp.repository.entity.profile.ProfileMetadataDeserializer
@@ -70,7 +70,7 @@ class NetworkRepositoryDefault : NetworkRepository {
 
     override fun postStory(title: String, content: String, tags: Array<String>, postingKey: String, rewardsPercent: Short, upvote: Boolean, callback: NetworkRepository.OnRequestFinishCallback) {
         Observable.fromCallable {
-            return@fromCallable ServiceLocator.getSteemRepository().post(title, content, tags, postingKey, rewardsPercent, upvote)
+            return@fromCallable RepositoryProvider.getSteemRepository().post(title, content, tags, postingKey, rewardsPercent, upvote)
         }.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext {
@@ -93,7 +93,7 @@ class NetworkRepositoryDefault : NetworkRepository {
 
     override fun uploadNewPhoto(uri: Uri, callback: NetworkRepository.OnRequestFinishCallback) {
         Observable.fromCallable {
-            return@fromCallable ServiceLocator.getSteemRepository().uploadImage(uri)
+            return@fromCallable RepositoryProvider.getSteemRepository().uploadImage(uri)
         }.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext {
@@ -202,27 +202,27 @@ class NetworkRepositoryDefault : NetworkRepository {
 
     fun saveData(su: CoinmarketcapCurrency, sdu: CoinmarketcapCurrency, pr: ProfileResponse, bv: Array<Double>) {
         if (su.currencyName.isNotEmpty()) {
-            ServiceLocator.getPreferencesRepository().saveSteemCurrency(su)
+            RepositoryProvider.getPreferencesRepository().saveSteemCurrency(su)
         }
         if (sdu.currencyName.isNotEmpty()) {
-            ServiceLocator.getPreferencesRepository().saveSBDCurrency(sdu)
+            RepositoryProvider.getPreferencesRepository().saveSBDCurrency(sdu)
         }
         if (pr.userExtended != null) {
-            ServiceLocator.getPreferencesRepository().saveUserExtendedData(pr.userExtended as UserExtended)
+            RepositoryProvider.getPreferencesRepository().saveUserExtendedData(pr.userExtended as UserExtended)
         }
         Log.d("NetworkRepoDef", "loadFullStartData:: combineFunction >> su = ${su.usdPrice}")
         Log.d("NetworkRepoDef", "loadFullStartData:: combineFunction >> sdu = ${sdu.usdPrice}")
         if (bv.size == 2) {
             Log.d("NetworkRepoDef", "loadFullStartData:: combineFunction >> bv[0] = ${bv[0]}")
             Log.d("NetworkRepository", "loadFullStartData:: combineFunction >> bv[1] = ${bv[1]}")
-            ServiceLocator.getPreferencesRepository().saveTotalVestingData(bv)
+            RepositoryProvider.getPreferencesRepository().saveTotalVestingData(bv)
         }
     }
 
 
     private fun getBalanceVetstObservable(): Observable<Array<Double>> {
         return Observable.fromCallable {
-            return@fromCallable ServiceLocator.getSteemRepository().getVestingShares()
+            return@fromCallable RepositoryProvider.getSteemRepository().getVestingShares()
         }
     }
 

@@ -2,7 +2,7 @@ package com.boomapps.steemapp.ui.signin
 
 import android.util.Log
 import com.boomapps.steemapp.SteemApplication
-import com.boomapps.steemapp.repository.ServiceLocator
+import com.boomapps.steemapp.repository.RepositoryProvider
 import com.boomapps.steemapp.repository.UserData
 import com.boomapps.steemapp.repository.network.NetworkRepository
 import com.boomapps.steemapp.repository.steem.SteemErrorCodes
@@ -43,7 +43,7 @@ class SignInViewModel : BaseViewModel() {
         }
         state.value = ViewState.PROGRESS
         Flowable.fromCallable {
-            return@fromCallable ServiceLocator.getSteemRepository().login(nickname.toLowerCase(), postingKey)
+            return@fromCallable RepositoryProvider.getSteemRepository().login(nickname.toLowerCase(), postingKey)
         }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -68,7 +68,7 @@ class SignInViewModel : BaseViewModel() {
                 .doOnComplete {
                     Log.d("SignInViewModel", "doOnComplete")
                     if (loginResult == LOGIN_SUCCESS) {
-                        ServiceLocator.getPreferencesRepository().saveUserData(UserData(nickname, null, null, postingKey))
+                        RepositoryProvider.getPreferencesRepository().saveUserData(UserData(nickname, null, null, postingKey))
                         loadFullAdditionalData(nickname)
                     } else {
                         state.value = ViewState.FAULT_RESULT
@@ -85,7 +85,7 @@ class SignInViewModel : BaseViewModel() {
     }
 
     private fun loadFullAdditionalData(nick: String) {
-        ServiceLocator.getNetworkRepository().loadFullStartData(nick, object : NetworkRepository.OnRequestFinishCallback {
+        RepositoryProvider.getNetworkRepository().loadFullStartData(nick, object : NetworkRepository.OnRequestFinishCallback {
 
             override fun onSuccessRequestFinish() {
                 state.value = ViewState.SUCCESS_RESULT

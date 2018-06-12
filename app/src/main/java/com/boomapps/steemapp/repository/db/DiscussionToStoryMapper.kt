@@ -22,8 +22,8 @@ class DiscussionToStoryMapper(val data: ArrayList<DiscussionData>, val accountNa
     }
 
     val linksMarkdownPattern = Regex("\\[!\\[.*\\)]\\(.*?\\)|!\\[.*?\\)")
-    val pattern = Regex("(\\s+)|(\\\\n+)")
-    val tagsPattern = Regex("<.+?>")
+//    val pattern = Regex("(\\s+)|(\\\\n+)")
+//    val tagsPattern = Regex("<.+?>")
     val linksPattern = Regex("((https?|ftp|gopher|telnet|file|Unsure|http):((//)|(\\\\))+[\\w\\d:#@%/;\$()~_?\\+-=\\\\\\.&]*)")
 
     private fun convertToStory(data: DiscussionData): StoryEntity? {
@@ -71,8 +71,8 @@ class DiscussionToStoryMapper(val data: ArrayList<DiscussionData>, val accountNa
         outValue.created = inValue.created.dateTimeAsTimestamp
         outValue.lastUpdate = inValue.lastUpdate.dateTimeAsTimestamp
         outValue.active = inValue.active.dateTimeAsTimestamp
+        Timber.d("map() >> looking for vote state for $accountName")
         if (inValue.activeVotes.isNotEmpty()) {
-
             val voter = inValue.activeVotes.filter {
                 it.voter.name == accountName
             }

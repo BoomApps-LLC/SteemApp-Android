@@ -3,7 +3,7 @@ package com.boomapps.steemapp.repository.steem
 import android.net.Uri
 import com.boomapps.steemapp.BuildConfig
 import com.boomapps.steemapp.repository.FeedType
-import com.boomapps.steemapp.repository.ServiceLocator
+import com.boomapps.steemapp.repository.RepositoryProvider
 import com.boomapps.steemapp.repository.db.DiscussionToStoryMapper
 import com.boomapps.steemapp.repository.db.entities.StoryEntity
 import eu.bittrade.crypto.core.AddressFormatException
@@ -53,11 +53,29 @@ class SteemRepositoryDefault : SteemRepository {
         if (steemJConfig?.privateKeyStorage != null) {
             val accountName = steemJConfig?.defaultAccount
             if (accountName != null) {
-                val key = steemJConfig?.privateKeyStorage?.getKeyForAccount(PrivateKeyType.POSTING, accountName)
-                return key != null
+                val accounts = steemJConfig?.privateKeyStorage?.accounts
+                if (accounts == null || !accounts.contains(accountName)) {
+                    return false
+                }
+                val allKeysForAccount = steemJConfig?.privateKeyStorage?.privateKeysPerAccounts?.get(accountName)
+                        ?: return false
+                for (imPair in allKeysForAccount) {
+                    if (imPair.left == PrivateKeyType.POSTING) {
+                        return true
+                    }
+                }
             }
         }
         return false
+    }
+
+    override fun updatePostingKey(postingKey: String?) {
+        val privateKeys = arrayListOf<ImmutablePair<PrivateKeyType, String>>()
+        if (postingKey != null && postingKey.isNotEmpty()) {
+            privateKeys.add(ImmutablePair(PrivateKeyType.POSTING, postingKey))
+        }
+        steemJConfig?.privateKeyStorage?.addAccount(steemJConfig?.defaultAccount, privateKeys);
+        steemJ = SteemJ()
     }
 
     /**
@@ -126,7 +144,7 @@ class SteemRepositoryDefault : SteemRepository {
                 }
 
                 if (!withKey) {
-                    val uData = ServiceLocator.getPreferencesRepository().loadUserData()
+                    val uData = RepositoryProvider.getPreferencesRepository().loadUserData()
                     if (uData.postKey != null) {
                         addNewPostingKey(uData.postKey)
                         withKey = true
@@ -179,7 +197,7 @@ class SteemRepositoryDefault : SteemRepository {
         val config = SteemJImageUploadConfig.getInstance()
         config.connectTimeout = 30000
         config.readTimeout = 30000
-        val uData = ServiceLocator.getPreferencesRepository().loadUserData()
+        val uData = RepositoryProvider.getPreferencesRepository().loadUserData()
         var url: URL? = null
         try {
             url = SteemJImageUpload.uploadImage(
@@ -243,6 +261,7 @@ class SteemRepositoryDefault : SteemRepository {
 
     override fun getStoryDetails(aName: AccountName?, pLink: Permlink, orderId: Int): Observable<DiscussionData> {
         val rqName = aName ?: steemJConfig?.defaultAccount
+        Timber.d("getStoryDetails(aName=${rqName?.name}; permlink=${pLink.link}; orderId=$orderId)")
         return Observable.fromCallable { DiscussionData(orderId, steemJ?.getContent(rqName, pLink)) }
     }
 
@@ -414,11 +433,11 @@ class SteemRepositoryDefault : SteemRepository {
                         {
                             val result = it
                             if (result?.discussion != null) {
-                                val mapped = DiscussionToStoryMapper(result, steemJConfig?.apiUsername?.name
+                                val mapped = DiscussionToStoryMapper(result, steemJConfig?.defaultAccount?.name
                                         ?: "_").map()
                                 if (mapped.isNotEmpty()) {
                                     mapped[0].storyType = type.ordinal
-                                    ServiceLocator.getDaoRepository().updateStorySync(mapped[0])
+                                    RepositoryProvider.getDaoRepository().updateStorySync(mapped[0])
                                     callback.onSuccess(true)
                                     return@subscribe
                                 }
@@ -433,11 +452,13 @@ class SteemRepositoryDefault : SteemRepository {
     }
 
     override fun voteWithUpdate(story: StoryEntity, type: FeedType, percent: Int, callback: SteemRepository.Callback<Boolean>) {
+//        Timber.d("voteWithUpdate(id=${story.entityId}; percent=$percent)")
         Observable.fromCallable {
             return@fromCallable vote(story.author, story.permlink, percent)
         }
                 .subscribeOn(Schedulers.io())
                 .flatMap {
+//                    Timber.d("voteWithUpdate.flatMap(result=${it})")
                     return@flatMap getStoryDetails(AccountName(story.author), Permlink(story.permlink), story.indexInResponse)
                 }
                 .observeOn(Schedulers.io())
@@ -445,11 +466,13 @@ class SteemRepositoryDefault : SteemRepository {
                         {
                             val result = it
                             if (result?.discussion != null) {
-                                val mapped = DiscussionToStoryMapper(result, steemJConfig?.apiUsername?.name
+//                                Timber.d("voteWithUpdate.subscribe.onNext(discussion != null)")
+                                val mapped = DiscussionToStoryMapper(result, steemJConfig?.defaultAccount?.name
                                         ?: "_").map()
                                 if (mapped.isNotEmpty()) {
                                     mapped[0].storyType = type.ordinal
-                                    ServiceLocator.getDaoRepository().updateStorySync(mapped[0])
+//                                    Timber.d("voteWithUpdate.subscribe.onNext(save StoryEntity into DB)")
+                                    RepositoryProvider.getDaoRepository().updateStorySync(mapped[0])
                                     callback.onSuccess(true)
                                     return@subscribe
                                 }

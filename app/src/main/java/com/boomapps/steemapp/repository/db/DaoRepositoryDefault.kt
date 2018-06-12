@@ -19,7 +19,7 @@ import java.util.concurrent.Executor
 class DaoRepositoryDefault(
         val db: AppDatabase,
         private val ioExecutor: Executor,
-        private val networkPageSize: Int = ServiceLocator.NETWORK_PAGE_SIZE) : DaoRepository {
+        private val networkPageSize: Int = RepositoryProvider.NETWORK_PAGE_SIZE) : DaoRepository {
 
 
     override fun updateStorySync(story: StoryEntity) {
@@ -69,9 +69,9 @@ class DaoRepositoryDefault(
         networkState.value = NetworkState.LOADING
         val discussions: ArrayList<DiscussionData> = arrayListOf()
         val obs = if (type == FeedType.BLOG) {
-            ServiceLocator.getSteemRepository().getBlogShortDataList(null, 0, ServiceLocator.NETWORK_PAGE_SIZE)
+            RepositoryProvider.getSteemRepository().getBlogShortDataList(null, 0, RepositoryProvider.NETWORK_PAGE_SIZE)
         } else {
-            ServiceLocator.getSteemRepository().getFeedShortDataList(null, 0, ServiceLocator.NETWORK_PAGE_SIZE)
+            RepositoryProvider.getSteemRepository().getFeedShortDataList(null, 0, RepositoryProvider.NETWORK_PAGE_SIZE)
         }
         obs.subscribeOn(Schedulers.io())
                 .take(networkPageSize.toLong())
@@ -81,7 +81,7 @@ class DaoRepositoryDefault(
                                 Timber.d("Feed: First fromIterable >> permlink = ${it.permlink}")
                             }
                             .flatMap {
-                                return@flatMap ServiceLocator.getSteemRepository().getStoryDetails(AccountName(it.author), Permlink(it.permlink), it.id)
+                                return@flatMap RepositoryProvider.getSteemRepository().getStoryDetails(AccountName(it.author), Permlink(it.permlink), it.id)
                             }
                             .doOnNext {
                                 Timber.d("Feed: onNext Details for(%s) >> title = %s", it.discussion?.permlink, it.discussion?.title)
@@ -102,7 +102,7 @@ class DaoRepositoryDefault(
 
                             // process new discussions
                             val result = discussions.map {
-                                return@map DiscussionToStoryMapper(it, ServiceLocator.getPreferencesRepository().loadUserData().nickname
+                                return@map DiscussionToStoryMapper(it, RepositoryProvider.getPreferencesRepository().loadUserData().nickname
                                         ?: "_").map()[0]
                             }.toTypedArray()
                             db.runInTransaction {
@@ -123,9 +123,9 @@ class DaoRepositoryDefault(
         networkState.value = NetworkState.LOADING
         val discussions: ArrayList<DiscussionData> = arrayListOf()
         val obs = if (type == FeedType.TRENDING) {
-            ServiceLocator.getSteemRepository().getTrendingDataList(0, ServiceLocator.NETWORK_PAGE_SIZE, null)
+            RepositoryProvider.getSteemRepository().getTrendingDataList(0, RepositoryProvider.NETWORK_PAGE_SIZE, null)
         } else {
-            ServiceLocator.getSteemRepository().getNewDataList(0, ServiceLocator.NETWORK_PAGE_SIZE, null)
+            RepositoryProvider.getSteemRepository().getNewDataList(0, RepositoryProvider.NETWORK_PAGE_SIZE, null)
         }
         obs
                 ?.subscribeOn(Schedulers.io())
@@ -133,7 +133,7 @@ class DaoRepositoryDefault(
                 ?.subscribe(
                         {
                             // process new discussions
-                            val result = DiscussionToStoryMapper(it, ServiceLocator.getPreferencesRepository().loadUserData().nickname
+                            val result = DiscussionToStoryMapper(it, RepositoryProvider.getPreferencesRepository().loadUserData().nickname
                                     ?: "_").map().toTypedArray()
                             db.runInTransaction {
                                 // clear data for type
@@ -161,7 +161,7 @@ class DaoRepositoryDefault(
         // the list and update the database with extra data.
         val boundaryCallback = FeedBoundaryCallback(
                 type,
-                ServiceLocator.getSteemRepository(),
+                RepositoryProvider.getSteemRepository(),
                 handleResponse = this::insertResultIntoDb,
                 ioExecutor = ioExecutor,
                 networkPageSize = networkPageSize)
