@@ -1,8 +1,7 @@
 package com.boomapps.steemapp.repository.preferences
 
-import com.boomapps.steemapp.UserData
-import com.boomapps.steemapp.repository.Balance
 import com.boomapps.steemapp.repository.RepositoryProvider
+import com.boomapps.steemapp.repository.UserData
 import com.boomapps.steemapp.repository.currency.CoinmarketcapCurrency
 import com.boomapps.steemapp.repository.entity.profile.UserExtended
 
@@ -67,7 +66,7 @@ class MemoryStorage {
                 oldData?.postKey)
         if (extUserData != null) {
             val newUserData = UserData(shortUserInfo?.nickname, userExtended.profileMetadata.userName, userExtended.profileMetadata.photoUrl, shortUserInfo?.postKey)
-            RepositoryProvider.instance.getSharedRepository().updateUserData(newUserData)
+            RepositoryProvider.getPreferencesRepository().updateUserData(newUserData)
         }
     }
 

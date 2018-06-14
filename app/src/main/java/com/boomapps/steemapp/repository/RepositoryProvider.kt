@@ -1,48 +1,114 @@
 package com.boomapps.steemapp.repository
 
+import android.app.Application
+import android.arch.persistence.room.Room
+import com.boomapps.steemapp.SteemApplication
+import com.boomapps.steemapp.repository.db.AppDatabase
+import com.boomapps.steemapp.repository.db.DaoRepository
+import com.boomapps.steemapp.repository.db.DaoRepositoryDefault
 import com.boomapps.steemapp.repository.files.FilesRepository
 import com.boomapps.steemapp.repository.files.FilesRepositoryDefault
 import com.boomapps.steemapp.repository.network.NetworkRepository
 import com.boomapps.steemapp.repository.network.NetworkRepositoryDefault
 import com.boomapps.steemapp.repository.preferences.SharedRepository
 import com.boomapps.steemapp.repository.preferences.SharedRepositoryDefault
+import com.boomapps.steemapp.repository.steem.SteemRepository
+import com.boomapps.steemapp.repository.steem.SteemRepositoryDefault
+import java.util.concurrent.Executors
 
-/**
- * Created by vgrechikha on 21.03.2018.
- */
-class RepositoryProvider {
-
+interface RepositoryProvider {
     companion object {
-        val instance = RepositoryProvider()
+        const val NETWORK_PAGE_SIZE = 12
+        const val DATABASE_PAGE_SIZE = 10
+
+        val locator: RepositoryProvider by lazy {
+            DefaultRepositoryProvider(
+                    SteemApplication.instance as Application)
+        }
+
+
+        fun getDaoRepository(): DaoRepository {
+            return locator!!.getDbRepository()
+        }
+
+        fun getSteemRepository(): SteemRepository {
+            return locator!!.getSteemRepository()
+        }
+
+        fun getNetworkRepository(): NetworkRepository {
+            return locator!!.getNetworkRepository()
+        }
+
+        fun getPreferencesRepository(): SharedRepository {
+            return locator!!.getPreferencesRepository()
+        }
+
+        fun getFileRepository(): FilesRepository {
+            return locator!!.getFileRepository()
+        }
     }
 
-    private var networkRepository: NetworkRepository = NetworkRepositoryDefault()
-    private var sharedRepository: SharedRepository = SharedRepositoryDefault()
-    private var filesRepository: FilesRepository = FilesRepositoryDefault()
+//    /**
+//     * Allows tests to replace the default implementations.
+//     */
+//    @VisibleForTesting
+//    fun swap(newLocator: RepositoryProvider) {
+//        locator = newLocator
+//    }
 
-    fun getNetworkRepository(): NetworkRepository {
-        return networkRepository
+    fun getDbRepository(): DaoRepository
+
+    fun getSteemRepository(): SteemRepository
+
+    fun getNetworkRepository(): NetworkRepository
+
+    fun getPreferencesRepository(): SharedRepository
+
+    fun getFileRepository(): FilesRepository
+
+}
+
+open class DefaultRepositoryProvider(val app: Application) : RepositoryProvider {
+    private val dbRepo by lazy {
+        DaoRepositoryDefault(
+                Room.databaseBuilder(app, AppDatabase::class.java, "steem_app_db").build(),
+                Executors.newSingleThreadExecutor()
+        )
     }
 
-    fun getSharedRepository(): SharedRepository {
-        return sharedRepository
+    private val steemRepo by lazy {
+        SteemRepositoryDefault()
     }
 
-    fun getFileRepository(): FilesRepository {
-        return filesRepository
+    private val networkRepo by lazy {
+        NetworkRepositoryDefault()
     }
 
-    fun setNetworkRepository(repository: NetworkRepository) {
-        networkRepository = repository
+    private val sharedRepo by lazy {
+        SharedRepositoryDefault()
     }
 
-    fun setPreferencesRepository(repository: SharedRepository) {
-        sharedRepository = repository
+    private val fileRepo by lazy {
+        FilesRepositoryDefault()
     }
 
-    fun setFilesRepository(repository: FilesRepository) {
-        filesRepository = repository
+    override fun getDbRepository(): DaoRepository {
+        return dbRepo
     }
 
+    override fun getSteemRepository(): SteemRepository {
+        return steemRepo
+    }
 
+    override fun getNetworkRepository(): NetworkRepository {
+        return networkRepo
+    }
+
+    override fun getPreferencesRepository(): SharedRepository {
+        return sharedRepo
+    }
+
+    override fun getFileRepository(): FilesRepository {
+        return fileRepo
+    }
 }

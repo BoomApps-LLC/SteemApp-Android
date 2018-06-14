@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.boomapps.steemapp.ui.controls.SquareCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginBottom="16dp"
+    android:elevation="3dp"
+    app:cardCornerRadius="6dp">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/feedCard_ivMain"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/violetLight"
+            android:minHeight="105dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/img_logo"
+            app:layout_constraintDimensionRatio="w,10:10"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/img_logo" />
+
+        <TextView
+            android:id="@+id/feedCard_tvTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="12dp"
+            android:ellipsize="end"
+            android:gravity="start"
+            android:lineSpacingExtra="2sp"
+            android:maxLines="2"
+            android:textColor="#0b0712"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/feedCard_ivMain"
+            tools:text="Launch of new Steemit Mobile App Today!" />
+
+        <ImageView
+            android:id="@+id/feedCard_ivMore"
+            android:layout_width="4dp"
+            android:layout_height="16dp"
+            android:layout_marginTop="8dp"
+            android:elevation="1dp"
+            android:src="@drawable/ic_more"
+            app:layout_constraintEnd_toEndOf="@id/feedCard_tvTitle"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/feedCard_tvText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:gravity="start"
+            android:lineSpacingExtra="5sp"
+            android:maxLines="2"
+            android:minHeight="36dp"
+            android:textColor="#0b0712"
+            android:textSize="13sp"
+            app:layout_constraintEnd_toEndOf="@id/feedCard_tvTitle"
+            app:layout_constraintStart_toStartOf="@id/feedCard_tvTitle"
+            app:layout_constraintTop_toBottomOf="@id/feedCard_tvTitle"
+            tools:text="Hurray Steemians! We are very exited to present to you our awesome version of SteemApp , which is a tool made…" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="8dp"
+            android:background="#e2e2e2"
+            app:layout_constraintEnd_toEndOf="@id/feedCard_tvTitle"
+            app:layout_constraintStart_toStartOf="@id/feedCard_tvTitle"
+            app:layout_constraintTop_toBottomOf="@id/feedCard_tvText" />
+
+        <ImageView
+            android:id="@+id/feedCard_ivAuthorAvatar"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="@id/feedCard_tvTitle"
+            app:layout_constraintTop_toBottomOf="@id/feedCard_tvText"
+            app:srcCompat="@drawable/ic_account_circle_black_24dp" />
+
+        <TextView
+            android:id="@+id/feedCard_tvAuthor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:gravity="top"
+            android:hint="Unknown"
+            android:textColor="#0b0712"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@id/feedCard_ivAuthorAvatar"
+            app:layout_constraintTop_toTopOf="@id/feedCard_ivAuthorAvatar"
+            tools:text="yuriks2000" />
+
+        <TextView
+            android:id="@+id/feedCard_tvLastActivityTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:gravity="top"
+            android:paddingBottom="2dp"
+            android:textColor="#9c97a4"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/feedCard_ivAuthorAvatar"
+            app:layout_constraintStart_toEndOf="@id/feedCard_ivAuthorAvatar"
+            tools:text="5 days ago" />
+
+        <android.support.constraint.Barrier
+            android:id="@+id/barrier2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="end"
+            app:constraint_referenced_ids="feedCard_tvLastActivityTime,feedCard_tvAuthor" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="0dp"
+            android:layout_marginBottom="2dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="2dp"
+            android:background="#e2e2e2"
+            app:layout_constraintBottom_toBottomOf="@id/feedCard_tvAuthor"
+            app:layout_constraintStart_toEndOf="@id/barrier2"
+            app:layout_constraintTop_toTopOf="@id/feedCard_tvAuthor" />
+
+
+        <TextView
+            android:id="@+id/feedCard_tvReputation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:gravity="top"
+            android:textColor="@color/violet"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/feedCard_tvAuthor"
+            app:layout_constraintStart_toEndOf="@id/feedCard_tvAuthor"
+            app:layout_constraintTop_toTopOf="@id/feedCard_tvAuthor"
+            tools:text="59" />
+
+        <LinearLayout
+            android:id="@+id/feedCard_priceLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:background="@drawable/bg_feed_card_price_voted_selector"
+            android:clickable="true"
+            android:focusable="false"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="@id/feedCard_ivAuthorAvatar"
+            app:layout_constraintEnd_toEndOf="@id/feedCard_tvTitle"
+            app:layout_constraintTop_toTopOf="@id/feedCard_ivAuthorAvatar">
+
+            <ImageView
+                android:id="@+id/feedCard_ivVotesPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
+                android:layout_marginStart="8dp"
+                android:src="@drawable/ic_feed_card_price_selector" />
+
+            <TextView
+                android:id="@+id/feedCard_tvVotesPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="4dp"
+                android:textColor="@color/feed_card_price_voted_text_selector"
+                tools:text="$127.33" />
+        </LinearLayout>
+
+        <android.support.constraint.Guideline
+            android:id="@+id/feedCard_guidelineCenter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5" />
+
+        <TextView
+            android:id="@+id/feedCard_tvCommentNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="16dp"
+            android:textColor="#0b0712"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/feedCard_guidelineCenter"
+            app:layout_constraintTop_toBottomOf="@id/feedCard_priceLayout"
+            tools:text="120" />
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginTop="16dp"
+            android:src="@drawable/ic_feed_card_comments"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/feedCard_guidelineCenter"
+            app:layout_constraintTop_toBottomOf="@id/feedCard_priceLayout" />
+
+        <android.support.constraint.Guideline
+            android:id="@+id/feedCard_guidelineRight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="48dp" />
+
+        <TextView
+            android:id="@+id/feedCard_tvLinkNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="16dp"
+            android:textColor="#0b0712"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/feedCard_guidelineRight"
+            app:layout_constraintTop_toBottomOf="@id/feedCard_priceLayout"
+            tools:text="95" />
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginTop="16dp"
+            android:src="@drawable/ic_feed_card_linked"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/feedCard_guidelineRight"
+            app:layout_constraintTop_toBottomOf="@id/feedCard_priceLayout" />
+
+
+        <android.support.constraint.Guideline
+            android:id="@+id/feedCard_guidelineLeft"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="48dp" />
+
+
+        <TextView
+            android:id="@+id/feedCard_tvVotesNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="16dp"
+            android:textColor="#0b0712"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/feedCard_guidelineLeft"
+            app:layout_constraintTop_toBottomOf="@id/feedCard_priceLayout"
+            tools:text="20" />
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginTop="16dp"
+            android:src="@drawable/ic_feed_card_votes"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/feedCard_guidelineLeft"
+            app:layout_constraintTop_toBottomOf="@id/feedCard_priceLayout" />
+
+
+    </android.support.constraint.ConstraintLayout>
+</com.boomapps.steemapp.ui.controls.SquareCardView>

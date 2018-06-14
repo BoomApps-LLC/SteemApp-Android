@@ -51,7 +51,7 @@ android {
             // All the usual Gradle options.
             testLogging {
                 events "passed", "skipped", "failed", "standardOut", "standardError"
-                outputs.upToDateWhen {false}
+                outputs.upToDateWhen { false }
                 showStandardStreams = true
             }
         }
@@ -67,21 +67,29 @@ configurations {
 
 apply from: '../versions.gradle'
 
-
+repositories {
+    maven {
+        url "https://s3.amazonaws.com/repo.commonsware.com"
+    }
+}
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "com.android.support:support-v4:$supportVersion"
     implementation "com.android.support:design:$supportVersion"
     implementation "com.android.support:appcompat-v7:$supportVersion"
     implementation "com.android.support:customtabs:$supportVersion"
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0-beta6'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.1'
     implementation "com.android.support:design:$supportVersion"
-    implementation 'com.google.firebase:firebase-crash:12.0.1'
+    implementation "com.android.support:cardview-v7:$supportVersion"
+    implementation 'com.google.firebase:firebase-crash:16.0.0'
+    implementation 'com.android.support:support-v4:27.1.1'
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.1'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
+    implementation 'androidx.core:core-ktx:0.3'
 
     // QR reader
     implementation 'com.dlazaro66.qrcodereaderview:qrcodereaderview:2.0.3'
@@ -100,8 +108,8 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.2'
 
     // GLIDE
-    implementation 'com.github.bumptech.glide:glide:4.5.0'
-    kapt 'com.github.bumptech.glide:compiler:4.5.0'
+    implementation 'com.github.bumptech.glide:glide:4.7.1'
+    kapt 'com.github.bumptech.glide:compiler:4.7.1'
     implementation 'jp.wasabeef:glide-transformations:3.1.0'
 
     //    RX
@@ -120,8 +128,23 @@ dependencies {
 
     // ViewModel and LiveData
     implementation "android.arch.lifecycle:extensions:$architectureComponents"
-    annotationProcessor "android.arch.lifecycle:compiler:$architectureComponents"
     kapt "android.arch.lifecycle:compiler:$architectureComponents"
+    // Room
+    implementation "android.arch.persistence.room:runtime:$room_version"
+    kapt "android.arch.persistence.room:compiler:$room_version"
+    // Test helpers for Room
+    testImplementation "android.arch.persistence.room:testing:$room_version"
+
+    // Paging
+    implementation "android.arch.paging:runtime:$paging_version"
+
+    // markdown library
+    compile 'com.commonsware.cwac:anddown:0.4.0'
+
+    kapt "android.arch.lifecycle:compiler:$architectureComponents"
+
+    implementation 'org.jsoup:jsoup:1.11.3'
+
     implementation project(path: ':richeditor')
     implementation project(path: ':steemj-core')
     configurations.all {

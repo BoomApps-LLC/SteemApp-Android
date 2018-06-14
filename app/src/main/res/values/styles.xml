@@ -62,6 +62,10 @@
         <item name="android:textColor">@color/selector_grey_violet</item>
     </style>
 
+    <style name="Text.White">
+        <item name="android:textColor">@color/selector_white_violet</item>
+    </style>
+
     <style name="Custom.Widget.SwitchCompat" parent="Widget.AppCompat.CompoundButton.Switch">
         <item name="colorControlActivated">@color/green_filled</item>
         <item name="colorSwitchThumbNormal">@color/green_active</item>
@@ -94,5 +98,25 @@
         <item name="android:background">@drawable/selector_dots_in_onboarding</item>
     </style>
 
+    <style name="FeedTabStyle" parent="Widget.Design.TabLayout">
+        <item name="tabIndicatorColor">@color/violet</item>
+        <item name="tabBackground">@color/violet</item>
+        <item name="tabMode">fixed</item>
+        <item name="tabSelectedTextColor">@color/white</item>
+        <item name="tabTextAppearance">@style/FeedTabTextAppearance</item>
+    </style>
+
+    <style name="FeedTabTextAppearance" parent="TextAppearance.Design.Tab">
+        <item name="textAllCaps">true</item>
+        <item name="android:textColor">#BFABEE</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+
+    <style name="BottomNavigationButton" parent="@android:style/Widget.CompoundButton.RadioButton">
+        <item name="android:background">@color/bnColor</item>
+        <item name="android:button">@null</item>
+        <item name="android:gravity">center_horizontal|top</item>
+    </style>
 
 </resources>

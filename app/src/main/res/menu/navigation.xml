@@ -2,9 +2,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/navigation_wallet"
-        android:icon="@drawable/ic_account_balance_wallet_black_24dp"
-        android:title="@string/title_wallet" />
+        android:id="@+id/navigation_feeds"
+        android:icon="@drawable/ic_bn_feed_selector"
+        android:title="@string/title_feeds" />
 
     <item
         android:id="@+id/navigation_edit"
@@ -13,7 +13,7 @@
 
     <item
         android:id="@+id/navigation_profile"
-        android:icon="@drawable/ic_account_circle_black_24dp"
+        android:icon="@drawable/ic_bn_profile_selector"
         android:title="@string/title_profile" />
 
 </menu>

@@ -5,8 +5,8 @@ import android.content.SharedPreferences
 import android.util.Base64
 import com.boomapps.steemapp.MDCOLOR_TYPE
 import com.boomapps.steemapp.SteemApplication
-import com.boomapps.steemapp.UserData
-import com.boomapps.steemapp.editor.tabs.CategoryItem
+import com.boomapps.steemapp.repository.UserData
+import com.boomapps.steemapp.ui.editor.tabs.CategoryItem
 import com.boomapps.steemapp.getMatColor
 import com.boomapps.steemapp.repository.Balance
 import com.boomapps.steemapp.repository.StoryInstance
@@ -93,8 +93,19 @@ class SharedRepositoryDefault : SharedRepository {
         val photoUrl = prefs.getString("photo_url", "")
         val encryptedDataInfo = SettingsRepository.getProperty("posting_key", SteemApplication.instance)
         crypto.setIvForDecryptor(encryptedDataInfo.iv)
-        val postingKey = crypto.decrypt(Base64.decode(encryptedDataInfo.data, Base64.DEFAULT))
+        val postingKey = if (encryptedDataInfo.data == null) {
+            ""
+        } else {
+            crypto.decrypt(Base64.decode(encryptedDataInfo.data, Base64.DEFAULT))
+        }
         return UserData(nick, username, photoUrl, postingKey)
+    }
+
+
+    override fun updatePostingKey(newKey: String?) {
+        val uData = loadUserData()
+        val newUserData = UserData(uData.nickname, uData.userName, uData.photoUrl, newKey)
+        saveUserData(newUserData)
     }
 
     private fun isUserSaved(): Boolean {

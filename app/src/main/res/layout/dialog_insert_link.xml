@@ -10,7 +10,7 @@
     android:paddingRight="@dimen/dialog_content_horizontal_padding"
     android:paddingStart="@dimen/dialog_content_horizontal_padding"
     android:paddingTop="@dimen/dialog_content_top_padding"
-    tools:context="com.boomapps.steemapp.controls.InsertLinkDialogFragment">
+    tools:context=".ui.dialogs.InsertLinkDialogFragment">
 
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"

@@ -1,6 +1,6 @@
 package com.boomapps.steemapp.repository.preferences
 
-import com.boomapps.steemapp.UserData
+import com.boomapps.steemapp.repository.UserData
 import com.boomapps.steemapp.repository.Balance
 import com.boomapps.steemapp.repository.StoryInstance
 import com.boomapps.steemapp.repository.currency.CoinmarketcapCurrency
@@ -15,6 +15,8 @@ interface SharedRepository {
     fun saveUserData(userData: UserData)
 
     fun updateUserData(userData: UserData)
+
+    fun updatePostingKey(newKey: String?)
 
     fun loadUserData(): UserData
 

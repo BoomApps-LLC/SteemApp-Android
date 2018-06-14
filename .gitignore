@@ -13,3 +13,9 @@
 .idea/vcs.xml
 .idea/
 app/release/
+
+gradlew
+
+gradlew\.bat
+
+gradle/wrapper/

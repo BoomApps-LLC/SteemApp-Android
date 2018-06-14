@@ -3,6 +3,8 @@ package com.boomapps.steemapp.repository.network
 import android.net.Uri
 import com.boomapps.steemapp.repository.currency.CoinmarketcapCurrency
 import com.boomapps.steemapp.repository.entity.profile.ProfileResponse
+import com.boomapps.steemapp.repository.feed.FeedFullData
+import io.reactivex.Observable
 import java.net.URL
 
 /**
@@ -31,5 +33,7 @@ interface NetworkRepository {
     fun loadExtendedUserProfile(nick: String, callback: NetworkRepository.OnRequestFinishCallback)
 
     fun loadFullStartData(nick: String, callback: NetworkRepository.OnRequestFinishCallback)
+
+    fun loadExtendedPostData(name : String, permlink : String) : Observable<FeedFullData>
 
 }

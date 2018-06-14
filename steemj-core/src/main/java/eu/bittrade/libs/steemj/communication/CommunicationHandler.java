@@ -1,5 +1,7 @@
 package eu.bittrade.libs.steemj.communication;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.net.URI;
 import java.security.InvalidParameterException;
@@ -107,10 +109,12 @@ public class CommunicationHandler {
      */
     public <T> List<T> performRequest(JsonRPCRequest requestObject, Class<T> targetClass)
             throws SteemCommunicationException, SteemResponseException {
+        String full = "";
         try {
             Pair<URI, Boolean> endpoint = SteemJConfig.getInstance().getNextEndpointURI(numberOfConnectionTries++);
             JsonRPCResponse rawJsonResponse = client.invokeAndReadResponse(requestObject, endpoint.getLeft(),
                     endpoint.getRight());
+            full = rawJsonResponse.toString();
             LOGGER.debug("Received {} ", rawJsonResponse);
 
             if (rawJsonResponse.isError()) {
@@ -130,6 +134,17 @@ public class CommunicationHandler {
                 throw e;
             }
 
+        }catch (Exception e){
+            int step = 512;
+            if (full.length() <= step) {
+                Log.d(CommunicationHandler.class.getSimpleName(), String.format("Received {} %s", full));
+            } else {
+                while (step <= full.length()) {
+                    Log.d(CommunicationHandler.class.getSimpleName(), String.format("%s", full.substring(step - 512, step)));
+                    step = step + 512;
+                }
+            }
+            throw e;
         }
     }
 
@@ -148,6 +163,7 @@ public class CommunicationHandler {
             mapper.setDateFormat(simpleDateFormat);
             mapper.setTimeZone(TimeZone.getTimeZone(SteemJConfig.getInstance().getTimeZoneId()));
             mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
+            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
             SimpleModule simpleModule = new SimpleModule("BooleanAsString", new Version(1, 0, 0, null, null, null));
             simpleModule.addSerializer(Boolean.class, new BooleanSerializer());

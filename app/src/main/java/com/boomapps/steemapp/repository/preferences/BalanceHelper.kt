@@ -43,7 +43,7 @@ class BalanceHelper(var balance: Balance) {
         val steemPower = vestingShares[0] * (balance.vestShares / (vestingShares[1]))
 //                Log.d("MainViewModel", "calculateBalance:: combineFunction >> ${vestsShare} VESTS = $steemPower STEEM")
         val price = (balance.steemBalance + balance.steemSavingBalance + steemPower) * steemCurency.usdPrice + (balance.steemBalance + balance.steemSavingBalance) * sbdCurrency.usdPrice
-//                Log.d("MainViewModel", "calculateBalance:: combineFunction >> fullPrice=$price")
+//                Log.d("MainViewModel", "calculateBalance:: combineFunction >> votesPrice=$price")
         balance = Balance(
                 balance.steemBalance,
                 balance.steemSavingBalance,
