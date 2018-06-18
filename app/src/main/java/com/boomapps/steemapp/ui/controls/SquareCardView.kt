@@ -1,3 +1,7 @@
+/*
+ * Copyright 2018, BoomApps LLC. 
+ * All rights reserved.
+*/
 package com.boomapps.steemapp.ui.controls
 
 import android.content.Context

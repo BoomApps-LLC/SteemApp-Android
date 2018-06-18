@@ -1,3 +1,7 @@
+/*
+ * Copyright 2018, BoomApps LLC. 
+ * All rights reserved.
+*/
 package com.boomapps.steemapp.ui.splash
 
 import android.arch.lifecycle.Observer

@@ -1,6 +1,9 @@
+/*
+ * Copyright 2018, BoomApps LLC. 
+ * All rights reserved.
+*/
 package com.boomapps.steemapp
 
-import android.content.Context
 import android.net.Uri
 import android.util.Log
 import io.reactivex.Observable
@@ -8,7 +11,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.util.concurrent.Callable
 
 /**
  * Created by Vitali Grechikha on 20.02.2018.
