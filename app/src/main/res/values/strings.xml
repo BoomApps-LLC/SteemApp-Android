@@ -116,6 +116,22 @@ Do you want to enter correct key and try to post again?</string>
         <item quantity="many">days</item>
         <item quantity="other">days</item>
     </plurals>
+
+    <plurals name="hours">
+        <item quantity="one">hour</item>
+        <item quantity="two">hours</item>
+        <item quantity="few">hours</item>
+        <item quantity="many">hours</item>
+        <item quantity="other">hours</item>
+    </plurals>
+
+    <plurals name="minutes">
+        <item quantity="one">minute</item>
+        <item quantity="two">minutes</item>
+        <item quantity="few">minutes</item>
+        <item quantity="many">minutes</item>
+        <item quantity="other">minutes</item>
+    </plurals>
     
     <string name="adsactly_powered">Powered by "<b>"Adsactly"</b>"</string>
 

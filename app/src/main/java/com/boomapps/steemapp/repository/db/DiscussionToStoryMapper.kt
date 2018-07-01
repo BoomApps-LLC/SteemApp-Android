@@ -6,8 +6,11 @@ package com.boomapps.steemapp.repository.db
 
 import android.text.Html
 import com.boomapps.steemapp.repository.db.entities.StoryEntity
+import com.boomapps.steemapp.repository.entity.UserDataEntity
+import com.boomapps.steemapp.repository.entity.profile.ProfileMetadataDeserializer
 import com.boomapps.steemapp.repository.steem.DiscussionData
 import com.boomapps.steemapp.repository.steem.StoryMetadata
+import com.boomapps.steemapp.repository.steem.StoryMetadataDeserializer
 import com.google.gson.GsonBuilder
 import timber.log.Timber
 
@@ -123,7 +126,9 @@ class DiscussionToStoryMapper(val data: ArrayList<DiscussionData>, val accountNa
         if (input.isEmpty()) {
             return StoryMetadata()
         }
-        val gson = GsonBuilder().create()
+        val gson = GsonBuilder()
+                .registerTypeAdapter(StoryMetadata::class.java, StoryMetadataDeserializer())
+                .create()
         return gson.fromJson<StoryMetadata>(input, StoryMetadata::class.java)
     }
 
