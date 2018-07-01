@@ -17,6 +17,7 @@ import com.boomapps.steemapp.repository.db.entities.StoryEntity
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
+import timber.log.Timber
 import java.util.*
 
 class FeedViewHolder(itemView: View, callback: Callback) : RecyclerView.ViewHolder(itemView) {
@@ -94,17 +95,25 @@ class FeedViewHolder(itemView: View, callback: Callback) : RecyclerView.ViewHold
         created.timeInMillis = data?.created ?: 0L
         var sCreated = "unknown"
         if (created.timeInMillis > 0) {
+            Timber.d("Created time for ${story?.permlink} = ${created.timeInMillis}")
             val curCal = currentDate()
             val yearsDelta = curCal.get(Calendar.YEAR) - created.get(Calendar.YEAR)
             val monthDelta = curCal.get(Calendar.MONTH) - created.get(Calendar.MONTH)
             val dayDelta = curCal.get(Calendar.DAY_OF_YEAR) - created.get(Calendar.DAY_OF_YEAR)
-            if (yearsDelta > 0) {
-                lastTime.text = formatDate(yearsDelta, itemView.context.resources.getQuantityString(R.plurals.years, yearsDelta))
-            } else if (monthDelta > 0) {
-                lastTime.text = formatDate(monthDelta, itemView.context.resources.getQuantityString(R.plurals.months, monthDelta))
-            } else if (dayDelta > 1) {
+            val hoursDelta = curCal.get(Calendar.HOUR_OF_DAY) - created.get(Calendar.HOUR_OF_DAY)
+            val minutesDelta = curCal.get(Calendar.MINUTE) - created.get(Calendar.MINUTE)
+            Timber.d("Created time y=$yearsDelta; m=$monthDelta; d=$dayDelta; h=$hoursDelta")
+            if (dayDelta in 2..29) {
                 lastTime.text = formatDate(dayDelta, itemView.context.resources.getQuantityString(R.plurals.days, dayDelta))
-            } else {
+            } else if (dayDelta >= 30 && monthDelta in 1..11) {
+                lastTime.text = formatDate(monthDelta, itemView.context.resources.getQuantityString(R.plurals.months, monthDelta))
+            } else if (yearsDelta > 0) {
+                lastTime.text = formatDate(yearsDelta, itemView.context.resources.getQuantityString(R.plurals.years, yearsDelta))
+            } else if (hoursDelta in 1..23) {
+                lastTime.text = formatDate(hoursDelta, itemView.context.resources.getQuantityString(R.plurals.hours, hoursDelta))
+            } else if(minutesDelta in 0..59){
+                lastTime.text = formatDate(minutesDelta, itemView.context.resources.getQuantityString(R.plurals.minutes, minutesDelta))
+            }else{
                 lastTime.text = itemView.context.getString(R.string.feed_card_date_format_yesterday)
             }
         }
