@@ -144,4 +144,8 @@ Do you want to enter correct key and try to post again?</string>
     <string name="d_cancel_vote_btn_ok">Confirm</string>
     <string name="d_cancel_vote_btn_cancel">Cancel</string>
 
+    <string name="sign_up">Sign Up with STEEM</string>
+    <string name="log_in">Log In</string>
+    <string name="steemit_username">Steemit Username</string>
+
 </resources>
