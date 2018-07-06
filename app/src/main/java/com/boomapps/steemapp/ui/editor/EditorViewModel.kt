@@ -28,7 +28,6 @@ class EditorViewModel : BaseViewModel() {
     var story: String = ""
     val categories: ArrayList<CategoryItem> = arrayListOf()
     var activeTab: Int = 0
-    var inputCategory: String = ""
     var rewardPosition: Int = 1
     var upvoteState: Boolean = false
     var uploadedImageUrl: URL? = null
@@ -133,6 +132,7 @@ class EditorViewModel : BaseViewModel() {
                         }
 
                         override fun onFailureRequestFinish(throwable: Throwable) {
+                            stringError = throwable.message!!
                             state.value = ViewState.FAULT_RESULT
                         }
                     })
