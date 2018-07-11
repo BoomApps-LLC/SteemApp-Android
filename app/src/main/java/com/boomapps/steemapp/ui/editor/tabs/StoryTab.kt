@@ -28,19 +28,19 @@ import timber.log.Timber
 class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel) : BaseTabView(view, tabListener, viewModel) {
 
     lateinit var editor: RichEditor
-    lateinit var actionsPanel: HorizontalScrollView
-    lateinit var keyboardButton: ImageView
+    private lateinit var actionsPanel: HorizontalScrollView
+    private lateinit var keyboardButton: ImageView
     lateinit var bold: View
     lateinit var italic: View
     lateinit var underline: View
-    lateinit var strike: View
-    lateinit var h1: View
-    lateinit var h2: View
-    lateinit var h3: View
-    lateinit var bulletList: View
-    lateinit var numberedList: View
-    lateinit var quote: View
-    lateinit var insertLine: View
+    private lateinit var strike: View
+    private lateinit var h1: View
+    private lateinit var h2: View
+    private lateinit var h3: View
+    private lateinit var bulletList: View
+    private lateinit var numberedList: View
+    private lateinit var quote: View
+    private lateinit var insertLine: View
 
     private var isKeyboardOpened = true
     private val states: HashMap<String, Boolean> = hashMapOf(
@@ -68,6 +68,8 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
 
     override fun onShow() {
         editor.html = viewModel.story
+        val ready = !viewModel.story.isEmpty() and (viewModel.story != "<br><br>")
+        dataListener.onDataChange(ready)
     }
 
     override fun onHide() {
@@ -80,7 +82,8 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
         } else {
             storyLength
         }
-        dataListener.onDataChange(sLength > 0)
+        val ready = (sLength > 0) and (viewModel.story != "<br><br>")
+        dataListener.onDataChange(ready)
     }
 
     private fun initEditor() {
@@ -90,11 +93,11 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
             editor.setEditorFontSize(14)
             editor.setPadding(0, 0, 0, 10)
             editor.setPlaceholder(view.context.getString(R.string.a_editor_story_text_hint))
-            editor.setOnTextChangeListener({ _ ->
+            editor.setOnTextChangeListener { _ ->
                 val value = editor.html
                 viewModel.story = value
                 processFullDataChange(storyLength = value.length)
-            })
+            }
             editor.html = viewModel.story
             editor.focusEditor()
         }
@@ -186,7 +189,7 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
         }
 
         keyboardButton = view.findViewById(R.id.keyboard_button)
-        keyboardButton.setOnClickListener({
+        keyboardButton.setOnClickListener {
             if (isKeyboardOpened) {
                 val imm = editor.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.hideSoftInputFromWindow(editor.windowToken, 0)
@@ -194,7 +197,7 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
                 val imm = editor.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(editor, InputMethodManager.SHOW_IMPLICIT)
             }
-        })
+        }
         initKeyboardStateListener()
     }
 
@@ -219,7 +222,7 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
 
     private fun initKeyboardStateListener() {
         try {
-            view.viewTreeObserver.addOnGlobalLayoutListener({
+            view.viewTreeObserver.addOnGlobalLayoutListener {
                 val r = Rect()
                 view.getWindowVisibleDisplayFrame(r)
 
@@ -235,7 +238,7 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
                     }
                     // kEYBOARD IS HIDDEN
                 }
-            })
+            }
         } catch (e: Throwable) {
             Timber.e(e)
         }
