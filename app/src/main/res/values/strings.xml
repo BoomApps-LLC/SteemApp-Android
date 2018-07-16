@@ -144,4 +144,9 @@ Do you want to enter correct key and try to post again?</string>
     <string name="d_cancel_vote_btn_ok">Confirm</string>
     <string name="d_cancel_vote_btn_cancel">Cancel</string>
 
+    <string name="blog">BLOG</string>
+    <string name="feed">FEED</string>
+    <string name="trending">TRENDING</string>
+    <string name="new_title">NEW</string>
+
 </resources>
