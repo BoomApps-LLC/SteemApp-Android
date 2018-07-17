@@ -33,6 +33,7 @@ import java.util.*
 class PostViewActivity : BaseActivity() {
 
     companion object {
+        const val EXTRA_ACTIVITY_TITLE = "activity_title"
         const val EXTRA_POST_ID = "post_id"
         const val EXTRA_URL = "url"
         const val EXTRA_TITLE = "title"
@@ -43,7 +44,6 @@ class PostViewActivity : BaseActivity() {
         const val EXTRA_LINK_NUM = "link_num"
         const val EXTRA_VOTE_NUM = "vote_num"
         const val EXTRA_AMOUNT = "amount"
-
     }
 
     private val INPUT_NEW_KEY_POST_ACTIVITY_CODE = 32
@@ -75,7 +75,7 @@ class PostViewActivity : BaseActivity() {
         }
         extractExtras()
         initPostDataUI()
-        title = "FEED"
+        title = intent.extras.getString(EXTRA_ACTIVITY_TITLE)
         viewModel = ViewModelProviders.of(this, PostViewModelFactory(extraPostId, extraUrl, extraTitle)).get(PostViewModel::class.java)
         progressParams = postWebViewProgress.layoutParams as ConstraintLayout.LayoutParams
         initWebView()
