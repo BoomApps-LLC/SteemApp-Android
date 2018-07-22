@@ -132,7 +132,9 @@ class EditorViewModel : BaseViewModel() {
                         }
 
                         override fun onFailureRequestFinish(throwable: Throwable) {
-                            stringError = throwable.message!!
+                            if (throwable.message != null) {
+                                stringError = throwable.message!!
+                            }
                             state.value = ViewState.FAULT_RESULT
                         }
                     })
