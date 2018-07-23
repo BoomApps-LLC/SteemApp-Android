@@ -11,6 +11,7 @@ import com.boomapps.steemapp.repository.RepositoryProvider
 import com.boomapps.steemapp.repository.UserData
 import com.boomapps.steemapp.repository.entity.VoteState
 import com.boomapps.steemapp.repository.network.NetworkRepository
+import com.boomapps.steemapp.repository.network.NetworkResponseCode
 import com.boomapps.steemapp.ui.BaseViewModel
 import com.boomapps.steemapp.ui.ViewState
 
@@ -83,7 +84,7 @@ class MainViewModel : BaseViewModel() {
                     }
                 }
 
-                override fun onFailureRequestFinish(throwable: Throwable) {
+                override fun onFailureRequestFinish(code : NetworkResponseCode, throwable: Throwable) {
                     Log.d("MainViewModel", "doOnError")
                     stringError = throwable.localizedMessage
                     state.value = ViewState.FAULT_RESULT
@@ -139,7 +140,7 @@ class MainViewModel : BaseViewModel() {
                 isDataUpdating = false
             }
 
-            override fun onFailureRequestFinish(throwable: Throwable) {
+            override fun onFailureRequestFinish(code : NetworkResponseCode, throwable: Throwable) {
                 isDataUpdating = false
                 stringError = if (throwable.localizedMessage != null) {
                     throwable.localizedMessage
