@@ -65,11 +65,7 @@ interface SteemRepository {
 
     fun getNewDataList(start: Int, limit: Int, storyEntity: StoryEntity?): Single<ArrayList<DiscussionData>>?
 
-    fun vote(postPermLink: String, percentage: Int)
-
     fun vote(authorFor: String, postPermLink: String, percentage: Int) : Boolean
-
-    fun cancelVote(postPermLink: String)
 
     fun cancelVote(author: String, postPermLink: String) : Boolean
 

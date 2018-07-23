@@ -348,26 +348,6 @@ class SteemRepositoryDefault : SteemRepository {
         return getDiscussionsDataList(DiscussionSortType.GET_DISCUSSIONS_BY_CREATED, start, limit, storyEntity)
     }
 
-
-    /*
-        * Upvote the post
-        * "steem-java-api-learned-to-speak-graphene-update-5" written by
-        * "dez1337" using 100% of the defaultAccounts voting power.
-        */
-    override fun vote(postPermLink: String, percentage: Int) {
-        try {
-            steemJ?.vote(steemJConfig?.apiUsername, Permlink(postPermLink),
-                    percentage.toShort())
-        } catch (communicationException: SteemCommunicationException) {
-
-        } catch (responseException: SteemResponseException) {
-
-        } catch (transactionException: SteemInvalidTransactionException) {
-
-        }
-    }
-
-
     /*
         * Upvote the post
         * "steem-java-api-learned-to-speak-graphene-update-5" written by
@@ -388,29 +368,19 @@ class SteemRepositoryDefault : SteemRepository {
         return false
     }
 
-    override fun cancelVote(postPermLink: String) {
-        try {
-            steemJ?.cancelVote(steemJConfig?.apiUsername,
-                    Permlink(postPermLink))
-        } catch (communicationException: SteemCommunicationException) {
-
-        } catch (responseException: SteemResponseException) {
-
-        } catch (transactionException: SteemInvalidTransactionException) {
-
-        }
-    }
-
     override fun cancelVote(author: String, postPermLink: String): Boolean {
         try {
             steemJ?.cancelVote(AccountName(author),
                     Permlink(postPermLink))
             return true
         } catch (communicationException: SteemCommunicationException) {
+            Timber.e(communicationException)
             return false
         } catch (responseException: SteemResponseException) {
+            Timber.e(responseException)
             return false
         } catch (transactionException: SteemInvalidTransactionException) {
+            Timber.e(transactionException)
             return false
         }
         return false
@@ -419,6 +389,7 @@ class SteemRepositoryDefault : SteemRepository {
     override fun unvoteWithUpdate(story: StoryEntity, type: FeedType, callback: SteemRepository.Callback<Boolean>) {
         Observable.fromCallable {
             val result = cancelVote(story.author, story.permlink)
+            Timber.d("unvoteWithUpdate >> result of cancelVote = $result")
             if (result) {
                 return@fromCallable result
             } else {
@@ -439,6 +410,17 @@ class SteemRepositoryDefault : SteemRepository {
                         {
                             val result = it
                             if (result?.discussion != null) {
+
+                                run {
+                                    // TODO remove after testing
+                                    Timber.d("unvoteWithUpdate >> updated story result:")
+                                    val filteredResult = result?.discussion?.activeVotes.filter { it.voter.name.contains("grevit") }
+                                    filteredResult.forEach {
+                                        Timber.d("unvoteWithUpdate >> my vote >> ${it.percent} :: ${it.time}")
+                                    }
+                                }
+
+
                                 val mapped = DiscussionToStoryMapper(result, steemJConfig?.defaultAccount?.name
                                         ?: "_").map()
                                 if (mapped.isNotEmpty()) {
@@ -464,7 +446,7 @@ class SteemRepositoryDefault : SteemRepository {
         }
                 .subscribeOn(Schedulers.io())
                 .flatMap {
-//                    Timber.d("voteWithUpdate.flatMap(result=${it})")
+                    //                    Timber.d("voteWithUpdate.flatMap(result=${it})")
                     return@flatMap getStoryDetails(AccountName(story.author), Permlink(story.permlink), story.indexInResponse)
                 }
                 .observeOn(Schedulers.io())
