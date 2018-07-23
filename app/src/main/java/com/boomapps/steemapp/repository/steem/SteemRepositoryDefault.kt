@@ -210,6 +210,8 @@ class SteemRepositoryDefault : SteemRepository {
                     imageFile)
         } catch (e: IOException) {
             Timber.e(e, "Image upload exception")
+        } finally {
+            return url
         }
         return url
     }
