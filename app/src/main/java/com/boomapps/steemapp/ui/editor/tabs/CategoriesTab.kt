@@ -5,6 +5,7 @@
 package com.boomapps.steemapp.ui.editor.tabs
 
 import android.support.v7.widget.RecyclerView
+import android.text.InputFilter
 import android.view.KeyEvent
 import android.view.View
 import android.widget.EditText
@@ -16,6 +17,8 @@ import com.boomapps.steemapp.ui.editor.EditorViewModel
 import com.boomapps.steemapp.ui.showKeyboard
 import com.xiaofeng.flowlayoutmanager.Alignment
 import com.xiaofeng.flowlayoutmanager.FlowLayoutManager
+import android.text.Spanned
+
 
 /**
  * Created by vgrechikha on 21.02.2018.
@@ -29,6 +32,7 @@ class CategoriesTab(view: View, tabListener: TabListener, viewModel: EditorViewM
 
     override fun initComponents() {
         inputTag = view.findViewById(R.id.hashtagInput)
+        setInputCharsFilter()
         addButton = view.findViewById(R.id.addCategoryButton)
         addButton.setOnClickListener(View.OnClickListener {
             createTag()
@@ -128,6 +132,24 @@ class CategoriesTab(view: View, tabListener: TabListener, viewModel: EditorViewM
         }
     }
 
+    private fun setInputCharsFilter() {
+        val filter = InputFilter { source, start, end, dest, dstart, dend ->
+            var lines = false
+            for (i in start until end) {
+                lines = Character.toString(source[i]) == "_" || Character.toString(source[i]) == "-"
+                if (!Character.isLetterOrDigit(source[i]) &&
+                        !lines) {
+                    return@InputFilter ""
+                }
+                if (dend == 0 && lines) {
+                    return@InputFilter ""
+                }
+            }
+            null
+        }
+        inputTag.filters = arrayOf(filter)
+    }
+
     private fun getMatColor(typeColor: String): Int {
 
 
@@ -144,5 +166,6 @@ class CategoriesTab(view: View, tabListener: TabListener, viewModel: EditorViewM
 //        }
 //        return returnColor
     }
+
 
 }

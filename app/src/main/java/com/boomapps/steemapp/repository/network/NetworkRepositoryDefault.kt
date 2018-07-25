@@ -7,8 +7,8 @@ package com.boomapps.steemapp.repository.network
 import android.net.Uri
 import android.util.Log
 import com.boomapps.steemapp.repository.HeadersInterceptor
-import com.boomapps.steemapp.repository.RequestsApi
 import com.boomapps.steemapp.repository.RepositoryProvider
+import com.boomapps.steemapp.repository.RequestsApi
 import com.boomapps.steemapp.repository.currency.CoinmarketcapCurrency
 import com.boomapps.steemapp.repository.entity.UserDataEntity
 import com.boomapps.steemapp.repository.entity.profile.ProfileMetadataDeserializer
@@ -17,6 +17,7 @@ import com.boomapps.steemapp.repository.entity.profile.UserExtended
 import com.boomapps.steemapp.repository.feed.FeedFullData
 import com.boomapps.steemapp.repository.feed.ServerDate
 import com.boomapps.steemapp.repository.feed.ServerDateSerialiizer
+import com.boomapps.steemapp.repository.steem.SteemAnswerCodes
 import com.google.gson.GsonBuilder
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -29,8 +30,10 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.IOException
 import java.net.URL
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 
 class NetworkRepositoryDefault : NetworkRepository {
 
@@ -73,15 +76,24 @@ class NetworkRepositoryDefault : NetworkRepository {
 
 
     override fun postStory(title: String, content: String, tags: Array<String>, postingKey: String, rewardsPercent: Short, upvote: Boolean, callback: NetworkRepository.OnRequestFinishCallback) {
+        postStory(title, content, tags, postingKey, rewardsPercent, upvote, null, callback)
+    }
+
+    override fun postStory(title: String, content: String, tags: Array<String>, postingKey: String, rewardsPercent: Short, upvote: Boolean, permlink: String?, callback: NetworkRepository.OnRequestFinishCallback) {
         Observable.fromCallable {
-            return@fromCallable RepositoryProvider.getSteemRepository().post(title, content, tags, postingKey, rewardsPercent, upvote)
+            return@fromCallable RepositoryProvider.getSteemRepository().post(title, content, tags, postingKey, rewardsPercent, upvote, permlink)
         }.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext {
                     if (it.success) {
                         callback.onSuccessRequestFinish()
                     } else {
-                        callback.onFailureRequestFinish(Throwable(it.result))
+                        if (it.code == SteemAnswerCodes.PERMLINK_DUPLICATE) {
+                            callback.onFailureRequestFinish(NetworkResponseCode.PERMLINK_DUPLICATE, Throwable(it.result))
+                        } else {
+                            callback.onFailureRequestFinish(NetworkResponseCode.UNKNOWN_ERROR, Throwable(it.result))
+                        }
+
                     }
                     Log.d("postStory", "doOnNext")
                 }
@@ -90,7 +102,11 @@ class NetworkRepositoryDefault : NetworkRepository {
                 }
                 .doOnError {
                     Log.d("postStory", "doOnError")
-                    callback.onFailureRequestFinish(it)
+                    if (it is TimeoutException || it is IOException) {
+                        callback.onFailureRequestFinish(NetworkResponseCode.CONNECTION_ERROR, it)
+                    } else {
+                        callback.onFailureRequestFinish(NetworkResponseCode.UNKNOWN_ERROR, it)
+                    }
                 }
                 .subscribe()
     }
@@ -109,13 +125,17 @@ class NetworkRepositoryDefault : NetworkRepository {
                     if (lastUploadedPhotoUrl != null && !lastUploadedPhotoUrl.toString().equals("http://empty.com", true)) {
                         callback.onSuccessRequestFinish()
                     } else {
-                        callback.onFailureRequestFinish(Throwable("Image uploading error"))
+                        callback.onFailureRequestFinish(NetworkResponseCode.UNKNOWN_ERROR, Throwable("Image uploading error"))
                     }
                 }
                 .doOnError {
                     Log.d("uploadNewPhoto", "doOnError")
-                    callback.onFailureRequestFinish(it)
-
+                    // TODO process steemjupload library exceptions
+                    if (it is TimeoutException || it is IOException) {
+                        callback.onFailureRequestFinish(NetworkResponseCode.CONNECTION_ERROR, it)
+                    } else {
+                        callback.onFailureRequestFinish(NetworkResponseCode.UNKNOWN_ERROR, it)
+                    }
                 }
                 .subscribe()
     }
@@ -137,7 +157,12 @@ class NetworkRepositoryDefault : NetworkRepository {
 
                         },
                         { throwable ->
-                            callback.onFailureRequestFinish(throwable)
+                            if (throwable is TimeoutException || throwable is IOException) {
+                                callback.onFailureRequestFinish(NetworkResponseCode.CONNECTION_ERROR, throwable)
+                            } else {
+                                callback.onFailureRequestFinish(NetworkResponseCode.UNKNOWN_ERROR, throwable)
+                            }
+
                         }
                 )
     }
@@ -260,7 +285,7 @@ class NetworkRepositoryDefault : NetworkRepository {
     }
 
 
-    override fun loadExtendedPostData(name : String, permlink : String) : Observable<FeedFullData>{
+    override fun loadExtendedPostData(name: String, permlink: String): Observable<FeedFullData> {
         return getRequestsApi("https://steemit.com/", null).loadFeedFullData(name, permlink)
     }
 
