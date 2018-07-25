@@ -455,17 +455,6 @@ class SteemRepositoryDefault : SteemRepository {
                         {
                             val result = it
                             if (result?.discussion != null) {
-
-                                run {
-                                    // TODO remove after testing
-                                    Timber.d("unvoteWithUpdate >> updated story result:")
-                                    val filteredResult = result?.discussion?.activeVotes.filter { it.voter.name.contains("grevit") }
-                                    filteredResult.forEach {
-                                        Timber.d("unvoteWithUpdate >> my vote >> ${it.percent} :: ${it.time}")
-                                    }
-                                }
-
-
                                 val mapped = DiscussionToStoryMapper(result, steemJConfig?.defaultAccount?.name
                                         ?: "_").map()
                                 if (mapped.isNotEmpty()) {

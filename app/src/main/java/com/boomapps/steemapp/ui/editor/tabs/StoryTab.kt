@@ -186,7 +186,7 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
         }
 
         keyboardButton = view.findViewById(R.id.keyboard_button)
-        keyboardButton.setOnClickListener({
+        keyboardButton.setOnClickListener {
             if (isKeyboardOpened) {
                 val imm = editor.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.hideSoftInputFromWindow(editor.windowToken, 0)
@@ -194,7 +194,7 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
                 val imm = editor.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(editor, InputMethodManager.SHOW_IMPLICIT)
             }
-        })
+        }
         initKeyboardStateListener()
     }
 

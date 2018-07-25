@@ -32,8 +32,7 @@ class CategoryHolder(view: View, val onRemoveClickListener: OnRemoveClickListene
         valueControl = view.findViewById(R.id.itemCategoryTextValue)
         // next code is used for extending touch area of remove tag control
         // @link{https://developer.android.com/training/gestures/viewgroup.html}
-        // TODO check next section
-        view.post({
+        view.post {
             val delegateArea = Rect()
             removeControl.getHitRect(delegateArea)
             delegateArea.top += 16
@@ -41,7 +40,7 @@ class CategoryHolder(view: View, val onRemoveClickListener: OnRemoveClickListene
             delegateArea.left += 16
             delegateArea.right += 16
             view.touchDelegate = TouchDelegate(delegateArea, removeControl)
-        })
+        }
 
     }
 

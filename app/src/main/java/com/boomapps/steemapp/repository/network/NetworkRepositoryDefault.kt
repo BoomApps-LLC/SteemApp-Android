@@ -30,6 +30,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
+import timber.log.Timber
 import java.io.IOException
 import java.net.URL
 import java.util.concurrent.TimeUnit
@@ -129,8 +130,8 @@ class NetworkRepositoryDefault : NetworkRepository {
                     }
                 }
                 .doOnError {
-                    Log.d("uploadNewPhoto", "doOnError")
-                    // TODO process steemjupload library exceptions
+                    Timber.e(it)
+                    callback.onFailureRequestFinish(NetworkResponseCode.UNKNOWN_ERROR, it)
                     if (it is TimeoutException || it is IOException) {
                         callback.onFailureRequestFinish(NetworkResponseCode.CONNECTION_ERROR, it)
                     } else {
