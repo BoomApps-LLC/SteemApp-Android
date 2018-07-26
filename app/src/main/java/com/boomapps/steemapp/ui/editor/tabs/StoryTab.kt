@@ -25,7 +25,8 @@ import timber.log.Timber
 /**
  * Created by vgrechikha on 21.02.2018.
  */
-class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel) : BaseTabView(view, tabListener, viewModel) {
+class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel) :
+        BaseTabView(view, tabListener, viewModel), RichEditor.OnTextClickListener {
 
     lateinit var editor: RichEditor
     lateinit var actionsPanel: HorizontalScrollView
@@ -43,9 +44,8 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
     lateinit var insertLine: View
 
     private var isKeyboardOpened = true
-    private val states: HashMap<String, Boolean> = hashMapOf(
-            "undo" to false,
-            "redo" to false,
+    private var position = 0
+    private var state: HashMap<String, Boolean> = hashMapOf(
             "bold" to false,
             "italic" to false,
             "underline" to false,
@@ -56,8 +56,7 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
             "bullet_list" to false,
             "numbered_list" to false,
             "quote" to false,
-            "insert_line" to false,
-            "image" to false
+            "insert_line" to false
     )
 
     override fun initComponents() {
@@ -94,7 +93,9 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
                 val value = editor.html
                 viewModel.story = value
                 processFullDataChange(storyLength = value.length)
+                viewModel.styleState.add(position++, HashMap(state))
             })
+            editor.setOnTextClickListener(this)
             editor.html = viewModel.story
             editor.focusEditor()
         }
@@ -199,12 +200,12 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
     }
 
     private fun switchButtonState(key: String, view: View) {
-        setButtonState(key, view, states[key] != true)
+        setButtonState(key, view, state[key] != true)
     }
 
     private fun setButtonState(key: String, view: View, state: Boolean) {
-        states[key] = state
-        val color =  if (states[key]!!) {
+        this.state[key] = state
+        val color =  if (this.state[key]!!) {
             R.color.green_active
         } else {
             R.color.black
@@ -244,6 +245,42 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
     private val onInsertLinkClickListener = object : InsertLinkDialogFragment.OnInsertClickListener {
         override fun onInsertClick(title: String, url: String) {
             editor.insertLink(url, title)
+        }
+    }
+
+    override fun onTextClick(position: Int) {
+        this.position = position
+        state = viewModel.styleState[position]
+        updateStyleState()
+    }
+
+    private fun updateStyleState() {
+        for (s in state) {
+            when (s.key) {
+                "bold" -> updateButtonState(s.key, bold)
+                "italic" -> updateButtonState(s.key, italic)
+                "underline" -> updateButtonState(s.key, underline)
+                "strike" -> updateButtonState(s.key, strike)
+                "h1" -> updateButtonState(s.key, h1)
+                "h2" -> updateButtonState(s.key, h2)
+                "h3" -> updateButtonState(s.key, h3)
+                "bullet_list" -> updateButtonState(s.key, bulletList)
+                "numbered_list" -> updateButtonState(s.key, numberedList)
+                "quote" -> updateButtonState(s.key, quote)
+                "insert_line" -> updateButtonState(s.key, insertLine)
+            }
+        }
+    }
+
+    private fun updateButtonState(key: String, view: View) {
+        val color =  if (this.state[key]!!) {
+            R.color.green_active
+        } else {
+            R.color.black
+        }
+        view.post {
+            ImageViewCompat.setImageTintList(view as ImageButton,
+                    ColorStateList.valueOf(ContextCompat.getColor(view.context, color)))
         }
     }
 

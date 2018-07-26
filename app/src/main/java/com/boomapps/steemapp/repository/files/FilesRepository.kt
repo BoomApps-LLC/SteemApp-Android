@@ -15,12 +15,12 @@ interface FilesRepository {
 
         fun onClearStory()
 
-        fun onLoadStory(story : String)
+        fun onLoadStory(story : String, stylesState: ArrayList<HashMap<String, Boolean>>)
 
         fun onError()
     }
 
-    fun saveStory(value: String, storyCallback: StoryCallback?)
+    fun saveStory(value: String, stylesState: ArrayList<HashMap<String, Boolean>>, storyCallback: StoryCallback?)
 
     fun clearStory(storyCallback: StoryCallback?)
 
