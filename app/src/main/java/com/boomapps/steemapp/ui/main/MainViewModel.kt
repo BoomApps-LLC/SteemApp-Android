@@ -5,6 +5,7 @@
 package com.boomapps.steemapp.ui.main
 
 import android.arch.lifecycle.MutableLiveData
+import android.arch.lifecycle.extensions.R.id.async
 import android.util.Log
 import com.boomapps.steemapp.repository.Balance
 import com.boomapps.steemapp.repository.RepositoryProvider
@@ -14,6 +15,8 @@ import com.boomapps.steemapp.repository.network.NetworkRepository
 import com.boomapps.steemapp.repository.network.NetworkResponseCode
 import com.boomapps.steemapp.ui.BaseViewModel
 import com.boomapps.steemapp.ui.ViewState
+import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 
 /**
  * Created by vgrechikha on 25.01.2018.
@@ -45,6 +48,13 @@ class MainViewModel : BaseViewModel() {
     }
 
     fun signOut() {
+        Single.fromCallable {
+            RepositoryProvider.getDaoRepository().clearDB()
+        }
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe()
+
         RepositoryProvider.getPreferencesRepository().clearAllData()
         RepositoryProvider.getSteemRepository().signOut()
 
@@ -84,7 +94,7 @@ class MainViewModel : BaseViewModel() {
                     }
                 }
 
-                override fun onFailureRequestFinish(code : NetworkResponseCode, throwable: Throwable) {
+                override fun onFailureRequestFinish(code: NetworkResponseCode, throwable: Throwable) {
                     Log.d("MainViewModel", "doOnError")
                     stringError = throwable.localizedMessage
                     state.value = ViewState.FAULT_RESULT
@@ -140,7 +150,7 @@ class MainViewModel : BaseViewModel() {
                 isDataUpdating = false
             }
 
-            override fun onFailureRequestFinish(code : NetworkResponseCode, throwable: Throwable) {
+            override fun onFailureRequestFinish(code: NetworkResponseCode, throwable: Throwable) {
                 isDataUpdating = false
                 stringError = if (throwable.localizedMessage != null) {
                     throwable.localizedMessage
