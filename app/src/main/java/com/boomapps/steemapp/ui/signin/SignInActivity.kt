@@ -215,8 +215,7 @@ class SignInActivity : BaseActivity() {
     }
 
     fun setLoginButtonState() {
-        // TODO uncomment after testing
-        if (viewModel.nickname.isNotEmpty()){// && viewModel.postingKey.isNotEmpty() && viewModel.postingKey.length >= 40) {
+        if (viewModel.nickname.isNotEmpty()){
             btnLogin.apply {
                 setTextColor(ContextCompat.getColor(this@SignInActivity, R.color.green_active))
                 isEnabled = true

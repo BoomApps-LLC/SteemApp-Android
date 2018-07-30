@@ -9,6 +9,7 @@ import com.boomapps.steemapp.SteemApplication
 import com.boomapps.steemapp.repository.RepositoryProvider
 import com.boomapps.steemapp.repository.UserData
 import com.boomapps.steemapp.repository.network.NetworkRepository
+import com.boomapps.steemapp.repository.network.NetworkResponseCode
 import com.boomapps.steemapp.repository.steem.SteemErrorCodes
 import com.boomapps.steemapp.ui.BaseViewModel
 import com.boomapps.steemapp.ui.ViewState
@@ -95,7 +96,7 @@ class SignInViewModel : BaseViewModel() {
                 state.value = ViewState.SUCCESS_RESULT
             }
 
-            override fun onFailureRequestFinish(throwable: Throwable) {
+            override fun onFailureRequestFinish(code : NetworkResponseCode, throwable: Throwable) {
                 stringError = if (throwable.localizedMessage == null) {
                     throwable.message ?: ""
                 } else {

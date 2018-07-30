@@ -20,7 +20,7 @@ interface NetworkRepository {
 
         fun onSuccessRequestFinish()
 
-        fun onFailureRequestFinish(throwable: Throwable)
+        fun onFailureRequestFinish(code : NetworkResponseCode, throwable: Throwable)
 
     }
 
@@ -31,6 +31,8 @@ interface NetworkRepository {
 
 
     fun postStory(title: String, content: String, tags: Array<String>, postingKey: String, rewardsPercent: Short, upvote: Boolean, callback: NetworkRepository.OnRequestFinishCallback)
+
+    fun postStory(title: String, content: String, tags: Array<String>, postingKey: String, rewardsPercent: Short, upvote: Boolean, permlink: String?, callback: NetworkRepository.OnRequestFinishCallback)
 
     fun uploadNewPhoto(uri: Uri, callback: NetworkRepository.OnRequestFinishCallback)
 

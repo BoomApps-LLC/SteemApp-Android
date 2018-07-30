@@ -171,7 +171,7 @@ class FeedsFragment : Fragment(), FeedListHolderCallback {
             postIntent.putExtra(PostViewActivity.EXTRA_COMMENTS_NUM, story.commentsNum)
             postIntent.putExtra(PostViewActivity.EXTRA_LINK_NUM, story.linksNum)
             postIntent.putExtra(PostViewActivity.EXTRA_VOTE_NUM, story.votesNum)
-            postIntent.putExtra(PostViewActivity.EXTRA_AMOUNT, story.price) // TODO cahange
+            postIntent.putExtra(PostViewActivity.EXTRA_AMOUNT, story.price) // TODO change
             postIntent.putExtra(PostViewActivity.EXTRA_AVATAR_URL, story.avatarUrl)
             startActivity(postIntent)
         }
@@ -183,11 +183,10 @@ class FeedsFragment : Fragment(), FeedListHolderCallback {
         builder
                 .setTitle(getString(R.string.d_wron_post_key_title))
                 .setMessage(getString(R.string.d_wron_post_key_message))
-                .setPositiveButton(getString(R.string.d_wron_post_key_btn_ok), { dialog, id ->
+                .setPositiveButton(getString(R.string.d_wron_post_key_btn_ok)) { _, _ ->
                     showScreenForEnterNewPostingKey()
-
-                })
-                .setNegativeButton(getString(R.string.d_wron_post_key_btn_cancel), { dialog, id ->
+                }
+                .setNegativeButton(getString(R.string.d_wron_post_key_btn_cancel), { _, _ ->
                     // do nothing
                 }).create().show()
     }

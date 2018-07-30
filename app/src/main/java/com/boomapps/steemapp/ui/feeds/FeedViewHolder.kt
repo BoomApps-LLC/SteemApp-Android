@@ -115,7 +115,7 @@ class FeedViewHolder(itemView: View, callback: Callback) : RecyclerView.ViewHold
                 lastTime.text = formatDate(minutesDelta, itemView.context.resources.getQuantityString(R.plurals.minutes, minutesDelta))
             }else{
                 lastTime.text = itemView.context.getString(R.string.feed_card_date_format_yesterday)
-            }
+7            }
         }
 
         val imageUrl = data?.mainImageUrl

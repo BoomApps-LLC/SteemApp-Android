@@ -9,6 +9,7 @@ import android.arch.lifecycle.MutableLiveData
 import android.util.Log
 import com.boomapps.steemapp.repository.RepositoryProvider
 import com.boomapps.steemapp.repository.network.NetworkRepository
+import com.boomapps.steemapp.repository.network.NetworkResponseCode
 import com.boomapps.steemapp.repository.steem.SteemWorker
 import com.boomapps.steemapp.ui.BaseViewModel
 import io.reactivex.Observable
@@ -92,7 +93,7 @@ class SplashViewModel : BaseViewModel() {
                 loginState.value = LoginState.LOGGED
             }
 
-            override fun onFailureRequestFinish(throwable: Throwable) {
+            override fun onFailureRequestFinish(code : NetworkResponseCode, throwable: Throwable) {
                 stringError = if (throwable.localizedMessage != null) {
                     throwable.localizedMessage
                 } else {
