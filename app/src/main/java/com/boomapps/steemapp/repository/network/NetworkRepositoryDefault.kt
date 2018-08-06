@@ -9,7 +9,10 @@ import android.util.Log
 import com.boomapps.steemapp.repository.HeadersInterceptor
 import com.boomapps.steemapp.repository.RepositoryProvider
 import com.boomapps.steemapp.repository.RequestsApi
+import com.boomapps.steemapp.repository.currency.AmountRequestData
 import com.boomapps.steemapp.repository.currency.CoinmarketcapCurrency
+import com.boomapps.steemapp.repository.currency.OutputAmount
+import com.boomapps.steemapp.repository.currency.TradingPairInfo
 import com.boomapps.steemapp.repository.entity.UserDataEntity
 import com.boomapps.steemapp.repository.entity.profile.ProfileMetadataDeserializer
 import com.boomapps.steemapp.repository.entity.profile.ProfileResponse
@@ -39,8 +42,7 @@ import java.util.concurrent.TimeoutException
 class NetworkRepositoryDefault : NetworkRepository {
 
     override var extendedProfileResponse: ProfileResponse? = null
-    override var coinmarketcapCurrency: CoinmarketcapCurrency? = null
-    override var lastUploadedPhotoUrl: URL? = null
+
 
     companion object {
         var instance: NetworkRepositoryDefault = NetworkRepositoryDefault()
@@ -76,18 +78,18 @@ class NetworkRepositoryDefault : NetworkRepository {
     }
 
 
-    override fun postStory(title: String, content: String, tags: Array<String>, postingKey: String, rewardsPercent: Short, upvote: Boolean, callback: NetworkRepository.OnRequestFinishCallback) {
+    override fun postStory(title: String, content: String, tags: Array<String>, postingKey: String, rewardsPercent: Short, upvote: Boolean, callback: NetworkRepository.OnRequestFinishCallback<Any?>) {
         postStory(title, content, tags, postingKey, rewardsPercent, upvote, null, callback)
     }
 
-    override fun postStory(title: String, content: String, tags: Array<String>, postingKey: String, rewardsPercent: Short, upvote: Boolean, permlink: String?, callback: NetworkRepository.OnRequestFinishCallback) {
+    override fun postStory(title: String, content: String, tags: Array<String>, postingKey: String, rewardsPercent: Short, upvote: Boolean, permlink: String?, callback: NetworkRepository.OnRequestFinishCallback<Any?>) {
         Observable.fromCallable {
             return@fromCallable RepositoryProvider.getSteemRepository().post(title, content, tags, postingKey, rewardsPercent, upvote, permlink)
         }.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext {
                     if (it.success) {
-                        callback.onSuccessRequestFinish()
+                        callback.onSuccessRequestFinish("")
                     } else {
                         if (it.code == SteemAnswerCodes.PERMLINK_DUPLICATE) {
                             callback.onFailureRequestFinish(NetworkResponseCode.PERMLINK_DUPLICATE, Throwable(it.result))
@@ -112,19 +114,20 @@ class NetworkRepositoryDefault : NetworkRepository {
                 .subscribe()
     }
 
-    override fun uploadNewPhoto(uri: Uri, callback: NetworkRepository.OnRequestFinishCallback) {
+    override fun uploadNewPhoto(uri: Uri, callback: NetworkRepository.OnRequestFinishCallback<URL?>) {
+        var result: URL? = null
         Observable.fromCallable {
             return@fromCallable RepositoryProvider.getSteemRepository().uploadImage(uri)
         }.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext {
                     Log.d("uploadNewPhoto", "doOnNext: ${it.toString()}")
-                    lastUploadedPhotoUrl = it
+                    result = it
                 }
                 .doOnComplete {
                     Log.d("uploadNewPhoto", "doOnComplete")
-                    if (lastUploadedPhotoUrl != null && !lastUploadedPhotoUrl.toString().equals("http://empty.com", true)) {
-                        callback.onSuccessRequestFinish()
+                    if (result != null && !result.toString().equals("http://empty.com", true)) {
+                        callback.onSuccessRequestFinish(result)
                     } else {
                         callback.onFailureRequestFinish(NetworkResponseCode.UNKNOWN_ERROR, Throwable("Image uploading error"))
                     }
@@ -141,9 +144,9 @@ class NetworkRepositoryDefault : NetworkRepository {
                 .subscribe()
     }
 
-    override fun loadExtendedUserProfile(nick: String, callback: NetworkRepository.OnRequestFinishCallback) {
+    override fun loadExtendedUserProfile(nick: String, callback: NetworkRepository.OnRequestFinishCallback<ProfileResponse?>) {
         if (extendedProfileResponse != null) {
-            callback.onSuccessRequestFinish()
+            callback.onSuccessRequestFinish(extendedProfileResponse)
             return
         }
         // update current currencies
@@ -154,7 +157,7 @@ class NetworkRepositoryDefault : NetworkRepository {
                 .subscribe(
                         { contributor ->
                             extendedProfileResponse = contributor
-                            callback.onSuccessRequestFinish()
+                            callback.onSuccessRequestFinish(extendedProfileResponse)
 
                         },
                         { throwable ->
@@ -168,7 +171,7 @@ class NetworkRepositoryDefault : NetworkRepository {
                 )
     }
 
-    override fun loadFullStartData(nick: String, callback: NetworkRepository.OnRequestFinishCallback) {
+    override fun loadFullStartData(nick: String, callback: NetworkRepository.OnRequestFinishCallback<Any?>) {
         val coinmarketcapToUsdFloawable: Observable<Array<CoinmarketcapCurrency>> = getObservableForCurrency("steem")//.onErrorResumeNext { s: Subscriber<in Array<CoinmarketcapCurrency>>? -> Log.d("NetworkRepoDef", "steemToUsd error loading") }
         val coinmarketcapDollarToUsdFlowable: Observable<Array<CoinmarketcapCurrency>> = getObservableForCurrency("steem-dollars")//.onErrorResumeNext { s: Subscriber<in Array<CoinmarketcapCurrency>>? -> Log.d("NetworkRepoDef", "steemDollarToUsd error loading") }
         val balanceVestFlowable: Observable<Array<Double>> = getBalanceVetstObservable()//.onErrorResumeNext { s: Subscriber<in Array<Double>>? -> Log.d("NetworkRepoDef", "balanceVests error loading") }
@@ -216,14 +219,14 @@ class NetworkRepositoryDefault : NetworkRepository {
                 .observeOn(AndroidSchedulers.mainThread())
                 .onExceptionResumeNext {
                     Log.d("NetworkRepository", "loadFullStartData >> onExceptionResumeNext")
-                    callback.onSuccessRequestFinish()
+                    callback.onSuccessRequestFinish("")
                 }
                 .doOnError {
                     Log.d("NetworkRepository", "loadFullStartData >> doOnError")
 //                    callback.onSuccessRequestFinish()
                 }.doOnComplete {
                     Log.d("NetworkRepository", "loadFullStartData >> doOnComplete")
-                    callback.onSuccessRequestFinish()
+                    callback.onSuccessRequestFinish("")
                 }
                 .subscribe()
 
@@ -290,8 +293,50 @@ class NetworkRepositoryDefault : NetworkRepository {
         return getRequestsApi("https://steemit.com/", null).loadFeedFullData(name, permlink)
     }
 
-    private fun loadFeedFullData() {
+    override fun loadTradingPairs(callback: NetworkRepository.OnRequestFinishCallback<Array<TradingPairInfo>>) {
+        getRequestsApi("https://blocktrades.us:443/api/v2/", null)
+                .loadAllTradingPairs()
+                .timeout(30, TimeUnit.SECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        { contributor ->
+                            callback.onSuccessRequestFinish(contributor ?: arrayOf())
+                        },
+                        { throwable ->
+                            if (throwable is TimeoutException || throwable is IOException) {
+                                callback.onFailureRequestFinish(NetworkResponseCode.CONNECTION_ERROR, throwable)
+                            } else {
+                                callback.onFailureRequestFinish(NetworkResponseCode.UNKNOWN_ERROR, throwable)
+                            }
 
+                        }
+                )
     }
 
+    override fun loadOutputAmount(requestData : AmountRequestData, callback: NetworkRepository.OnRequestFinishCallback<OutputAmount>) {
+        val params = hashMapOf<String, String>()
+        params["inputAmount"] = requestData.value.toString()
+        params["inputCoinType"] = requestData.inputType
+        params["outputCoinType"] = requestData.outputType
+        getRequestsApi("https://blocktrades.us:443/api/v2/", null)
+                .getOutputAmount(params)
+                .timeout(30, TimeUnit.SECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        { contributor ->
+                            callback.onSuccessRequestFinish(contributor ?: OutputAmount())
+
+                        },
+                        { throwable ->
+                            if (throwable is TimeoutException || throwable is IOException) {
+                                callback.onFailureRequestFinish(NetworkResponseCode.CONNECTION_ERROR, throwable)
+                            } else {
+                                callback.onFailureRequestFinish(NetworkResponseCode.UNKNOWN_ERROR, throwable)
+                            }
+
+                        }
+                )
+    }
 }

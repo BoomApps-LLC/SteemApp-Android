@@ -90,9 +90,9 @@ class SignInViewModel : BaseViewModel() {
     }
 
     private fun loadFullAdditionalData(nick: String) {
-        RepositoryProvider.getNetworkRepository().loadFullStartData(nick, object : NetworkRepository.OnRequestFinishCallback {
+        RepositoryProvider.getNetworkRepository().loadFullStartData(nick, object : NetworkRepository.OnRequestFinishCallback<Any?> {
 
-            override fun onSuccessRequestFinish() {
+            override fun onSuccessRequestFinish(response: Any?) {
                 state.value = ViewState.SUCCESS_RESULT
             }
 

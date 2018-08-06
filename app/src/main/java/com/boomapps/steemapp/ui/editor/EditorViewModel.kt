@@ -124,11 +124,11 @@ class EditorViewModel : BaseViewModel() {
             }
             RepositoryProvider.getNetworkRepository().uploadNewPhoto(
                     uri,
-                    object : NetworkRepository.OnRequestFinishCallback {
+                    object : NetworkRepository.OnRequestFinishCallback<URL?> {
 
-                        override fun onSuccessRequestFinish() {
+                        override fun onSuccessRequestFinish(response: URL?) {
                             successCode = SUCCESS_IMAGE_UPLOAD
-                            uploadedImageUrl = RepositoryProvider.getNetworkRepository().lastUploadedPhotoUrl
+                            uploadedImageUrl = response
                             state.value = ViewState.SUCCESS_RESULT
                             uploadTakenPhoto = false
                             uploadPickedPhoto = false
@@ -193,8 +193,8 @@ class EditorViewModel : BaseViewModel() {
 
     }
 
-    private var postCallback: NetworkRepository.OnRequestFinishCallback = object : NetworkRepository.OnRequestFinishCallback {
-        override fun onSuccessRequestFinish() {
+    private var postCallback: NetworkRepository.OnRequestFinishCallback<Any?> = object : NetworkRepository.OnRequestFinishCallback<Any?> {
+        override fun onSuccessRequestFinish(response : Any?) {
             processSuccessPosting()
         }
 

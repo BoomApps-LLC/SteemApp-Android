@@ -70,7 +70,7 @@
           android:resource="@xml/provider_paths"/>
     </provider>
 
-    <activity android:name=".ui.currency.CurrencyActivity">
+    <activity android:name=".ui.currencies.CurrenciesActivity">
     </activity>
   </application>
 
