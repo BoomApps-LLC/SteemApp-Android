@@ -1,198 +1,295 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/violet"
-    android:orientation="vertical"
-    tools:context=".ui.main.WalletFragment">
+    tools:context=".ui.main.WalletFragment"
+    >
+  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical"
+      >
+
+    <ImageView
+        android:id="@+id/profileAvatar"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="36dp"
+        android:src="@drawable/ic_account_circle_black_24dp"
+        />
 
     <TextView
-        android:id="@+id/myBalanceLabel"
-        android:layout_width="match_parent"
+        android:id="@+id/profileFullName"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="24dp"
-        android:text="My Balance"
-        android:textColor="@color/violetText"
-        android:textSize="40sp"
-        android:textStyle="bold" />
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:textSize="12sp"
+        tools:text="username | 59"
+        style="@style/Text.White"
+        />
+
 
     <TextView
         android:id="@+id/myBalanceValue"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="48dp"
+        android:layout_marginBottom="8dp"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="12dp"
         android:text="$10 000"
         android:textColor="@android:color/white"
         android:textSize="40sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        />
+
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="4dp"
+        android:background="@color/textGray"
+        />
+
+    <RelativeLayout
+        android:id="@+id/rlCurrency"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/listPreferredItemHeight"
+        >
+      <ImageView
+          android:id="@+id/ivCurrency"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_centerInParent="true"
+          android:layout_margin="8dp"
+          android:padding="4dp"
+          android:src="@drawable/ic_currency_grey"
+          />
+
+      <TextView
+          android:id="@+id/tvCurrencyFrom"
+          android:layout_width="wrap_content"
+          android:layout_height="match_parent"
+          android:layout_marginRight="24dp"
+          android:layout_toStartOf="@id/ivCurrency"
+          android:gravity="center_vertical|right"
+          android:textSize="17sp"
+          android:textStyle="bold"
+          tools:text="STEEM"
+          style="@style/Text.White"
+          />
+
+
+      <TextView
+          android:id="@+id/tvCurrencyTo"
+          android:layout_width="wrap_content"
+          android:layout_height="match_parent"
+          android:layout_marginStart="24dp"
+          android:layout_toEndOf="@id/ivCurrency"
+          android:gravity="center_vertical|left"
+          android:textSize="17sp"
+          android:textStyle="bold"
+          tools:text="USD"
+          style="@style/Text.White"
+          />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="4dp"
+        android:background="@color/textGray"
+        />
 
     <LinearLayout
         android:id="@+id/feedbackControl"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginTop="16dp"
         android:layout_weight="2"
         android:clickable="true"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        >
 
-        <LinearLayout
-            android:id="@+id/profileFeedbackControl"
+      <LinearLayout
+          android:id="@+id/profileFeedbackControl"
+          android:layout_width="match_parent"
+          android:layout_height="48dp"
+          android:layout_marginBottom="8dp"
+          android:background="?android:attr/selectableItemBackground"
+          android:clickable="true"
+          android:orientation="horizontal"
+          >
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="center_vertical|left"
+            android:layout_marginStart="16dp"
+            android:duplicateParentState="true"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_feedback_selector"
+            />
+
+        <TextView
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginBottom="8dp"
-            android:background="?selectableItemBackground"
-            android:clickable="true"
-            android:orientation="horizontal">
+            android:layout_height="match_parent"
+            android:layout_marginStart="24dp"
+            android:duplicateParentState="true"
+            android:gravity="center_vertical|left"
+            android:text="Feedback"
+            android:textSize="16sp"
+            style="@style/Text.White"
+            />
 
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_gravity="center_vertical|left"
-                android:layout_marginLeft="16dp"
-                android:duplicateParentState="true"
-                android:scaleType="fitXY"
-                android:src="@drawable/ic_feedback_selector" />
+      </LinearLayout>
 
-            <TextView
-                style="@style/Text.White"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="24dp"
-                android:duplicateParentState="true"
-                android:gravity="center_vertical|left"
-                android:text="Feedback"
-                android:textSize="16sp" />
+      <LinearLayout
+          android:id="@+id/profileShareControl"
+          android:layout_width="match_parent"
+          android:layout_height="48dp"
+          android:layout_marginBottom="8dp"
+          android:background="?android:attr/selectableItemBackground"
+          android:clickable="true"
+          android:orientation="horizontal"
+          >
 
-        </LinearLayout>
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="center_vertical|left"
+            android:layout_marginStart="16dp"
+            android:duplicateParentState="true"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_share_selector"
+            />
 
-        <LinearLayout
-            android:id="@+id/profileShareControl"
+        <TextView
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginBottom="8dp"
-            android:background="?selectableItemBackground"
-            android:clickable="true"
-            android:orientation="horizontal">
+            android:layout_height="match_parent"
+            android:layout_marginStart="24dp"
+            android:duplicateParentState="true"
+            android:gravity="center_vertical|left"
+            android:text="Share the App"
+            android:textSize="16sp"
+            style="@style/Text.White"
+            />
 
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_gravity="center_vertical|left"
-                android:layout_marginLeft="16dp"
-                android:duplicateParentState="true"
-                android:scaleType="fitXY"
-                android:src="@drawable/ic_share_selector" />
+      </LinearLayout>
 
-            <TextView
-                style="@style/Text.White"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="24dp"
-                android:duplicateParentState="true"
-                android:gravity="center_vertical|left"
-                android:text="Share the App"
-                android:textSize="16sp" />
+      <LinearLayout
+          android:id="@+id/profileRateControl"
+          android:layout_width="match_parent"
+          android:layout_height="48dp"
+          android:layout_marginBottom="8dp"
+          android:background="?android:attr/selectableItemBackground"
+          android:clickable="true"
+          android:orientation="horizontal"
+          >
 
-        </LinearLayout>
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="center_vertical|left"
+            android:layout_marginStart="16dp"
+            android:duplicateParentState="true"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_rate_selector"
+            />
 
-        <LinearLayout
-            android:id="@+id/profileRateControl"
+        <TextView
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginBottom="8dp"
-            android:background="?selectableItemBackground"
-            android:clickable="true"
-            android:orientation="horizontal">
+            android:layout_height="match_parent"
+            android:layout_marginStart="24dp"
+            android:duplicateParentState="true"
+            android:gravity="center_vertical|left"
+            android:text="Rate the App"
+            android:textSize="16sp"
+            style="@style/Text.White"
+            />
 
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_gravity="center_vertical|left"
-                android:layout_marginLeft="16dp"
-                android:duplicateParentState="true"
-                android:scaleType="fitXY"
-                android:src="@drawable/ic_rate_selector" />
+      </LinearLayout>
 
-            <TextView
-                style="@style/Text.White"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="24dp"
-                android:duplicateParentState="true"
-                android:gravity="center_vertical|left"
-                android:text="Rate the App"
-                android:textSize="16sp" />
+      <View
+          android:layout_width="match_parent"
+          android:layout_height="1dp"
+          android:layout_marginBottom="4dp"
+          android:layout_marginTop="8dp"
+          android:background="@color/textGray"
+          />
 
-        </LinearLayout>
+      <LinearLayout
+          android:id="@+id/profileSignOutControl"
+          android:layout_width="match_parent"
+          android:layout_height="48dp"
+          android:background="?android:attr/selectableItemBackground"
+          android:clickable="true"
+          android:orientation="horizontal"
+          >
 
-        <View
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center_vertical|left"
+            android:layout_marginStart="16dp"
+            android:duplicateParentState="true"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_exit_selector"
+            />
+
+        <TextView
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginBottom="4dp"
-            android:layout_marginTop="8dp"
-            android:background="@color/textGray" />
+            android:layout_height="match_parent"
+            android:layout_marginStart="24dp"
+            android:duplicateParentState="true"
+            android:gravity="center_vertical|left"
+            android:text="Sign Out"
+            android:textSize="16sp"
+            style="@style/Text.White"
+            />
 
-        <LinearLayout
-            android:id="@+id/profileSignOutControl"
+      </LinearLayout>
+
+      <View
+          android:layout_width="match_parent"
+          android:layout_height="1dp"
+          android:layout_marginTop="4dp"
+          android:background="@color/textGray"
+          />
+
+      <LinearLayout
+          android:id="@+id/poweredBy"
+          android:layout_width="match_parent"
+          android:layout_height="48dp"
+          android:layout_marginBottom="8dp"
+          android:layout_marginTop="16dp"
+          android:background="?android:attr/selectableItemBackground"
+          android:clickable="true"
+          android:orientation="horizontal"
+          >
+
+        <TextView
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="?selectableItemBackground"
-            android:clickable="true"
-            android:orientation="horizontal">
+            android:layout_height="match_parent"
+            android:duplicateParentState="true"
+            android:gravity="center"
+            android:text="@string/adsactly_powered"
+            android:textSize="16sp"
+            style="@style/Text.White"
+            />
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_gravity="center_vertical|left"
-                android:layout_marginLeft="16dp"
-                android:duplicateParentState="true"
-                android:scaleType="fitXY"
-                android:src="@drawable/ic_exit_selector" />
-
-            <TextView
-                style="@style/Text.White"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="24dp"
-                android:duplicateParentState="true"
-                android:gravity="center_vertical|left"
-                android:text="Sign Out"
-                android:textSize="16sp" />
-
-        </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="4dp"
-            android:background="@color/textGray" />
-
-        <LinearLayout
-            android:id="@+id/poweredBy"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginBottom="8dp"
-            android:background="?selectableItemBackground"
-            android:clickable="true"
-            android:orientation="horizontal">
-
-            <TextView
-                style="@style/Text.White"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginRight="32dp"
-                android:duplicateParentState="true"
-                android:gravity="center_vertical|right"
-                android:text="@string/adsactly_powered"
-                android:textSize="16sp" />
-
-        </LinearLayout>
+      </LinearLayout>
 
     </LinearLayout>
 
 
-</LinearLayout>
+  </LinearLayout>
+
+
+</ScrollView>
+

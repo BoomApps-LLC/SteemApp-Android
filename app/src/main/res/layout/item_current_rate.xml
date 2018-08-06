@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="?android:attr/listPreferredItemHeight"
+    >
+
+  <ImageView
+      android:id="@+id/iCurrentRate_ivRate"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginBottom="8dp"
+      android:layout_marginEnd="8dp"
+      android:layout_marginStart="8dp"
+      android:layout_marginTop="8dp"
+      android:adjustViewBounds="true"
+      android:padding="4dp"
+      android:scaleType="fitCenter"
+      android:src="@drawable/ic_current_rate"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintVertical_bias="0.6"
+      />
+
+  <TextView
+      android:id="@+id/iCurrentRate_tvFrom"
+      android:layout_width="wrap_content"
+      android:layout_height="0dp"
+      android:layout_margin="8dp"
+      android:gravity="center_vertical|left"
+      android:minWidth="60dp"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toStartOf="@id/iCurrentRate_ivRate"
+      app:layout_constraintHorizontal_bias="0.9"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      tools:text="STEEM"
+      />
+
+  <TextView
+      android:id="@+id/iCurrentRate_tvTo"
+      android:layout_width="wrap_content"
+      android:layout_height="0dp"
+      android:layout_margin="8dp"
+      android:gravity="center_vertical|right"
+      android:minWidth="60dp"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHorizontal_bias="0.1"
+      app:layout_constraintStart_toEndOf="@id/iCurrentRate_ivRate"
+      app:layout_constraintTop_toTopOf="parent"
+      tools:text="USD"
+      />
+
+
+</android.support.constraint.ConstraintLayout>
