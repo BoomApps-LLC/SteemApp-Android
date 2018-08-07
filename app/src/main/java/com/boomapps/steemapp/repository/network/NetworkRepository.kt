@@ -45,4 +45,7 @@ interface NetworkRepository {
 
     fun loadOutputAmount(requestData : AmountRequestData, callback: NetworkRepository.OnRequestFinishCallback<OutputAmount>)
 
+    fun loadOutputAmounts(requestData : ArrayList<AmountRequestData>, callback: NetworkRepository
+    .OnRequestFinishCallback<ArrayList<OutputAmount>>)
+
 }

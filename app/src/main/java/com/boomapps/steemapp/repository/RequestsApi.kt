@@ -17,21 +17,21 @@ import retrofit2.http.*
  */
 interface RequestsApi {
 
+  @GET("@{userExtended}.json")
+  fun loadProfileExtendedData(@Path("userExtended") user: String): Observable<ProfileResponse>
 
-    @GET("@{userExtended}.json")
-    fun loadProfileExtendedData(@Path("userExtended") user: String): Observable<ProfileResponse>
+  @GET("{currency_name}")
+  fun loadCurrencyFor(@Path("currency_name") user: String): Observable<Array<CoinmarketcapCurrency>>
 
-    @GET("{currency_name}")
-    fun loadCurrencyFor(@Path("currency_name") user: String): Observable<Array<CoinmarketcapCurrency>>
+  @GET("@{username}/{permlink}.json")
+  fun loadFeedFullData(@Path("username") username: String, @Path("permlink") permlink: String): Observable<FeedFullData>
 
-    @GET("@{username}/{permlink}.json")
-    fun loadFeedFullData(@Path("username") username: String, @Path("permlink") permlink: String): Observable<FeedFullData>
+  @GET("trading-pairs")
+  fun loadAllTradingPairs(): Observable<Array<TradingPairInfo>>
 
+  @GET("estimate-output-amount")
+  fun getOutputAmount(@QueryMap params: Map<String, String>): Observable<OutputAmount>
 
-    @GET("trading-pairs")
-    fun loadAllTradingPairs(): Observable<Array<TradingPairInfo>>
-
-
-    @GET("estimate-output-amount")
-    fun getOutputAmount(@QueryMap params: Map<String, String>) : Observable<OutputAmount>
+  @GET("estimate-output-amount")
+  fun getOutputAmountSync(@QueryMap params: Map<String, String>): OutputAmount
 }
