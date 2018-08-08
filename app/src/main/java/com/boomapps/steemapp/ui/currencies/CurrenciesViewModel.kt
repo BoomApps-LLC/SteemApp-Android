@@ -25,17 +25,35 @@ class CurrenciesViewModel : BaseViewModel() {
 
     RepositoryProvider.getNetworkRepository()
         .loadOutputAmounts(requestedCurrencies, amountsCallback)
-
-    for (r in requestedCurrencies) {
-      RepositoryProvider.getNetworkRepository()
-          .loadOutputAmount(r, callback)
-    }
+//
+//    for (r in requestedCurrencies) {
+//      RepositoryProvider.getNetworkRepository()
+//          .loadOutputAmount(r, callback)
+//    }
   }
 
   private val amountsCallback = object : NetworkRepository.OnRequestFinishCallback<ArrayList<OutputAmount>> {
 
     override fun onSuccessRequestFinish(newData: ArrayList<OutputAmount>) {
-      data.value = newData
+      var steemToUsd = 1.0f
+      var ethToSteem = 1.0f
+      var sbdToSteem = 1.0f
+      if (newData != null) {
+        for (item in newData) {
+          when (item.inputCoinType) {
+            "steem" -> steemToUsd = item.outputAmount
+            "eth" -> ethToSteem = item.outputAmount
+            "sbd" -> sbdToSteem = item.outputAmount
+          }
+        }
+      }
+      val formattedData = arrayListOf<OutputAmount>()
+      formattedData.addAll(newData.filter { it.inputCoinType == "steem" })
+      formattedData.add(OutputAmount(1.0f, "sbd", sbdToSteem * steemToUsd, "bitusd"))
+      formattedData.addAll(newData.filter { it.inputCoinType == "bts" })
+      formattedData.addAll(newData.filter { it.inputCoinType == "btc" })
+      formattedData.add(OutputAmount(1.0f, "eth", ethToSteem * steemToUsd, "bitusd"))
+      data.value = formattedData
     }
 
     override fun onFailureRequestFinish(
@@ -67,10 +85,10 @@ class CurrenciesViewModel : BaseViewModel() {
 
   val requestedCurrencies = arrayListOf(
       AmountRequestData(1.0f, "steem", "bitusd"),
-      AmountRequestData(1.0f, "sbd", "bitusd"), // through steem <> bitusd
+//      AmountRequestData(1.0f, "sbd", "bitusd"), // through steem <> bitusd
       AmountRequestData(1.0f, "bts", "bitusd"), // +
       AmountRequestData(1.0f, "btc", "bitusd"), // +
-      AmountRequestData(1.0f, "eth", "bitusd"), // through steem <> bitusd
+//      AmountRequestData(1.0f, "eth", "bitusd"), // through steem <> bitusd
       AmountRequestData(1.0f, "eth", "steem"),
       AmountRequestData(1.0f, "sbd", "steem")
   )

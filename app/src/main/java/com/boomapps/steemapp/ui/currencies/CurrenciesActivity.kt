@@ -7,100 +7,127 @@ import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
+import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.RecyclerView.ItemDecoration
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.TextPaint
 import android.text.style.ClickableSpan
+import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import com.boomapps.steemapp.R
 import com.boomapps.steemapp.repository.currency.OutputAmount
 import com.boomapps.steemapp.ui.BaseActivity
 import com.boomapps.steemapp.ui.ViewState
-import kotlinx.android.synthetic.main.activity_current_rate.*
+import kotlinx.android.synthetic.main.activity_current_rate.aCurrentRate_rvList
+import kotlinx.android.synthetic.main.activity_current_rate.aCurrentRate_tvPowered
 
 class CurrenciesActivity : BaseActivity() {
 
+  lateinit var viewModel: CurrenciesViewModel
+  lateinit var currenciesList: RecyclerView
 
-    lateinit var viewModel: CurrenciesViewModel
-    lateinit var currenciesList: RecyclerView
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_current_rate)
-        viewModel = ViewModelProviders.of(this).get(CurrenciesViewModel::class.java)
-        viewModel.state.observe(this, object : Observer<ViewState> {
-            override fun onChanged(t: ViewState?) {
-                when (t) {
-                    ViewState.COMMON -> {
-                        dismissProgress()
-                    }
-                    ViewState.PROGRESS -> {
-                        showProgress("Processing ...")
-                    }
-                }
-            }
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_current_rate)
+    val bar = supportActionBar
+    if (bar != null) {
+      bar.setDisplayHomeAsUpEnabled(true)
+    }
+    viewModel = ViewModelProviders.of(this)
+        .get(CurrenciesViewModel::class.java)
+    viewModel.state.observe(this, object : Observer<ViewState> {
+      override fun onChanged(t: ViewState?) {
+        when (t) {
+          ViewState.COMMON -> {
+            dismissProgress()
+          }
+          ViewState.PROGRESS -> {
+            showProgress("Processing ...")
+          }
+        }
+      }
+    })
+    setPoweredText()
+    setCurrenciesList()
+    viewModel.getCurrencies()
+        .observe(this, Observer<ArrayList<OutputAmount>> { data ->
+          if (data != null) {
+            (currenciesList.adapter as CurrenciesListAdapter).addCurrencies(data)
+          }
         })
-        setPoweredText()
-        setCurrenciesList()
-        viewModel.getCurrencies()
-                .observe(this, Observer<ArrayList<OutputAmount>> { data ->
-                    if (data != null) {
-                        (currenciesList.adapter as CurrenciesListAdapter).addCurrencies(data)
-                    }
-                })
+  }
+
+  override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    if (item.itemId == android.R.id.home) {
+      finish()
+      return true
+    }
+    return super.onOptionsItemSelected(item)
+  }
+
+  override fun dismissProgress() {
+
+  }
+
+  override fun showProgress(message: String) {
+
+  }
+
+  fun setCurrenciesList() {
+    currenciesList = aCurrentRate_rvList
+    val manager = LinearLayoutManager(this)
+    manager.orientation = LinearLayoutManager.VERTICAL
+    currenciesList.layoutManager = manager
+    currenciesList.itemAnimator = DefaultItemAnimator()
+    currenciesList.addItemDecoration(object : ItemDecoration() {
+
+    })
+    currenciesList.adapter = CurrenciesListAdapter(this)
+
+  }
+
+  private fun setPoweredText() {
+    val powered1 = getString(R.string.blocktrades_powered_1)
+    val powered2 = getString(R.string.blocktrades_powered_2)
+    val fullPoweredString = powered1.plus(" ")
+        .plus(powered2)
+    val clSpan = object : ClickableSpan() {
+
+      override fun onClick(widget: View) {
+        Toast.makeText(this@CurrenciesActivity, "CLICK ON SPAN", Toast.LENGTH_LONG)
+            .show()
+        this@CurrenciesActivity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://blocktrades.us")))
+      }
+
+      override fun updateDrawState(ds: TextPaint?) {
+        super.updateDrawState(ds)
+        ds?.color = ContextCompat.getColor(this@CurrenciesActivity, R.color.violet)
+        ds?.isUnderlineText = false
+        ds?.typeface = Typeface.DEFAULT_BOLD
+      }
     }
 
-    override fun dismissProgress() {
-
+    if (fullPoweredString.indexOf(powered2) > -1) {
+      val spannableString = SpannableString(fullPoweredString)
+      spannableString.setSpan(
+          clSpan,
+          fullPoweredString.indexOf(powered2),
+          fullPoweredString.indexOf(powered2) + powered2.length,
+          Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+      )
+      aCurrentRate_tvPowered.setText(spannableString)
+    } else {
+      aCurrentRate_tvPowered.text = fullPoweredString
     }
-
-    override fun showProgress(message: String) {
-
+    aCurrentRate_tvPowered.setOnClickListener {
+      Toast.makeText(this@CurrenciesActivity, "CLICK ON SPAN", Toast.LENGTH_LONG)
+          .show()
+      this@CurrenciesActivity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://blocktrades.us")))
     }
-
-    fun setCurrenciesList() {
-        currenciesList = aCurrentRate_rvList
-        val manager = LinearLayoutManager(this)
-        manager.orientation = LinearLayoutManager.VERTICAL
-        currenciesList.layoutManager = manager
-        currenciesList.adapter = CurrenciesListAdapter(this)
-
-    }
-
-
-    private fun setPoweredText() {
-        val powered1 = getString(R.string.blocktrades_powered_1)
-        val powered2 = getString(R.string.blocktrades_powered_2)
-        val fullPoweredString = powered1.plus(" ")
-                .plus(powered2)
-        val clSpan = object : ClickableSpan() {
-            override fun onClick(widget: View?) {
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://blocktrades.us")))
-            }
-
-            override fun updateDrawState(ds: TextPaint?) {
-                super.updateDrawState(ds)
-                ds?.color = ContextCompat.getColor(this@CurrenciesActivity, R.color.violet)
-                ds?.isUnderlineText = false
-                ds?.typeface = Typeface.DEFAULT_BOLD
-            }
-        }
-
-        if (fullPoweredString.indexOf(powered2) > -1) {
-            val spannableString = SpannableString(fullPoweredString)
-            spannableString.setSpan(
-                    clSpan,
-                    fullPoweredString.indexOf(powered2),
-                    fullPoweredString.indexOf(powered2) + powered2.length,
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
-            aCurrentRate_tvPowered.text = spannableString
-        } else {
-            aCurrentRate_tvPowered.text = fullPoweredString
-        }
-
-    }
+  }
 
 }

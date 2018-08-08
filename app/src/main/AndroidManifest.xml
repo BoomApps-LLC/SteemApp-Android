@@ -70,7 +70,9 @@
           android:resource="@xml/provider_paths"/>
     </provider>
 
-    <activity android:name=".ui.currencies.CurrenciesActivity">
+    <activity android:name=".ui.currencies.CurrenciesActivity"
+        android:theme="@style/AppTheme"
+        android:label="Current Rate">
     </activity>
   </application>
 

@@ -21,6 +21,7 @@ import com.boomapps.steemapp.repository.feed.FeedFullData
 import com.boomapps.steemapp.repository.feed.ServerDate
 import com.boomapps.steemapp.repository.feed.ServerDateSerialiizer
 import com.boomapps.steemapp.repository.network.NetworkRepository.OnRequestFinishCallback
+import com.boomapps.steemapp.repository.network.NetworkResponseCode.UNKNOWN_ERROR
 import com.boomapps.steemapp.repository.steem.SteemAnswerCodes
 import com.google.gson.GsonBuilder
 import io.reactivex.Observable
@@ -400,37 +401,63 @@ class NetworkRepositoryDefault : NetworkRepository {
     requestData: ArrayList<AmountRequestData>,
     callback: OnRequestFinishCallback<ArrayList<OutputAmount>>
   ) {
-
-    val result: ArrayList<OutputAmount> = arrayListOf()
-
-    val params = hashMapOf<String, String>()
-    params["inputAmount"] = ""
-    params["inputCoinType"] = ""
-    params["outputCoinType"] = ""
-    Observable
-        .fromIterable(requestData)
-        .debounce(200, MILLISECONDS)
+    Observable.fromIterable(requestData)
         .subscribeOn(Schedulers.io())
         .observeOn(Schedulers.io())
+        .flatMap {
+          val params = hashMapOf<String, String>()
+          params["inputAmount"] = it.value.toString()
+          params["inputCoinType"] = it.inputType
+          params["outputCoinType"] = it.outputType
+          return@flatMap getRequestsApi("https://blocktrades.us:443/api/v2/", null)
+              .getOutputAmount(params)
+        }
+        .toList()
+        .observeOn(AndroidSchedulers.mainThread())
         .subscribe(
             {
-              if (it != null) {
-                params["inputAmount"] = it.value.toString()
-                params["inputCoinType"] = it.inputType
-                params["outputCoinType"] = it.outputType
-                val response = getRequestsApi("https://blocktrades.us:443/api/v2/", null)
-                    .getOutputAmountSync(params)
-                if (response != null) {
-                  result.add(response)
-                }
-              }
-            },
-            {
-              Timber.e(it?.message ?: "Unknown error")
-            },
-            {
+              val result = arrayListOf<OutputAmount>()
+              result.addAll(it)
               callback.onSuccessRequestFinish(result)
-            }
-        )
+            },
+            {
+              callback.onFailureRequestFinish(UNKNOWN_ERROR, it)
+            })
+
+//    Observable
+//        .fromIterable(requestData)
+//        .debounce(200, MILLISECONDS)
+//        .subscribeOn(Schedulers.io())
+//        .observeOn(Schedulers.io())
+//
+//        .doOnNext {
+//          if (it != null) {
+//            params["inputAmount"] = it.value.toString()
+//            params["inputCoinType"] = it.inputType
+//            params["outputCoinType"] = it.outputType
+//            return@doOnNext getRequestsApi("https://blocktrades.us:443/api/v2/", null)
+//                .getOutputAmount(params)
+//          }
+//        }
+//        .subscribe(
+//            {
+//              if (it != null) {
+//                params["inputAmount"] = it.value.toString()
+//                params["inputCoinType"] = it.inputType
+//                params["outputCoinType"] = it.outputType
+//                val response = getRequestsApi("https://blocktrades.us:443/api/v2/", null)
+//                    .getOutputAmountSync(params)
+//                if (response != null) {
+//                  result.add(response)
+//                }
+//              }
+//            },
+//            {
+//              Timber.e(it?.message ?: "Unknown error")
+//            },
+//            {
+//              callback.onSuccessRequestFinish(result)
+//            }
+//        )
   }
 }

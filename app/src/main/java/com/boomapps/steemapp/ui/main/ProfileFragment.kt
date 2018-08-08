@@ -124,7 +124,7 @@ class ProfileFragment : Fragment() {
 
         view.profileFeedbackControl.setOnClickListener {
             val intent = Intent(Intent.ACTION_SENDTO)
-            intent.data = Uri.parse("mailto:"); // only email apps should handle this
+            intent.data = Uri.parse("mailto:") // only email apps should handle this
             intent.putExtra(Intent.EXTRA_EMAIL, arrayOf("support@steemitapp.com"))
             intent.putExtra(Intent.EXTRA_SUBJECT, "Feedback")
             if (intent.resolveActivity(activity?.packageManager) != null) {

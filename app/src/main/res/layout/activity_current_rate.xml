@@ -7,27 +7,6 @@
     android:layout_height="match_parent"
     >
 
-  <TextView
-      android:id="@+id/aCurrentRate_tvPowered"
-      android:layout_width="0dp"
-      android:layout_height="wrap_content"
-      android:layout_marginBottom="24dp"
-      android:layout_marginEnd="16dp"
-      android:layout_marginStart="16dp"
-      android:layout_marginTop="16dp"
-      android:gravity="center"
-      android:textSize="14sp"
-      android:visibility="visible"
-      style="@style/Text"
-      app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent"
-      app:layout_constraintVertical_bias="1.0"
-      android:clickable="true"
-      android:focusable="true"
-      tools:text="Powered by Blocktrades.us"
-      />
   <android.support.v7.widget.RecyclerView
       android:id="@+id/aCurrentRate_rvList"
       android:layout_width="0dp"
@@ -41,5 +20,28 @@
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="parent"
       tools:listitem="@layout/item_current_rate"
+      />
+
+
+  <TextView
+      android:id="@+id/aCurrentRate_tvPowered"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_marginBottom="24dp"
+      android:layout_marginEnd="16dp"
+      android:layout_marginStart="16dp"
+      android:layout_marginTop="16dp"
+      android:clickable="true"
+      android:focusable="true"
+      android:gravity="center"
+      android:textSize="20sp"
+      android:visibility="visible"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintVertical_bias="1.0"
+      tools:text="Powered by Blocktrades.us"
+      style="@style/Text"
       />
 </android.support.constraint.ConstraintLayout>
