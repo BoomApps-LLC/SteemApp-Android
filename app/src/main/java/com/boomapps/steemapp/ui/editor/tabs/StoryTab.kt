@@ -19,7 +19,6 @@ import com.boomapps.steemapp.ui.editor.EditorViewModel
 import jp.wasabeef.richeditor.RichEditor
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageButton
-import android.widget.Toast
 import com.boomapps.steemapp.utils.StyledText
 import org.jsoup.parser.Tag
 import timber.log.Timber
