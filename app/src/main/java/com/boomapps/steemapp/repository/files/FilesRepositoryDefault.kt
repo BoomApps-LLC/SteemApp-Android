@@ -16,12 +16,10 @@ import java.io.*
  */
 class FilesRepositoryDefault : FilesRepository {
 
-    override fun saveStory(value: String, stylesState: ArrayList<HashMap<String, Boolean>>,
-                           storyCallback: FilesRepository.StoryCallback?) {
+    override fun saveStory(value: String, storyCallback: FilesRepository.StoryCallback?) {
         Observable
                 .fromCallable({
                     saveStoryToFile(value)
-                    saveStylesToFile(stylesState)
                 }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnError {
@@ -52,33 +50,22 @@ class FilesRepositoryDefault : FilesRepository {
         Observable
                 .fromCallable({
                     story = readStory()
-                    stylesState = readStyles()
                 }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnError {
                     storyCallback.onError()
                 }
                 .doOnComplete {
-                    storyCallback.onLoadStory(story, stylesState)
+                    storyCallback.onLoadStory(story)
                 }
                 .subscribe()
     }
 
     var story: String = ""
-    var stylesState: ArrayList<HashMap<String, Boolean>> = arrayListOf()
 
     private fun saveStoryToFile(value: String) {
         SteemApplication.instance.openFileOutput("story.txt", Context.MODE_PRIVATE).use {
             it.write(value.toByteArray())
-        }
-    }
-
-    private fun saveStylesToFile(stylesState: ArrayList<HashMap<String, Boolean>>) {
-        SteemApplication.instance.openFileOutput("styles.obj", Context.MODE_PRIVATE).use {
-            val bufferedOutputStream = BufferedOutputStream(it)
-            val objectOutputStream = ObjectOutputStream(bufferedOutputStream)
-            objectOutputStream.writeObject(stylesState)
-            objectOutputStream.close()
         }
     }
 
@@ -94,24 +81,8 @@ class FilesRepositoryDefault : FilesRepository {
 
     }
 
-    private fun readStyles(): ArrayList<HashMap<String, Boolean>> {
-        val file = File(SteemApplication.instance.filesDir, "styles.obj")
-        if (!file.exists() || file.isDirectory || !file.canRead()) {
-            return arrayListOf()
-        }
-        // check on 1st is file exists
-        SteemApplication.instance.openFileInput("styles.obj").use {
-            val bufferedInputStream = BufferedInputStream(it)
-            val objectInputStream = ObjectInputStream(bufferedInputStream)
-            val styles = objectInputStream.readObject() as ArrayList<HashMap<String, Boolean>>
-            objectInputStream.close()
-            return styles
-        }
-    }
-
     private fun deleteStoryFile() {
         SteemApplication.instance.deleteFile("story.txt")
-        SteemApplication.instance.deleteFile("styles.obj")
     }
 
 }

@@ -1,3 +1,7 @@
+/*
+ * Copyright 2018, BoomApps LLC.
+ * All rights reserved.
+*/
 package jp.wasabeef.richeditor
 
 import android.webkit.JavascriptInterface
@@ -12,6 +16,11 @@ class WebAppInterface {
     @JavascriptInterface
     fun onTextClick(position: Int) {
         onTextClickListener?.onTextClick(position)
+    }
+
+    @JavascriptInterface
+    fun onTextSelect(begin: Int, end: Int) {
+        onTextClickListener?.onTextSelect(begin, end)
     }
 
 }

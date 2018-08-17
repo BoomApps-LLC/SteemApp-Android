@@ -26,7 +26,6 @@ class EditorViewModel : BaseViewModel() {
 
     var title: String = ""
     var story: String = ""
-    var styleState: ArrayList<HashMap<String, Boolean>> = arrayListOf()
     val categories: ArrayList<CategoryItem> = arrayListOf()
     var activeTab: Int = 0
     var inputCategory: String = ""
@@ -218,7 +217,7 @@ class EditorViewModel : BaseViewModel() {
 
     fun saveStoryData() {
         RepositoryProvider.getPreferencesRepository().saveStoryData(StoryInstance(title, story, categories))
-        RepositoryProvider.getFileRepository().saveStory(story, styleState, null)
+        RepositoryProvider.getFileRepository().saveStory(story,null)
     }
 
     fun loadStoryData() {
@@ -237,9 +236,8 @@ class EditorViewModel : BaseViewModel() {
 
                 }
 
-                override fun onLoadStory(story: String, stylesState: ArrayList<HashMap<String, Boolean>>) {
+                override fun onLoadStory(story: String) {
                     this@EditorViewModel.story = story
-                    this@EditorViewModel.styleState = stylesState
                 }
             })
             title = storyData.title

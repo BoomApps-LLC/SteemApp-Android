@@ -19,6 +19,9 @@ import com.boomapps.steemapp.ui.editor.EditorViewModel
 import jp.wasabeef.richeditor.RichEditor
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageButton
+import android.widget.Toast
+import com.boomapps.steemapp.utils.StyledText
+import org.jsoup.parser.Tag
 import timber.log.Timber
 
 
@@ -44,7 +47,7 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
     lateinit var insertLine: View
 
     private var isKeyboardOpened = true
-    private var position = 0
+    private val styledText = StyledText()
     private var state: HashMap<String, Boolean> = hashMapOf(
             "bold" to false,
             "italic" to false,
@@ -93,7 +96,6 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
                 val value = editor.html
                 viewModel.story = value
                 processFullDataChange(storyLength = value.length)
-                viewModel.styleState.add(position++, HashMap(state))
             })
             editor.setOnTextClickListener(this)
             editor.html = viewModel.story
@@ -167,9 +169,6 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
             switchButtonState("quote", quote)
             editor.setBlockquote()
         }
-//        actionsPanel.findViewById<View>(R.id.actionAlignLeft)?.setOnClickListener { editor.setAlignLeft() }
-//        actionsPanel.findViewById<View>(R.id.actionAlignCenter)?.setOnClickListener { editor.setAlignCenter() }
-//        actionsPanel.findViewById<View>(R.id.actionAlignRight)?.setOnClickListener { editor.setAlignRight() }
         insertLine = actionsPanel.findViewById<View>(R.id.actionInsertLine)
         insertLine.setOnClickListener {
             editor.insertHorizontalLine()
@@ -227,14 +226,14 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
                 val heightDiff = view.rootView.height - (r.bottom - r.top)
                 if (heightDiff > 300) {
                     isKeyboardOpened = true
-                    // kEYBOARD IS OPEN
+                    // KEYBOARD IS OPEN
                     keyboardButton.setImageResource(R.drawable.ic_keyboard_arrow_down)
                 } else {
                     if (isKeyboardOpened) {
                         isKeyboardOpened = false
                         keyboardButton.setImageResource(R.drawable.ic_keyboard_arrow_up)
                     }
-                    // kEYBOARD IS HIDDEN
+                    // KEYBOARD IS HIDDEN
                 }
             })
         } catch (e: Throwable) {
@@ -249,39 +248,57 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
     }
 
     override fun onTextClick(position: Int) {
-        this.position = position
-        state = viewModel.styleState[position]
-        updateStyleState()
+        val tags = StyledText().findTagsInHtml(position, viewModel.story)
+        updateStyleState(tags)
     }
 
-    private fun updateStyleState() {
-        for (s in state) {
-            when (s.key) {
-                "bold" -> updateButtonState(s.key, bold)
-                "italic" -> updateButtonState(s.key, italic)
-                "underline" -> updateButtonState(s.key, underline)
-                "strike" -> updateButtonState(s.key, strike)
-                "h1" -> updateButtonState(s.key, h1)
-                "h2" -> updateButtonState(s.key, h2)
-                "h3" -> updateButtonState(s.key, h3)
-                "bullet_list" -> updateButtonState(s.key, bulletList)
-                "numbered_list" -> updateButtonState(s.key, numberedList)
-                "quote" -> updateButtonState(s.key, quote)
-                "insert_line" -> updateButtonState(s.key, insertLine)
+    private fun updateStyleState(tags: List<Tag>) {
+        resetButtons()
+        for (tag in tags) {
+            when (tag.name) {
+                 styledText.styledTags.BOLD -> setButtonState(bold)
+                 styledText.styledTags.ITALIC -> setButtonState(italic)
+                 styledText.styledTags.UNDERLINE -> setButtonState(underline)
+                 styledText.styledTags.STRIKE -> setButtonState(strike)
+                 styledText.styledTags.H1 -> setButtonState(h1)
+                 styledText.styledTags.H2 -> setButtonState(h2)
+                 styledText.styledTags.H3 -> setButtonState(h3)
+                 styledText.styledTags.BULLET_LIST -> setButtonState(bulletList)
+                 styledText.styledTags.NUMBERED_LIST -> setButtonState(numberedList)
             }
         }
     }
 
-    private fun updateButtonState(key: String, view: View) {
-        val color =  if (this.state[key]!!) {
-            R.color.green_active
-        } else {
-            R.color.black
-        }
+    private fun resetButtons() {
+        resetButtonState(bold)
+        resetButtonState(italic)
+        resetButtonState(underline)
+        resetButtonState(strike)
+        resetButtonState(h1)
+        resetButtonState(h2)
+        resetButtonState(h3)
+        resetButtonState(bulletList)
+        resetButtonState(numberedList)
+    }
+
+    private fun resetButtonState(view: View) {
+        val color = R.color.black
         view.post {
             ImageViewCompat.setImageTintList(view as ImageButton,
                     ColorStateList.valueOf(ContextCompat.getColor(view.context, color)))
         }
+    }
+
+    private fun setButtonState(view: View) {
+        val color = R.color.green_active
+        view.post {
+            ImageViewCompat.setImageTintList(view as ImageButton,
+                    ColorStateList.valueOf(ContextCompat.getColor(view.context, color)))
+        }
+    }
+
+    override fun onTextSelect(begin: Int, end: Int) {
+        //do nothing
     }
 
 }

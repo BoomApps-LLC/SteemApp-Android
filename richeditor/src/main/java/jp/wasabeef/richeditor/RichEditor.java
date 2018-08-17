@@ -60,22 +60,20 @@ public class RichEditor extends WebView {
   }
 
   public interface OnTextChangeListener {
-
     void onTextChange(String text);
   }
 
   public interface OnDecorationStateListener {
-
     void onStateChangeListener(String text, List<Type> types);
   }
 
   public interface AfterInitialLoadListener {
-
     void onAfterInitialLoad(boolean isReady);
   }
 
   public interface OnTextClickListener {
     void onTextClick(int position);
+    void onTextSelect(int begin, int end);
   }
 
   private static final String SETUP_HTML = "file:///android_asset/editor.html";
