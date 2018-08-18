@@ -39,4 +39,6 @@ interface DaoRepository {
 
     fun deletePost(postEntity: PostEntity)
 
+    fun clearDB()
+
 }

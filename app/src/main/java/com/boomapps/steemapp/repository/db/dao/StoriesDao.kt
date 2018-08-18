@@ -55,4 +55,9 @@ interface StoriesDao {
     @Query("SELECT * FROM story_entities WHERE story_entity_id = :storyId")
     fun loadStorySync(storyId: Long): StoryEntity
 
+    @Query("DELETE FROM story_entities")
+    fun deleteAllStories()
+
+
+
 }

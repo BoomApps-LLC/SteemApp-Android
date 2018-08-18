@@ -49,7 +49,7 @@ class PostingTab(view: View, tabListener: TabListener, viewModel: EditorViewMode
         postButton = view.findViewById(R.id.postButton)
         postButton.setOnClickListener({
             if (viewModel.postingDelay <= 0) {
-                viewModel.publishStory()
+                viewModel.publishStory(null)
             } else {
                 showPostingDelayDialog()
             }

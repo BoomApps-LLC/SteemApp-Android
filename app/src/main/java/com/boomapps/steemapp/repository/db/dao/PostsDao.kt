@@ -32,5 +32,7 @@ interface PostsDao {
     @Query("SELECT * FROM post_entities WHERE post_entity_id=:id")
     fun loadPostLiveData(id: Long): LiveData<PostEntity>
 
+    @Query("DELETE FROM post_entities")
+    fun deleteAllPosts()
 
 }

@@ -34,11 +34,11 @@ interface SteemRepository {
      */
     fun login(nickname: String, postingKey: String?): SteemWorkerResponse
 
-    fun hasPostingKey() : Boolean
+    fun hasPostingKey(): Boolean
 
     fun signOut()
 
-    fun post(title: String, content: String, tags: Array<String>, postingKey: String, rewardsPercent: Short, upvote: Boolean): SteemWorker.PostingResult
+    fun post(title: String, content: String, tags: Array<String>, postingKey: String, rewardsPercent: Short, upvote: Boolean, permlink: String?): PostingResult
 
     fun uploadImage(uri: Uri): URL?
 
@@ -65,13 +65,9 @@ interface SteemRepository {
 
     fun getNewDataList(start: Int, limit: Int, storyEntity: StoryEntity?): Single<ArrayList<DiscussionData>>?
 
-    fun vote(postPermLink: String, percentage: Int)
+    fun vote(authorFor: String, postPermLink: String, percentage: Int): Boolean
 
-    fun vote(authorFor: String, postPermLink: String, percentage: Int) : Boolean
-
-    fun cancelVote(postPermLink: String)
-
-    fun cancelVote(author: String, postPermLink: String) : Boolean
+    fun cancelVote(author: String, postPermLink: String): Boolean
 
     fun unvoteWithUpdate(story: StoryEntity, type: FeedType, callback: Callback<Boolean>)
 
