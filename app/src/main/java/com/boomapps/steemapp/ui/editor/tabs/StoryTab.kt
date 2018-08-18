@@ -44,6 +44,7 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
     lateinit var numberedList: View
     lateinit var quote: View
     lateinit var insertLine: View
+    lateinit var link: View
 
     private var isKeyboardOpened = true
     private val styledText = StyledText()
@@ -172,8 +173,8 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
         insertLine.setOnClickListener {
             editor.insertHorizontalLine()
         }
-        val link = actionsPanel.findViewById<View>(R.id.actionAddLink)
-        link?.setOnClickListener {
+        link = actionsPanel.findViewById<View>(R.id.actionAddLink)
+        link.setOnClickListener {
             val fragment = InsertLinkDialogFragment.newInstance()
             fragment.setOnInsertClickListener(onInsertLinkClickListener)
             // TODO maybe pass call dialog to activity
@@ -264,6 +265,7 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
                  styledText.styledTags.H3 -> setButtonState(h3)
                  styledText.styledTags.BULLET_LIST -> setButtonState(bulletList)
                  styledText.styledTags.NUMBERED_LIST -> setButtonState(numberedList)
+                 styledText.styledTags.LINK -> setButtonState(link)
             }
         }
     }
@@ -278,6 +280,7 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
         resetButtonState(h3)
         resetButtonState(bulletList)
         resetButtonState(numberedList)
+        resetButtonState(link)
     }
 
     private fun resetButtonState(view: View) {
