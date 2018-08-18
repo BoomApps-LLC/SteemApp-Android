@@ -133,7 +133,7 @@ class EditorViewModel : BaseViewModel() {
                             uploadPickedPhoto = false
                         }
 
-                        override fun onFailureRequestFinish(throwable: Throwable) {
+                        override fun onFailureRequestFinish(code: NetworkResponseCode, throwable: Throwable) {
                             if (throwable.message != null) {
                                 stringError = throwable.message!!
                             }
@@ -196,7 +196,7 @@ class EditorViewModel : BaseViewModel() {
     }
 
     private var postCallback: NetworkRepository.OnRequestFinishCallback<Any?> = object : NetworkRepository.OnRequestFinishCallback<Any?> {
-        override fun onSuccessRequestFinish(response : Any?) {
+        override fun onSuccessRequestFinish(response: Any?) {
             processSuccessPosting()
         }
 
