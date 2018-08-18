@@ -9,13 +9,12 @@ import com.boomapps.steemapp.SteemApplication
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import java.io.File
+import java.io.*
 
 /**
  * Created by vgrechikha on 21.03.2018.
  */
 class FilesRepositoryDefault : FilesRepository {
-
 
     override fun saveStory(value: String, storyCallback: FilesRepository.StoryCallback?) {
         Observable

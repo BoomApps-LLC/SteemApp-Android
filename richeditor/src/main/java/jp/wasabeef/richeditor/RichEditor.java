@@ -60,18 +60,20 @@ public class RichEditor extends WebView {
   }
 
   public interface OnTextChangeListener {
-
     void onTextChange(String text);
   }
 
   public interface OnDecorationStateListener {
-
     void onStateChangeListener(String text, List<Type> types);
   }
 
   public interface AfterInitialLoadListener {
-
     void onAfterInitialLoad(boolean isReady);
+  }
+
+  public interface OnTextClickListener {
+    void onTextClick(int position);
+    void onTextSelect(int begin, int end);
   }
 
   private static final String SETUP_HTML = "file:///android_asset/editor.html";
@@ -79,6 +81,7 @@ public class RichEditor extends WebView {
   private static final String STATE_SCHEME = "re-state://";
   private boolean isReady = false;
   private String mContents;
+  private WebAppInterface webAppInterface = new WebAppInterface();
   private OnTextChangeListener mTextChangeListener;
   private OnDecorationStateListener mDecorationStateListener;
   private AfterInitialLoadListener mLoadListener;
@@ -100,6 +103,7 @@ public class RichEditor extends WebView {
     getSettings().setJavaScriptEnabled(true);
     setWebChromeClient(new WebChromeClient());
     setWebViewClient(createWebviewClient());
+    addJavascriptInterface(webAppInterface, "AndroidInterface");
     loadUrl(SETUP_HTML);
 
     applyAttributes(context, attrs);
@@ -119,6 +123,10 @@ public class RichEditor extends WebView {
 
   public void setOnInitialLoadListener(AfterInitialLoadListener listener) {
     mLoadListener = listener;
+  }
+
+  public void setOnTextClickListener(OnTextClickListener listener) {
+    webAppInterface.setOnTextClickListener(listener);
   }
 
   private void callback(String text) {
