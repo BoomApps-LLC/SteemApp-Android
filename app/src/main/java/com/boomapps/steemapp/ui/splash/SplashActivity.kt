@@ -46,12 +46,6 @@ class SplashActivity : AppCompatActivity() {
                 }
             }
         })
-        // TODO remove after testing
-//        if (BuidConfig.TEST_VOTE) {
-//            val repo = RepositoryProvider.instance.getSharedRepository()
-//            repo.saveSuccessfulPostingNumber(0)
-//            repo.saveVotingState(true)
-//        }
     }
 
     private fun showNetworkErrorMessage() {

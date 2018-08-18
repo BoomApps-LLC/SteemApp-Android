@@ -28,11 +28,6 @@ class FeedListHolder(val type: FeedType, val tabName: String, val feedView: View
         recyclerView.layoutManager = manager
         initAdapter()
         initSwipeToRefresh()
-//        recyclerView.addOnItemCli(object : AdapterView.OnItemClickListener{
-//            override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-//                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-//            }
-//        })
     }
 
     private fun initAdapter() {

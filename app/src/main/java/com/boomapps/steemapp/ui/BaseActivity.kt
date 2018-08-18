@@ -18,7 +18,7 @@ import com.boomapps.steemapp.ui.dialogs.WarningDialog
  */
 open class BaseActivity : AppCompatActivity() {
 
-    fun showProgress(message: String) {
+    open fun showProgress(message: String) {
         if (isProgressShowed()) return
         ProgressFragmentDialog.newInstance(message).show(supportFragmentManager, ProgressFragmentDialog.TAG)
     }
@@ -32,7 +32,7 @@ open class BaseActivity : AppCompatActivity() {
         return f != null && (f.isVisible || f.isAdded)
     }
 
-    fun dismissProgress() {
+    open fun dismissProgress() {
         val fragment = supportFragmentManager.findFragmentByTag(ProgressFragmentDialog.TAG)
         if (fragment != null) {
             (fragment as ProgressFragmentDialog).dismiss()

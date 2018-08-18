@@ -1,5 +1,7 @@
 package eu.bittrade.libs.steemj;
 
+import android.text.TextUtils;
+
 import java.security.InvalidParameterException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -18,6 +20,8 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
+
+import javax.annotation.Nullable;
 
 import eu.bittrade.crypto.core.ECKey;
 import eu.bittrade.crypto.core.Sha256Hash;
@@ -2805,7 +2809,66 @@ public class SteemJ {
             throw new InvalidParameterException(NO_DEFAULT_ACCOUNT_ERROR_MESSAGE);
         }
 
-        return createPostSynchronous(SteemJConfig.getInstance().getDefaultAccount(), title, content, tags, rewardsPercent);
+        return createPostSynchronous(SteemJConfig.getInstance().getDefaultAccount(), title, content, tags, rewardsPercent, null);
+    }
+
+
+    /**
+     * Use this method to create a new post.
+     * <p>
+     * <b>Attention</b>
+     * <ul>
+     * <li>This method will write data on the blockchain. As all writing
+     * operations, a private key is required to sign the transaction. For a
+     * create post operation the private posting key of the
+     * {@link SteemJConfig#getDefaultAccount() DefaultAccount} needs to be
+     * configured in the {@link SteemJConfig#getPrivateKeyStorage()
+     * PrivateKeyStorage}.</li>
+     * <li>In case the {@link SteemJConfig#getSteemJWeight() SteemJWeight} is
+     * set to a positive value this method will add a comment options operation.
+     * Due to this, the {@link SteemJConfig#getSteemJWeight() SteemJWeight}
+     * percentage will be paid to the SteemJ account.</li>
+     * <li>This method will automatically use the
+     * {@link SteemJConfig#getDefaultAccount() DefaultAccount} as the account
+     * that will publish the post - If no default account has been provided,
+     * this method will throw an error. If you do not want to configure the
+     * author account as a default account, please use the
+     * {@link #createPost(AccountName, String, String, String[], short)} method and
+     * provide the author account separately.</li>
+     * </ul>
+     *
+     * @param title          The title of the post to publish.
+     * @param content        The content of the post to publish.
+     * @param tags           A list of tags while the first tag in this list is the main
+     *                       tag. You can provide up to five tags but at least one needs to
+     *                       be provided.
+     * @param permlinkString The custom permlink
+     * @return The {@link CommentOperation} which has been created within this
+     * method. The returned Operation allows you to access the generated
+     * values.
+     * @throws SteemCommunicationException      <ul>
+     *                                          <li>If the server was not able to answer the request in the
+     *                                          given time (see
+     *                                          {@link eu.bittrade.libs.steemj.configuration.SteemJConfig#setResponseTimeout(int)
+     *                                          setResponseTimeout}).</li>
+     *                                          <li>If there is a connection problem.</li>
+     *                                          </ul>
+     * @throws SteemResponseException           <ul>
+     *                                          <li>If the SteemJ is unable to transform the JSON response
+     *                                          into a Java object.</li>
+     *                                          <li>If the Server returned an error object.</li>
+     *                                          </ul>
+     * @throws SteemInvalidTransactionException If there is a problem while signing the transaction.
+     * @throws InvalidParameterException        If one of the provided parameters does not fulfill the
+     *                                          requirements described above.
+     */
+    public CommentOperation createPostSynchronous(String title, String content, String[] tags, short rewardsPercent, @Nullable String permlinkString)
+            throws SteemCommunicationException, SteemResponseException, SteemInvalidTransactionException {
+        if (SteemJConfig.getInstance().getDefaultAccount().isEmpty()) {
+            throw new InvalidParameterException(NO_DEFAULT_ACCOUNT_ERROR_MESSAGE);
+        }
+
+        return createPostSynchronous(SteemJConfig.getInstance().getDefaultAccount(), title, content, tags, rewardsPercent, permlinkString);
     }
 
 
@@ -2841,7 +2904,7 @@ public class SteemJ {
      *                                          requirements described above.
      */
     public CommentOperation createPostSynchronous(AccountName authorThatPublishsThePost, String title, String content,
-                                       String[] tags, short rewardsPercent)
+                                                  String[] tags, short rewardsPercent, @Nullable String permlinkString)
             throws SteemCommunicationException, SteemResponseException, SteemInvalidTransactionException {
         if (tags == null || tags.length < 1 || tags.length > 5) {
             throw new InvalidParameterException(TAG_ERROR_MESSAGE);
@@ -2850,7 +2913,8 @@ public class SteemJ {
 
         // Generate the permanent link from the title by replacing all unallowed
         // characters.
-        Permlink permlink = new Permlink(SteemJUtils.createPermlinkString(title));
+        Permlink permlink = new Permlink(
+                (TextUtils.isEmpty(permlinkString) ? SteemJUtils.createPermlinkString(title) : permlinkString));
         // On new posts the parentPermlink is the main tag.
         Permlink parentPermlink = new Permlink(tags[0]);
         // One new posts the parentAuthor is empty.
@@ -2904,8 +2968,6 @@ public class SteemJ {
 
         return commentOperation;
     }
-
-
 
 
     /**

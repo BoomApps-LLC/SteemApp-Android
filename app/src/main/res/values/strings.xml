@@ -1,147 +1,159 @@
 <resources>
-    <string name="app_name">SteemApp</string>
+  <string name="app_name">SteemApp</string>
 
-    <string name="a_editor_action_right_text">Next</string>
-    <string name="a_editor_action_left_t_title">Title</string>
-    <string name="a_editor_action_left_t_story">Story</string>
-    <string name="a_editor_action_left_t_tags">Add Tags</string>
-    <string name="a_editor_action_left_t_posing">Posting</string>
-    <string name="a_editor_story_title_hint">Title</string>
-    <string name="a_editor_story_text_hint">Your Story</string>
-    <string name="a_editor_hashtag_input_title">Add your favorite categories</string>
-    <string name="title_activity_main">MainActivity</string>
-    <string name="title_feeds">Feeds</string>
-    <string name="title_edit">Create Post</string>
-    <string name="title_profile">Profile</string>
+  <string name="a_editor_action_right_text">Next</string>
+  <string name="a_editor_action_left_t_title">Title</string>
+  <string name="a_editor_action_left_t_story">Story</string>
+  <string name="a_editor_action_left_t_tags">Add Tags</string>
+  <string name="a_editor_action_left_t_posing">Posting</string>
+  <string name="a_editor_story_title_hint">Title</string>
+  <string name="a_editor_story_text_hint">Your Story</string>
+  <string name="a_editor_hashtag_input_title">Add your favorite categories</string>
+  <string name="title_activity_main">MainActivity</string>
+  <string name="title_feeds">Feeds</string>
+  <string name="title_edit">Create Post</string>
+  <string name="title_profile">Profile</string>
 
-    <string name="button_ok">OK</string>
-    <string name="button_yes">yes</string>
-    <string name="button_cancel">Cancel</string>
-    <string name="button_confirm">Confirm</string>
+  <string name="button_ok">OK</string>
+  <string name="button_yes">yes</string>
+  <string name="button_cancel">Cancel</string>
+  <string name="button_confirm">Confirm</string>
 
-    <string name="reward_type_post">Reward type for your post</string>
+  <string name="reward_type_post">Reward type for your post</string>
 
-    <string name="dialog_title_text_color">Select a Text Color</string>
-    <string name="dialog_title_text_back_color">Select a Text Background Color</string>
+  <string name="dialog_title_text_color">Select a Text Color</string>
+  <string name="dialog_title_text_back_color">Select a Text Background Color</string>
 
-    <string name="dialog_positive_button">@string/button_confirm</string>
-    <string name="dialog_negative_button">@string/button_cancel</string>
+  <string name="dialog_positive_button">@string/button_confirm</string>
+  <string name="dialog_negative_button">@string/button_cancel</string>
 
-    <!-- Insert Link -->
-    <string name="title_insert_link">Insert Link</string>
-    <string name="hint_text_to_display">Text to display</string>
-    <string name="hint_link_to">Link to</string>
+  <!-- Insert Link -->
+  <string name="title_insert_link">Insert Link</string>
+  <string name="hint_text_to_display">Text to display</string>
+  <string name="hint_link_to">Link to</string>
 
-    <string name="take_a_photo_action">Take a Photo</string>
-    <string name="choose_from_library_action">Choose from Library</string>
-    <string name="picture_choose_dialog_title" translatable="false">Picture Source</string>
+  <string name="take_a_photo_action">Take a Photo</string>
+  <string name="choose_from_library_action">Choose from Library</string>
+  <string name="picture_choose_dialog_title" translatable="false">Picture Source</string>
 
-    <!-- COMMON WARNIN DIALOGS -->
-    <string name="dialog_common_ok_button">@string/button_ok</string>
-    <string name="dialog_common_cancel_button">@string/button_cancel</string>
+  <!-- COMMON WARNIN DIALOGS -->
+  <string name="dialog_common_ok_button">@string/button_ok</string>
+  <string name="dialog_common_cancel_button">@string/button_cancel</string>
 
-    <!-- ERROR DIALOG -->
-    <string name="dialog_error_retry_button">try again</string>
-    <string name="dialog_error_positive_button">@string/button_ok</string>
-    <string name="dialog_error_negative_button">@string/button_cancel</string>
+  <!-- ERROR DIALOG -->
+  <string name="dialog_error_retry_button">try again</string>
+  <string name="dialog_error_positive_button">@string/button_ok</string>
+  <string name="dialog_error_negative_button">@string/button_cancel</string>
 
-    <!-- LOGIN -->
-    <string name="error_title_login_error">Login Error</string>
-    <string name="error_message_bad_user_data">Your nickname or active posting key is incorrect. Please correct them and try again.</string>
-    <string name="error_message_network_connection_fault">Oops!!. Connection to server is fault.</string>
-    <string name="hint_input_posting_key">Input private POSTING key</string>
-    <string name="hint_input_username">Steemit Username</string>
+  <!-- LOGIN -->
+  <string name="error_title_login_error">Login Error</string>
+  <string name="error_message_bad_user_data">Your nickname or active posting key is incorrect. Please correct them and try again.</string>
+  <string name="error_message_network_connection_fault">Oops!!. Connection to server is fault.</string>
+  <string name="hint_input_posting_key">Input private POSTING key</string>
+  <string name="hint_input_username">Steemit Username</string>
 
-    <!-- WALLET -->
-    <string name="balance_template">%1$s %2$s.%3$s</string>
+  <!-- WALLET -->
+  <string name="balance_template">%1$s %2$s.%3$s</string>
 
-    <!-- PROFILE -->
-    <string name="signout_confirm_dialog_msg">Are you sure you want to Sign Out?</string>
+  <!-- PROFILE -->
+  <string name="signout_confirm_dialog_msg">Are you sure you want to Sign Out?</string>
 
-    <!-- EDITOR -->
-    <string name="warning_category_lenght">Category name\'s length can\'t be empty</string>
-    <string name="warning_categories_number">Please use only 5 tags</string>
-    <string name="warning_one_category_at_least">Please use at least one tag</string>
-    <string name="warning_wrong_posting_key_title">Error on posting</string>
-    <string name="warning_wrong_new_posting_key_title">New Posting Key</string>
-    <string name="warning_new_empty_posting_key_message">Oops!! Your new posting key is empty. Do you want to try to try again?</string>
-    <string name="warning_wrong_postingKey_message">Posting was saved, but not published due to INVALID PRIVATE POSTING KEY error.
+  <!-- EDITOR -->
+  <string name="warning_category_lenght">Category name\'s length can\'t be empty</string>
+  <string name="warning_categories_number">Please use only 5 tags</string>
+  <string name="warning_one_category_at_least">Please use at least one tag</string>
+  <string name="warning_wrong_posting_key_title">Error on posting</string>
+  <string name="warning_wrong_new_posting_key_title">New Posting Key</string>
+  <string name="warning_new_empty_posting_key_message">Oops!! Your new posting key is empty. Do you want to try to try again?</string>
+  <string name="warning_wrong_postingKey_message">Posting was saved, but not published due to INVALID PRIVATE POSTING KEY error.
 Do you want to enter correct key and try to post again?</string>
-    <string name="btn_posting_default">POST</string>
-    <string name="btn_posting_timer">POST available after    %1$d:%2$s</string>
-    <string name="d_publish_success_message">Your article was successfully\npublished</string>
+  <string name="btn_posting_default">POST</string>
+  <string name="btn_posting_timer">POST available after    %1$d:%2$s</string>
+  <string name="d_publish_success_message">Your article was successfully\npublished</string>
 
-    <string name="d_wron_post_key_title">Oops!!</string>
-    <string name="d_wron_post_key_message">Sorry. You can\'t vote, cause you didn\'t enter POSTING key before.\nDo you want enter it now?</string>
-    <string name="d_wron_post_key_btn_ok">Confirm</string>
-    <string name="d_wron_post_key_btn_cancel">Cancel</string>
+  <string name="d_wron_post_key_title">Oops!!</string>
+  <string name="d_wron_post_key_message">Sorry. You can\'t vote, cause you didn\'t enter POSTING key before.\nDo you want enter it now?</string>
+  <string name="d_wron_post_key_btn_ok">Confirm</string>
+  <string name="d_wron_post_key_btn_cancel">Cancel</string>
 
-    <!--  ONBOARDING -->
-    <string name="onboarding_title">A Quick Guide to Log In</string>
-    <string name="onboarding_message_1">Go to <b>My Wallet</b> tab</string>
-    <string name="onboarding_message_2">Then Select <b>Permissions</b> Tab</string>
-    <string name="onboarding_message_3">Tap on <b>Show Private Key</b></string>
-    <string name="onboarding_message_4">The posting key must begin with a <b>5</b></string>
-    <string name="onboarding_message_5">Click on the <b>QR Code icon</b></string>
-    <string name="onboarding_btn_skip">Skip</string>
-    <string name="onboarding_btn_next">Next</string>
-    <string name="onboarding_btn_done">Done</string>
+  <!--  ONBOARDING -->
+  <string name="onboarding_title">A Quick Guide to Log In</string>
+  <string name="onboarding_message_1">Go to <b>My Wallet</b> tab</string>
+  <string name="onboarding_message_2">Then Select <b>Permissions</b> Tab</string>
+  <string name="onboarding_message_3">Tap on <b>Show Private Key</b></string>
+  <string name="onboarding_message_4">The posting key must begin with a <b>5</b></string>
+  <string name="onboarding_message_5">Click on the <b>QR Code icon</b></string>
+  <string name="onboarding_btn_skip">Skip</string>
+  <string name="onboarding_btn_next">Next</string>
+  <string name="onboarding_btn_done">Done</string>
 
-    <!-- VOTE DIALOG -->
-    <string name="d_vote_message">Like this App?\nVote for Witness!</string>
-    <string name="d_vote_btn_vote">Vote</string>
+  <!-- VOTE DIALOG -->
+  <string name="d_vote_message">Like this App?\nVote for Witness!</string>
+  <string name="d_vote_btn_vote">Vote</string>
 
-    <string name="retry">Retry</string>
+  <string name="retry">Retry</string>
 
-    <plurals name="years">
-        <item quantity="one">year</item>
-        <item quantity="two">years</item>
-        <item quantity="few">years</item>
-        <item quantity="many">years</item>
-        <item quantity="other">years</item>
-    </plurals>
+  <plurals name="years">
+    <item quantity="one">year</item>
+    <item quantity="two">years</item>
+    <item quantity="few">years</item>
+    <item quantity="many">years</item>
+    <item quantity="other">years</item>
+  </plurals>
 
-    <plurals name="months">
-        <item quantity="one">month</item>
-        <item quantity="two">months</item>
-        <item quantity="few">months</item>
-        <item quantity="many">months</item>
-        <item quantity="other">months</item>
-    </plurals>
+  <plurals name="months">
+    <item quantity="one">month</item>
+    <item quantity="two">months</item>
+    <item quantity="few">months</item>
+    <item quantity="many">months</item>
+    <item quantity="other">months</item>
+  </plurals>
 
-    <plurals name="days">
-        <item quantity="one">day</item>
-        <item quantity="two">days</item>
-        <item quantity="few">days</item>
-        <item quantity="many">days</item>
-        <item quantity="other">days</item>
-    </plurals>
+  <plurals name="days">
+    <item quantity="one">day</item>
+    <item quantity="two">days</item>
+    <item quantity="few">days</item>
+    <item quantity="many">days</item>
+    <item quantity="other">days</item>
+  </plurals>
 
-    <plurals name="hours">
-        <item quantity="one">hour</item>
-        <item quantity="two">hours</item>
-        <item quantity="few">hours</item>
-        <item quantity="many">hours</item>
-        <item quantity="other">hours</item>
-    </plurals>
+  <plurals name="hours">
+    <item quantity="one">hour</item>
+    <item quantity="two">hours</item>
+    <item quantity="few">hours</item>
+    <item quantity="many">hours</item>
+    <item quantity="other">hours</item>
+  </plurals>
 
-    <plurals name="minutes">
-        <item quantity="one">minute</item>
-        <item quantity="two">minutes</item>
-        <item quantity="few">minutes</item>
-        <item quantity="many">minutes</item>
-        <item quantity="other">minutes</item>
-    </plurals>
-    
-    <string name="adsactly_powered">Powered by "<b>"Adsactly"</b>"</string>
+  <plurals name="minutes">
+    <item quantity="one">minute</item>
+    <item quantity="two">minutes</item>
+    <item quantity="few">minutes</item>
+    <item quantity="many">minutes</item>
+    <item quantity="other">minutes</item>
+  </plurals>
 
-    <!-- FEEDS-->
-    <string name="feed_card_date_format_common">%d %s ago</string>
-    <string name="feed_card_date_format_yesterday">yesterday</string>
+  <string name="adsactly_powered">Powered by "<b>"Adsactly"</b>"</string>
 
-    <string name="d_cancel_vote_title">Cancel vote</string>
-    <string name="d_cancel_vote_message">Are you sure to cancel vote this post?</string>
-    <string name="d_cancel_vote_btn_ok">Confirm</string>
-    <string name="d_cancel_vote_btn_cancel">Cancel</string>
+  <string name="blocktrades_powered_1">Powered by</string>
+  <string name="blocktrades_powered_2">Blocktrades.us</string>
+
+  <!-- FEEDS-->
+  <string name="feed_card_date_format_common">%d %s ago</string>
+  <string name="feed_card_date_format_yesterday">yesterday</string>
+
+  <string name="d_cancel_vote_title">Cancel vote</string>
+  <string name="d_cancel_vote_message">Are you sure to cancel vote this post?</string>
+  <string name="d_cancel_vote_btn_ok">Confirm</string>
+  <string name="d_cancel_vote_btn_cancel">Cancel</string>
+
+  <string name="blog">BLOG</string>
+  <string name="feed">FEED</string>
+  <string name="trending">TRENDING</string>
+  <string name="new_title">NEW</string>
+
+    <string name="sign_up">Sign Up with STEEM</string>
+    <string name="log_in">Log In</string>
+    <string name="steemit_username">Steemit Username</string>
 
 </resources>

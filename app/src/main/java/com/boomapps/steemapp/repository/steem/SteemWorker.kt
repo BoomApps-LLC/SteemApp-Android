@@ -149,48 +149,48 @@ class SteemWorker() {
         steemJ = null
     }
 
-    fun post(title: String, content: String, tags: Array<String>, postingKey: String, rewardsPercent: Short, upvote: Boolean): PostingResult {
-        try {
-            steemJConfig?.privateKeyStorage
-            if (steemJConfig?.privateKeyStorage?.privateKeysPerAccounts == null || steemJConfig?.privateKeyStorage?.privateKeysPerAccounts?.size == 0) {
-                if (postingKey.isNotEmpty()) {
-                    steemJConfig?.privateKeyStorage?.addPrivateKeyToAccount(steemJConfig?.defaultAccount, ImmutablePair(PrivateKeyType.POSTING, postingKey))
-                    val commentOperation: CommentOperation? = steemJ?.createPost(title, content, tags, rewardsPercent)
-                    if (commentOperation != null) {
-                        val metadata = commentOperation.jsonMetadata
-                        Timber.d("post answer >> ${metadata?.toString()}")
-                    }
-                } else {
-                    return PostingResult("Posting key is empty.", false)
-                }
-            } else {
-                val commentOperation = steemJ?.createPostSynchronous(title, content, tags, rewardsPercent)
-                if (!upvote) {
-                    return PostingResult()
-                }
-                if (commentOperation != null) {
-                    val permlink = commentOperation.permlink.link
-                    steemJ?.vote(steemJConfig?.defaultAccount, Permlink(permlink), 100.toShort())
-                    return PostingResult()
-                } else {
-                    return PostingResult("No comment operation.", false)
-                }
-            }
-        } catch (communicationException: SteemCommunicationException) {
-            Timber.e(communicationException)
-            return PostingResult(communicationException.localizedMessage, false)
-        } catch (responseException: SteemResponseException) {
-            Timber.e(responseException)
-            return PostingResult(responseException.localizedMessage, false)
-        } catch (transactionException: SteemInvalidTransactionException) {
-            Timber.e(transactionException)
-            return PostingResult(transactionException.localizedMessage, false)
-        } catch (parameterException: InvalidParameterException) {
-            Timber.e(parameterException)
-            return PostingResult(parameterException.localizedMessage, false)
-        }
-        return PostingResult()
-    }
+//    fun post(title: String, content: String, tags: Array<String>, postingKey: String, rewardsPercent: Short, upvote: Boolean): PostingResult {
+//        try {
+//            steemJConfig?.privateKeyStorage
+//            if (steemJConfig?.privateKeyStorage?.privateKeysPerAccounts == null || steemJConfig?.privateKeyStorage?.privateKeysPerAccounts?.size == 0) {
+//                if (postingKey.isNotEmpty()) {
+//                    steemJConfig?.privateKeyStorage?.addPrivateKeyToAccount(steemJConfig?.defaultAccount, ImmutablePair(PrivateKeyType.POSTING, postingKey))
+//                    val commentOperation: CommentOperation? = steemJ?.createPost(title, content, tags, rewardsPercent)
+//                    if (commentOperation != null) {
+//                        val metadata = commentOperation.jsonMetadata
+//                        Timber.d("post answer >> ${metadata?.toString()}")
+//                    }
+//                } else {
+//                    return PostingResult("Posting key is empty.", false)
+//                }
+//            } else {
+//                val commentOperation = steemJ?.createPostSynchronous(title, content, tags, rewardsPercent)
+//                if (!upvote) {
+//                    return PostingResult()
+//                }
+//                if (commentOperation != null) {
+//                    val permlink = commentOperation.permlink.link
+//                    steemJ?.vote(steemJConfig?.defaultAccount, Permlink(permlink), 100.toShort())
+//                    return PostingResult()
+//                } else {
+//                    return PostingResult("No comment operation.", false)
+//                }
+//            }
+//        } catch (communicationException: SteemCommunicationException) {
+//            Timber.e(communicationException)
+//            return PostingResult(communicationException.localizedMessage, false)
+//        } catch (responseException: SteemResponseException) {
+//            Timber.e(responseException)
+//            return PostingResult(responseException.localizedMessage, false)
+//        } catch (transactionException: SteemInvalidTransactionException) {
+//            Timber.e(transactionException)
+//            return PostingResult(transactionException.localizedMessage, false)
+//        } catch (parameterException: InvalidParameterException) {
+//            Timber.e(parameterException)
+//            return PostingResult(parameterException.localizedMessage, false)
+//        }
+//        return PostingResult()
+//    }
 
     fun uploadImage(uri: Uri): URL? {
         val imageFile = File(uri.path)
@@ -331,7 +331,5 @@ class SteemWorker() {
         }
 
     }
-
-    data class PostingResult(var result: String = "Posting was successful", var success: Boolean = true)
 
 }

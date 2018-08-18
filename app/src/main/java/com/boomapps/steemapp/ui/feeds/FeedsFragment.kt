@@ -37,7 +37,6 @@ import timber.log.Timber
  */
 class FeedsFragment : Fragment(), FeedListHolderCallback {
 
-
     private enum class LastActions {
         VOTE,
         UNVOTE,
@@ -52,6 +51,8 @@ class FeedsFragment : Fragment(), FeedListHolderCallback {
 
     lateinit var viewModel: FeedsViewModel
 
+    private var currentPosition = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(FeedsViewModel::class.java)
@@ -64,10 +65,10 @@ class FeedsFragment : Fragment(), FeedListHolderCallback {
         feedsPager = view.findViewById(R.id.feedsPager)
 
         val adapter = FeedsTabsAdapter(arrayOf(
-                FeedListHolder(FeedType.BLOG, "BLOG", View.inflate(context, R.layout.feed_list_view, null), viewModel, this),
-                FeedListHolder(FeedType.FEED, "FEED", View.inflate(context, R.layout.feed_list_view, null), viewModel, this),
-                FeedListHolder(FeedType.TRENDING, "TRENDING", View.inflate(context, R.layout.feed_list_view, null), viewModel, this),
-                FeedListHolder(FeedType.NEW, "NEW", View.inflate(context, R.layout.feed_list_view, null), viewModel, this)
+                FeedListHolder(FeedType.BLOG, getString(R.string.blog), View.inflate(context, R.layout.feed_list_view, null), viewModel, this),
+                FeedListHolder(FeedType.FEED, getString(R.string.feed), View.inflate(context, R.layout.feed_list_view, null), viewModel, this),
+                FeedListHolder(FeedType.TRENDING, getString(R.string.trending), View.inflate(context, R.layout.feed_list_view, null), viewModel, this),
+                FeedListHolder(FeedType.NEW, getString(R.string.new_title), View.inflate(context, R.layout.feed_list_view, null), viewModel, this)
         ))
         feedsPager.adapter = adapter
         view.findViewById<TabLayout>(R.id.feedsTabs).apply {
@@ -78,7 +79,7 @@ class FeedsFragment : Fragment(), FeedListHolderCallback {
         feedsPager.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 view.getViewTreeObserver()
-                        .removeOnGlobalLayoutListener(this);
+                        .removeOnGlobalLayoutListener(this)
                 // set page change listener
                 addPagerListener()
                 // call update page with delay
@@ -149,9 +150,8 @@ class FeedsFragment : Fragment(), FeedListHolderCallback {
             3 ->
                 viewModel.showList(FeedType.NEW)
         }
-
+        currentPosition = position
     }
-
 
     // Callback methods for interaction with lists
     override fun onRefresh(type: FeedType) {
@@ -162,6 +162,7 @@ class FeedsFragment : Fragment(), FeedListHolderCallback {
         val story = viewModel.getStory(type, position)
         if (story != null && story.url.isNotEmpty()) {
             val postIntent = Intent(this.context, PostViewActivity::class.java)
+            postIntent.putExtra(PostViewActivity.EXTRA_ACTIVITY_TITLE, feedsPager.adapter!!.getPageTitle(currentPosition))
             postIntent.putExtra(PostViewActivity.EXTRA_URL, story.url)
             postIntent.putExtra(PostViewActivity.EXTRA_TITLE, story.title)
             postIntent.putExtra(PostViewActivity.EXTRA_POST_ID, story.entityId)
@@ -170,7 +171,7 @@ class FeedsFragment : Fragment(), FeedListHolderCallback {
             postIntent.putExtra(PostViewActivity.EXTRA_COMMENTS_NUM, story.commentsNum)
             postIntent.putExtra(PostViewActivity.EXTRA_LINK_NUM, story.linksNum)
             postIntent.putExtra(PostViewActivity.EXTRA_VOTE_NUM, story.votesNum)
-            postIntent.putExtra(PostViewActivity.EXTRA_AMOUNT, story.price) // TODO cahange
+            postIntent.putExtra(PostViewActivity.EXTRA_AMOUNT, story.price) // TODO change
             postIntent.putExtra(PostViewActivity.EXTRA_AVATAR_URL, story.avatarUrl)
             startActivity(postIntent)
         }
@@ -182,11 +183,10 @@ class FeedsFragment : Fragment(), FeedListHolderCallback {
         builder
                 .setTitle(getString(R.string.d_wron_post_key_title))
                 .setMessage(getString(R.string.d_wron_post_key_message))
-                .setPositiveButton(getString(R.string.d_wron_post_key_btn_ok), { dialog, id ->
+                .setPositiveButton(getString(R.string.d_wron_post_key_btn_ok)) { _, _ ->
                     showScreenForEnterNewPostingKey()
-
-                })
-                .setNegativeButton(getString(R.string.d_wron_post_key_btn_cancel), { dialog, id ->
+                }
+                .setNegativeButton(getString(R.string.d_wron_post_key_btn_cancel), { _, _ ->
                     // do nothing
                 }).create().show()
     }
@@ -264,10 +264,6 @@ class FeedsFragment : Fragment(), FeedListHolderCallback {
 
     companion object {
         @JvmStatic
-        fun newInstance() =
-                FeedsFragment()
-
-        const val KEY_FEED_TYPE = "feed_type"
-
+        fun newInstance() = FeedsFragment()
     }
 }

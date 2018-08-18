@@ -223,4 +223,9 @@ class DaoRepositoryDefault(
     override fun deletePost(postEntity: PostEntity) {
         db.postsDao().deletePost(postEntity)
     }
+
+    override fun clearDB() {
+        db.postsDao().deleteAllPosts()
+        db.storiesDao().deleteAllStories()
+    }
 }

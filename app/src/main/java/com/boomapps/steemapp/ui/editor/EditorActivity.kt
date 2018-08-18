@@ -273,7 +273,7 @@ class EditorActivity : BaseActivity() {
                 CHOOSE_PHOTO -> viewModel.prepareForUploadingPickedPhoto(data, Utils.get().getNewTempUri())
                 INPUT_NEW_KEY_POST_ACTIVITY_CODE -> {
                     if (viewModel.saveNewPostingKey(data)) {
-                        viewModel.publishStory()
+                        viewModel.publishStory(null)
                     } else {
                         showInvalidReEnterPostingKeyDialog(INPUT_NEW_KEY_POST_ACTIVITY_CODE)
                     }

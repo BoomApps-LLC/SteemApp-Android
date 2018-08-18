@@ -13,9 +13,11 @@ import com.boomapps.steemapp.repository.StoryInstance
 import com.boomapps.steemapp.repository.UserData
 import com.boomapps.steemapp.repository.files.FilesRepository
 import com.boomapps.steemapp.repository.network.NetworkRepository
+import com.boomapps.steemapp.repository.network.NetworkResponseCode
 import com.boomapps.steemapp.ui.BaseViewModel
 import com.boomapps.steemapp.ui.ViewState
 import com.boomapps.steemapp.ui.editor.tabs.CategoryItem
+import eu.bittrade.libs.steemj.util.SteemJUtils
 import java.net.URL
 
 /**
@@ -121,11 +123,11 @@ class EditorViewModel : BaseViewModel() {
             }
             RepositoryProvider.getNetworkRepository().uploadNewPhoto(
                     uri,
-                    object : NetworkRepository.OnRequestFinishCallback {
+                    object : NetworkRepository.OnRequestFinishCallback<URL?> {
 
-                        override fun onSuccessRequestFinish() {
+                        override fun onSuccessRequestFinish(response: URL?) {
                             successCode = SUCCESS_IMAGE_UPLOAD
-                            uploadedImageUrl = RepositoryProvider.getNetworkRepository().lastUploadedPhotoUrl
+                            uploadedImageUrl = response
                             state.value = ViewState.SUCCESS_RESULT
                             uploadTakenPhoto = false
                             uploadPickedPhoto = false
@@ -176,7 +178,7 @@ class EditorViewModel : BaseViewModel() {
         return true
     }
 
-    fun publishStory() {
+    fun publishStory(permlink: String?) {
         state.value = ViewState.PROGRESS
         val rewardsPercent: Short =
                 when (rewardPosition) {
@@ -185,22 +187,34 @@ class EditorViewModel : BaseViewModel() {
                     2 -> 0
                     else -> 30000
                 }
+        if (permlink.isNullOrEmpty()) {
+            RepositoryProvider.getNetworkRepository().postStory(title, story, getCategoriesName(), "", rewardsPercent, upvoteState, postCallback)
+        } else {
+            RepositoryProvider.getNetworkRepository().postStory(title, story, getCategoriesName(), "", rewardsPercent, upvoteState, permlink, postCallback)
+        }
 
-        RepositoryProvider.getNetworkRepository().postStory(title, story, getCategoriesName(), "", rewardsPercent, upvoteState, object : NetworkRepository.OnRequestFinishCallback {
-            override fun onSuccessRequestFinish() {
-                processSuccessPosting()
-            }
-
-            override fun onFailureRequestFinish(throwable: Throwable) {
-                saveStoryData()
-
-                Log.d("EditorActivity", "can't post story >> " + throwable.localizedMessage)
-                stringError = throwable.localizedMessage
-                state.value = ViewState.FAULT_RESULT
-
-            }
-        })
     }
+
+    private var postCallback: NetworkRepository.OnRequestFinishCallback<Any?> = object : NetworkRepository.OnRequestFinishCallback<Any?> {
+        override fun onSuccessRequestFinish(response : Any?) {
+            processSuccessPosting()
+        }
+
+        override fun onFailureRequestFinish(code: NetworkResponseCode, throwable: Throwable) {
+            if (code == NetworkResponseCode.PERMLINK_DUPLICATE) {
+                // repeat request with new generated permlink
+                // generate manually new permlink and call postWithKey again
+                val newPermLink = SteemJUtils.createPermlinkString(title).plus("-").plus(System.currentTimeMillis().toString())
+                publishStory(newPermLink)
+            } else {
+                saveStoryData()
+                Log.d("EditorActivity", "Can't post story >> " + throwable.message)
+                stringError = throwable.message ?: "Posting error"
+                state.value = ViewState.FAULT_RESULT
+            }
+        }
+    }
+
 
     private fun processSuccessPosting() {
         lastPostingTime = System.currentTimeMillis()
@@ -266,7 +280,6 @@ class EditorViewModel : BaseViewModel() {
         }
         return postingDelay
     }
-
 
 
 }

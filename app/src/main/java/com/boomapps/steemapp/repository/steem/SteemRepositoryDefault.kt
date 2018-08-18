@@ -15,6 +15,7 @@ import eu.bittrade.libs.steemj.SteemJ
 import eu.bittrade.libs.steemj.base.models.AccountName
 import eu.bittrade.libs.steemj.base.models.DiscussionQuery
 import eu.bittrade.libs.steemj.base.models.Permlink
+import eu.bittrade.libs.steemj.base.models.operations.CommentOperation
 import eu.bittrade.libs.steemj.configuration.SteemJConfig
 import eu.bittrade.libs.steemj.enums.DiscussionSortType
 import eu.bittrade.libs.steemj.enums.PrivateKeyType
@@ -24,10 +25,12 @@ import eu.bittrade.libs.steemj.exceptions.SteemInvalidTransactionException
 import eu.bittrade.libs.steemj.exceptions.SteemResponseException
 import eu.bittrade.libs.steemj.image.upload.SteemJImageUpload
 import eu.bittrade.libs.steemj.image.upload.config.SteemJImageUploadConfig
+import eu.bittrade.libs.steemj.util.SteemJUtils
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import org.apache.commons.lang3.tuple.ImmutablePair
+import org.jetbrains.annotations.NotNull
 import timber.log.Timber
 import java.io.File
 import java.io.IOException
@@ -136,7 +139,7 @@ class SteemRepositoryDefault : SteemRepository {
         steemJConfig?.privateKeyStorage?.addPrivateKeyToAccount(steemJConfig?.defaultAccount, ImmutablePair(PrivateKeyType.POSTING, key))
     }
 
-    override fun post(title: String, content: String, tags: Array<String>, postingKey: String, rewardsPercent: Short, upvote: Boolean): SteemWorker.PostingResult {
+    override fun post(title: String, content: String, tags: Array<String>, postingKey: String, rewardsPercent: Short, upvote: Boolean, permlink: String?): PostingResult {
         try {
 //            steemJConfig?.privateKeyStorage
             if (steemJConfig?.privateKeyStorage?.privateKeysPerAccounts == null || steemJConfig?.privateKeyStorage?.privateKeysPerAccounts?.size == 0) {
@@ -155,41 +158,83 @@ class SteemRepositoryDefault : SteemRepository {
                     }
                 }
                 if (withKey) {
-                    return postWithKey(title, content, tags, rewardsPercent, upvote)
+                    return postWithKey(title, content, tags, rewardsPercent, upvote, permlink)
                 } else {
-                    return SteemWorker.PostingResult("Posting key is empty.", false)
+                    return PostingResult(SteemAnswerCodes.EPTY_POSTING_KEY, "Posting key is empty.", false)
                 }
 
             } else {
-                return postWithKey(title, content, tags, rewardsPercent, upvote)
+                return postWithKey(title, content, tags, rewardsPercent, upvote, permlink)
             }
         } catch (communicationException: SteemCommunicationException) {
             Timber.e(communicationException)
-            return SteemWorker.PostingResult(communicationException.localizedMessage, false)
+            // TODO define all codes for different errors
+            return PostingResult(SteemAnswerCodes.UNKNOWN_ERROR, communicationException.localizedMessage, false)
         } catch (responseException: SteemResponseException) {
             Timber.e(responseException)
-            return SteemWorker.PostingResult(responseException.localizedMessage, false)
+            return PostingResult(SteemAnswerCodes.UNKNOWN_ERROR, responseException.localizedMessage, false)
         } catch (transactionException: SteemInvalidTransactionException) {
             Timber.e(transactionException)
-            return SteemWorker.PostingResult(transactionException.localizedMessage, false)
+            return PostingResult(SteemAnswerCodes.UNKNOWN_ERROR, transactionException.localizedMessage, false)
         } catch (parameterException: InvalidParameterException) {
             Timber.e(parameterException)
-            return SteemWorker.PostingResult(parameterException.localizedMessage, false)
+            return PostingResult(SteemAnswerCodes.UNKNOWN_ERROR, parameterException.localizedMessage, false)
         }
-        return SteemWorker.PostingResult()
+        return PostingResult(SteemAnswerCodes.SUCCESS, "", true)
     }
 
-    private fun postWithKey(title: String, content: String, tags: Array<String>, rewardsPercent: Short, upvote: Boolean): SteemWorker.PostingResult {
-        val commentOperation = steemJ?.createPostSynchronous(title, content, tags, rewardsPercent)
+
+    private fun postWithKey(@NotNull title: String, @NotNull content: String, @NotNull tags: Array<String>, rewardsPercent: Short, upvote: Boolean, permlink: String?): PostingResult {
+        var commentOperation: CommentOperation? = null
+        try {
+            commentOperation = steemJ?.createPostSynchronous(title, content, tags, rewardsPercent, permlink)
+            Timber.d("postWithKey: commentOperations.notNull == ${commentOperation != null}")
+
+        } catch (e: SteemResponseException) {
+            if (permlink != null) {
+                // it was 2nd call with special permlink
+                PostingResult(SteemAnswerCodes.UNKNOWN_ERROR, "Cannot create new post. The same title post.\n Try to change your post title to another.", false)
+            } else {
+                if (e.data != null && e.data.has("code")) {
+                    val names = e.data.fieldNames()
+                    names.forEach {
+                        if (it != null) {
+                            Timber.d("Node $it; value is: ")
+                            val node = e.data.get(it)
+                            if (node.isInt) {
+                                Timber.d(" Int -> ${node.intValue()}")
+                            } else
+                                if (node.isTextual) {
+                                    Timber.d("Textual -> ${node.textValue()}")
+                                } else {
+                                    Timber.d("Other -> $node")
+                                }
+
+                        }
+
+                    }
+                    val codeNode = e.data.get("code")
+                    if (codeNode.isInt) {
+                        val codeValue = codeNode.intValue()
+                        Timber.d("Posting error: code = $codeValue")
+                        if (codeValue == 10 /*The permlink of a comment cannot change.*/) {
+                            return PostingResult(SteemAnswerCodes.PERMLINK_DUPLICATE, "Cannot publish new post with the same title", false)
+                        }
+                    }
+                }
+            }
+
+        }
+
         if (!upvote) {
-            return SteemWorker.PostingResult()
+            return PostingResult(SteemAnswerCodes.SUCCESS, "", true)
         }
         if (commentOperation != null) {
             val permlink = commentOperation.permlink.link
             steemJ?.vote(steemJConfig?.defaultAccount, Permlink(permlink), 100.toShort())
-            return SteemWorker.PostingResult()
+            return PostingResult(SteemAnswerCodes.SUCCESS, "", true)
         } else {
-            return SteemWorker.PostingResult("No comment operation.", false)
+            return PostingResult(SteemAnswerCodes.UNKNOWN_ERROR, "No comment operation.", false)
         }
     }
 
@@ -347,26 +392,6 @@ class SteemRepositoryDefault : SteemRepository {
         return getDiscussionsDataList(DiscussionSortType.GET_DISCUSSIONS_BY_CREATED, start, limit, storyEntity)
     }
 
-
-    /*
-        * Upvote the post
-        * "steem-java-api-learned-to-speak-graphene-update-5" written by
-        * "dez1337" using 100% of the defaultAccounts voting power.
-        */
-    override fun vote(postPermLink: String, percentage: Int) {
-        try {
-            steemJ?.vote(steemJConfig?.apiUsername, Permlink(postPermLink),
-                    percentage.toShort())
-        } catch (communicationException: SteemCommunicationException) {
-
-        } catch (responseException: SteemResponseException) {
-
-        } catch (transactionException: SteemInvalidTransactionException) {
-
-        }
-    }
-
-
     /*
         * Upvote the post
         * "steem-java-api-learned-to-speak-graphene-update-5" written by
@@ -387,29 +412,19 @@ class SteemRepositoryDefault : SteemRepository {
         return false
     }
 
-    override fun cancelVote(postPermLink: String) {
-        try {
-            steemJ?.cancelVote(steemJConfig?.apiUsername,
-                    Permlink(postPermLink))
-        } catch (communicationException: SteemCommunicationException) {
-
-        } catch (responseException: SteemResponseException) {
-
-        } catch (transactionException: SteemInvalidTransactionException) {
-
-        }
-    }
-
     override fun cancelVote(author: String, postPermLink: String): Boolean {
         try {
             steemJ?.cancelVote(AccountName(author),
                     Permlink(postPermLink))
             return true
         } catch (communicationException: SteemCommunicationException) {
+            Timber.e(communicationException)
             return false
         } catch (responseException: SteemResponseException) {
+            Timber.e(responseException)
             return false
         } catch (transactionException: SteemInvalidTransactionException) {
+            Timber.e(transactionException)
             return false
         }
         return false
@@ -418,6 +433,7 @@ class SteemRepositoryDefault : SteemRepository {
     override fun unvoteWithUpdate(story: StoryEntity, type: FeedType, callback: SteemRepository.Callback<Boolean>) {
         Observable.fromCallable {
             val result = cancelVote(story.author, story.permlink)
+            Timber.d("unvoteWithUpdate >> result of cancelVote = $result")
             if (result) {
                 return@fromCallable result
             } else {
@@ -463,7 +479,7 @@ class SteemRepositoryDefault : SteemRepository {
         }
                 .subscribeOn(Schedulers.io())
                 .flatMap {
-//                    Timber.d("voteWithUpdate.flatMap(result=${it})")
+                    //                    Timber.d("voteWithUpdate.flatMap(result=${it})")
                     return@flatMap getStoryDetails(AccountName(story.author), Permlink(story.permlink), story.indexInResponse)
                 }
                 .observeOn(Schedulers.io())

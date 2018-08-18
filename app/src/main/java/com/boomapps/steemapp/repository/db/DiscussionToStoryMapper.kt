@@ -6,12 +6,11 @@ package com.boomapps.steemapp.repository.db
 
 import android.text.Html
 import com.boomapps.steemapp.repository.db.entities.StoryEntity
-import com.boomapps.steemapp.repository.entity.UserDataEntity
-import com.boomapps.steemapp.repository.entity.profile.ProfileMetadataDeserializer
 import com.boomapps.steemapp.repository.steem.DiscussionData
 import com.boomapps.steemapp.repository.steem.StoryMetadata
 import com.boomapps.steemapp.repository.steem.StoryMetadataDeserializer
 import com.google.gson.GsonBuilder
+import eu.bittrade.libs.steemj.base.models.VoteState
 import timber.log.Timber
 
 class DiscussionToStoryMapper(val data: ArrayList<DiscussionData>, val accountName: String) {
@@ -29,7 +28,7 @@ class DiscussionToStoryMapper(val data: ArrayList<DiscussionData>, val accountNa
     }
 
     val linksMarkdownPattern = Regex("\\[!\\[.*\\)]\\(.*?\\)|!\\[.*?\\)")
-//    val pattern = Regex("(\\s+)|(\\\\n+)")
+    //    val pattern = Regex("(\\s+)|(\\\\n+)")
 //    val tagsPattern = Regex("<.+?>")
     val linksPattern = Regex("((https?|ftp|gopher|telnet|file|Unsure|http):((//)|(\\\\))+[\\w\\d:#@%/;\$()~_?\\+-=\\\\\\.&]*)")
 
@@ -59,7 +58,12 @@ class DiscussionToStoryMapper(val data: ArrayList<DiscussionData>, val accountNa
             outValue.links = metadata.links
         }
         outValue.linksNum = outValue.links.size
-        outValue.votesNum = inValue.netVotes
+
+        outValue.votesNum = if (inValue.activeVotes == null || inValue.activeVotes !is List<*>) {
+            0
+        } else {
+            getVotersNum(inValue.activeVotes)
+        }
         outValue.commentsNum = inValue.children
         outValue.price = if (inValue.pendingPayoutValue.amount > 0) {
             inValue.pendingPayoutValue.toReal().toFloat()
@@ -103,18 +107,12 @@ class DiscussionToStoryMapper(val data: ArrayList<DiscussionData>, val accountNa
         return outValue
     }
 
+    private fun getVotersNum(aVoters: List<VoteState>): Int {
+        return aVoters.filter { it.percent != 0 }.size
+    }
+
 
     private fun getShortText(input: String): String {
-
-//        val builder = StringBuilder()
-//        val lines = input.split(pattern)
-//        if (lines.size > 1) {
-//            for (line in lines) {
-//                if (!line.startsWith("http")) {
-//                    builder.append(line).append(" ")
-//                }
-//            }
-//        }
         var formatted = Html.fromHtml(input).trim()
         formatted = formatted.replace(linksMarkdownPattern, "").trim()
         formatted = formatted.replace(linksPattern, "").trim()

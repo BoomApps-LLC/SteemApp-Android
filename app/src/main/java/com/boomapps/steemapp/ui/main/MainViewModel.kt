@@ -9,10 +9,16 @@ import android.util.Log
 import com.boomapps.steemapp.repository.Balance
 import com.boomapps.steemapp.repository.RepositoryProvider
 import com.boomapps.steemapp.repository.UserData
+import com.boomapps.steemapp.repository.currency.AmountRequestData
+import com.boomapps.steemapp.repository.currency.OutputAmount
 import com.boomapps.steemapp.repository.entity.VoteState
+import com.boomapps.steemapp.repository.entity.profile.ProfileResponse
 import com.boomapps.steemapp.repository.network.NetworkRepository
+import com.boomapps.steemapp.repository.network.NetworkResponseCode
 import com.boomapps.steemapp.ui.BaseViewModel
 import com.boomapps.steemapp.ui.ViewState
+import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 
 /**
  * Created by vgrechikha on 25.01.2018.
@@ -34,6 +40,8 @@ class MainViewModel : BaseViewModel() {
 
     var successfulPostingNumber: Int = -1
 
+    var steemTradingAmount: MutableLiveData<OutputAmount> = MutableLiveData()
+
 
     fun getUserProfile(): MutableLiveData<UserData> {
         if (userData.value == null) {
@@ -44,6 +52,13 @@ class MainViewModel : BaseViewModel() {
     }
 
     fun signOut() {
+        Single.fromCallable {
+            RepositoryProvider.getDaoRepository().clearDB()
+        }
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe()
+
         RepositoryProvider.getPreferencesRepository().clearAllData()
         RepositoryProvider.getSteemRepository().signOut()
 
@@ -65,11 +80,11 @@ class MainViewModel : BaseViewModel() {
             return
         } else {
             state.value = ViewState.PROGRESS
-            RepositoryProvider.getNetworkRepository().loadExtendedUserProfile(nickName!!, object : NetworkRepository.OnRequestFinishCallback {
+            RepositoryProvider.getNetworkRepository().loadExtendedUserProfile(nickName!!, object : NetworkRepository.OnRequestFinishCallback<ProfileResponse?> {
 
-                override fun onSuccessRequestFinish() {
+                override fun onSuccessRequestFinish(response: ProfileResponse?) {
                     Log.d("MainViewModel", "onSuccessRequestFinish")
-                    val exUserData = RepositoryProvider.getNetworkRepository().extendedProfileResponse?.userExtended
+                    val exUserData = response?.userExtended
                     if (exUserData != null) {
                         val newUserData = UserData(nickName, exUserData.profileMetadata.userName, exUserData.profileMetadata.photoUrl, userData.value?.postKey)
                         userData.value = newUserData
@@ -83,7 +98,7 @@ class MainViewModel : BaseViewModel() {
                     }
                 }
 
-                override fun onFailureRequestFinish(throwable: Throwable) {
+                override fun onFailureRequestFinish(code: NetworkResponseCode, throwable: Throwable) {
                     Log.d("MainViewModel", "doOnError")
                     stringError = throwable.localizedMessage
                     state.value = ViewState.FAULT_RESULT
@@ -92,6 +107,36 @@ class MainViewModel : BaseViewModel() {
 
         }
 
+    }
+
+    fun getSteemUsdAmount(): MutableLiveData<OutputAmount> {
+        if (steemTradingAmount.value == null) {
+            steemTradingAmount.value = OutputAmount()
+            loadSteemUsdAmount()
+        }
+        return steemTradingAmount
+    }
+
+    private fun loadSteemUsdAmount() {
+        if (steemTradingAmount != null) {
+            val inputAmount = steemTradingAmount.value?.inputAmount
+            if (inputAmount != null && inputAmount > 0) {
+                return
+            }
+        }
+        RepositoryProvider.getNetworkRepository().loadOutputAmount(AmountRequestData(1.0f, "steem", "bitusd"), object : NetworkRepository.OnRequestFinishCallback<OutputAmount> {
+            override fun onSuccessRequestFinish(response: OutputAmount) {
+                steemTradingAmount.value = response
+            }
+
+            override fun onFailureRequestFinish(code: NetworkResponseCode, throwable: Throwable) {
+                stringError = if (throwable.localizedMessage != null) {
+                    throwable.localizedMessage
+                } else {
+                    throwable.message ?: "Cannot load currency"
+                }
+            }
+        })
     }
 
     fun getBalance(): MutableLiveData<Balance> {
@@ -130,16 +175,16 @@ class MainViewModel : BaseViewModel() {
             return
         }
         isDataUpdating = true
-        RepositoryProvider.getNetworkRepository().loadFullStartData(nick!!, object : NetworkRepository.OnRequestFinishCallback {
+        RepositoryProvider.getNetworkRepository().loadFullStartData(nick!!, object : NetworkRepository.OnRequestFinishCallback<Any?> {
 
-            override fun onSuccessRequestFinish() {
+            override fun onSuccessRequestFinish(response: Any?) {
                 userData.value = RepositoryProvider.getPreferencesRepository().loadUserData()
                 balanceData.value = RepositoryProvider.getPreferencesRepository().loadBalance(true)
                 state.value = ViewState.SUCCESS_RESULT
                 isDataUpdating = false
             }
 
-            override fun onFailureRequestFinish(throwable: Throwable) {
+            override fun onFailureRequestFinish(code: NetworkResponseCode, throwable: Throwable) {
                 isDataUpdating = false
                 stringError = if (throwable.localizedMessage != null) {
                     throwable.localizedMessage
