@@ -238,16 +238,17 @@ class SteemRepositoryDefault : SteemRepository {
         }
     }
 
-    override fun uploadImage(uri: Uri): URL? {
+    override fun uploadImage(uri: Uri): URL {
         val imageFile = File(uri.path)
         if (!imageFile.exists() || imageFile.isDirectory || !imageFile.canRead()) {
+            Timber.e("File or directory of image doesn't exist or cannot be read: " + uri.path)
             return URL("http://empty.com")
         }
         val config = SteemJImageUploadConfig.getInstance()
         config.connectTimeout = 30000
         config.readTimeout = 30000
         val uData = RepositoryProvider.getPreferencesRepository().loadUserData()
-        var url: URL? = null
+        var url = URL("http://empty.com")
         try {
             url = SteemJImageUpload.uploadImage(
                     eu.bittrade.libs.steemj.image.upload.models.AccountName(uData.nickname),
@@ -258,9 +259,7 @@ class SteemRepositoryDefault : SteemRepository {
         } finally {
             return url
         }
-        return url
     }
-
 
     override fun getVestingShares(): Array<Double> {
         val dgProperties = steemJ?.dynamicGlobalProperties

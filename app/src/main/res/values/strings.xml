@@ -152,4 +152,8 @@ Do you want to enter correct key and try to post again?</string>
   <string name="trending">TRENDING</string>
   <string name="new_title">NEW</string>
 
+    <string name="sign_up">Sign Up with STEEM</string>
+    <string name="log_in">Log In</string>
+    <string name="steemit_username">Steemit Username</string>
+
 </resources>

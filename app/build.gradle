@@ -153,5 +153,8 @@ dependencies {
 
     //timber
     implementation 'com.jakewharton.timber:timber:4.6.1'
+
+    // JSOUP
+    implementation 'org.jsoup:jsoup:1.11.3'
 }
 apply plugin: 'com.google.gms.google-services'

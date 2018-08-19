@@ -19,33 +19,36 @@ import com.boomapps.steemapp.ui.editor.EditorViewModel
 import jp.wasabeef.richeditor.RichEditor
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageButton
+import com.boomapps.steemapp.utils.StyledText
+import org.jsoup.parser.Tag
 import timber.log.Timber
 
 
 /**
  * Created by vgrechikha on 21.02.2018.
  */
-class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel) : BaseTabView(view, tabListener, viewModel) {
+class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel) :
+        BaseTabView(view, tabListener, viewModel), RichEditor.OnTextClickListener {
 
     lateinit var editor: RichEditor
-    lateinit var actionsPanel: HorizontalScrollView
-    lateinit var keyboardButton: ImageView
+    private lateinit var actionsPanel: HorizontalScrollView
+    private lateinit var keyboardButton: ImageView
     lateinit var bold: View
     lateinit var italic: View
     lateinit var underline: View
-    lateinit var strike: View
-    lateinit var h1: View
-    lateinit var h2: View
-    lateinit var h3: View
-    lateinit var bulletList: View
-    lateinit var numberedList: View
-    lateinit var quote: View
-    lateinit var insertLine: View
+    private lateinit var strike: View
+    private lateinit var h1: View
+    private lateinit var h2: View
+    private lateinit var h3: View
+    private lateinit var bulletList: View
+    private lateinit var numberedList: View
+    private lateinit var quote: View
+    private lateinit var insertLine: View
+    private lateinit var link: View
 
     private var isKeyboardOpened = true
-    private val states: HashMap<String, Boolean> = hashMapOf(
-            "undo" to false,
-            "redo" to false,
+    private val styledText = StyledText()
+    private var state: HashMap<String, Boolean> = hashMapOf(
             "bold" to false,
             "italic" to false,
             "underline" to false,
@@ -56,8 +59,7 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
             "bullet_list" to false,
             "numbered_list" to false,
             "quote" to false,
-            "insert_line" to false,
-            "image" to false
+            "insert_line" to false
     )
 
     override fun initComponents() {
@@ -68,6 +70,8 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
 
     override fun onShow() {
         editor.html = viewModel.story
+        val ready = !viewModel.story.isEmpty() and (viewModel.story != "<br><br>")
+        dataListener.onDataChange(ready)
     }
 
     override fun onHide() {
@@ -80,7 +84,8 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
         } else {
             storyLength
         }
-        dataListener.onDataChange(sLength > 0)
+        val ready = (sLength > 0) and (viewModel.story != "<br><br>")
+        dataListener.onDataChange(ready)
     }
 
     private fun initEditor() {
@@ -90,11 +95,12 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
             editor.setEditorFontSize(14)
             editor.setPadding(0, 0, 0, 10)
             editor.setPlaceholder(view.context.getString(R.string.a_editor_story_text_hint))
-            editor.setOnTextChangeListener({ _ ->
+            editor.setOnTextChangeListener { _ ->
                 val value = editor.html
                 viewModel.story = value
                 processFullDataChange(storyLength = value.length)
-            })
+            }
+            editor.setOnTextClickListener(this)
             editor.html = viewModel.story
             editor.focusEditor()
         }
@@ -166,15 +172,12 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
             switchButtonState("quote", quote)
             editor.setBlockquote()
         }
-//        actionsPanel.findViewById<View>(R.id.actionAlignLeft)?.setOnClickListener { editor.setAlignLeft() }
-//        actionsPanel.findViewById<View>(R.id.actionAlignCenter)?.setOnClickListener { editor.setAlignCenter() }
-//        actionsPanel.findViewById<View>(R.id.actionAlignRight)?.setOnClickListener { editor.setAlignRight() }
         insertLine = actionsPanel.findViewById<View>(R.id.actionInsertLine)
         insertLine.setOnClickListener {
             editor.insertHorizontalLine()
         }
-        val link = actionsPanel.findViewById<View>(R.id.actionAddLink)
-        link?.setOnClickListener {
+        link = actionsPanel.findViewById<View>(R.id.actionAddLink)
+        link.setOnClickListener {
             val fragment = InsertLinkDialogFragment.newInstance()
             fragment.setOnInsertClickListener(onInsertLinkClickListener)
             // TODO maybe pass call dialog to activity
@@ -199,12 +202,12 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
     }
 
     private fun switchButtonState(key: String, view: View) {
-        setButtonState(key, view, states[key] != true)
+        setButtonState(key, view, state[key] != true)
     }
 
     private fun setButtonState(key: String, view: View, state: Boolean) {
-        states[key] = state
-        val color =  if (states[key]!!) {
+        this.state[key] = state
+        val color =  if (this.state[key]!!) {
             R.color.green_active
         } else {
             R.color.black
@@ -219,23 +222,23 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
 
     private fun initKeyboardStateListener() {
         try {
-            view.viewTreeObserver.addOnGlobalLayoutListener({
+            view.viewTreeObserver.addOnGlobalLayoutListener {
                 val r = Rect()
                 view.getWindowVisibleDisplayFrame(r)
 
                 val heightDiff = view.rootView.height - (r.bottom - r.top)
                 if (heightDiff > 300) {
                     isKeyboardOpened = true
-                    // kEYBOARD IS OPEN
+                    // KEYBOARD IS OPEN
                     keyboardButton.setImageResource(R.drawable.ic_keyboard_arrow_down)
                 } else {
                     if (isKeyboardOpened) {
                         isKeyboardOpened = false
                         keyboardButton.setImageResource(R.drawable.ic_keyboard_arrow_up)
                     }
-                    // kEYBOARD IS HIDDEN
+                    // KEYBOARD IS HIDDEN
                 }
-            })
+            }
         } catch (e: Throwable) {
             Timber.e(e)
         }
@@ -245,6 +248,62 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
         override fun onInsertClick(title: String, url: String) {
             editor.insertLink(url, title)
         }
+    }
+
+    override fun onTextClick(position: Int) {
+        val tags = StyledText().findTagsInHtml(position, viewModel.story)
+        updateStyleState(tags)
+    }
+
+    private fun updateStyleState(tags: List<Tag>) {
+        resetButtons()
+        for (tag in tags) {
+            when (tag.name) {
+                 styledText.styledTags.BOLD -> setButtonState(bold)
+                 styledText.styledTags.ITALIC -> setButtonState(italic)
+                 styledText.styledTags.UNDERLINE -> setButtonState(underline)
+                 styledText.styledTags.STRIKE -> setButtonState(strike)
+                 styledText.styledTags.H1 -> setButtonState(h1)
+                 styledText.styledTags.H2 -> setButtonState(h2)
+                 styledText.styledTags.H3 -> setButtonState(h3)
+                 styledText.styledTags.BULLET_LIST -> setButtonState(bulletList)
+                 styledText.styledTags.NUMBERED_LIST -> setButtonState(numberedList)
+                 styledText.styledTags.LINK -> setButtonState(link)
+            }
+        }
+    }
+
+    private fun resetButtons() {
+        resetButtonState(bold)
+        resetButtonState(italic)
+        resetButtonState(underline)
+        resetButtonState(strike)
+        resetButtonState(h1)
+        resetButtonState(h2)
+        resetButtonState(h3)
+        resetButtonState(bulletList)
+        resetButtonState(numberedList)
+        resetButtonState(link)
+    }
+
+    private fun resetButtonState(view: View) {
+        val color = R.color.black
+        view.post {
+            ImageViewCompat.setImageTintList(view as ImageButton,
+                    ColorStateList.valueOf(ContextCompat.getColor(view.context, color)))
+        }
+    }
+
+    private fun setButtonState(view: View) {
+        val color = R.color.green_active
+        view.post {
+            ImageViewCompat.setImageTintList(view as ImageButton,
+                    ColorStateList.valueOf(ContextCompat.getColor(view.context, color)))
+        }
+    }
+
+    override fun onTextSelect(begin: Int, end: Int) {
+        //do nothing
     }
 
 }

@@ -30,7 +30,6 @@ class EditorViewModel : BaseViewModel() {
     var story: String = ""
     val categories: ArrayList<CategoryItem> = arrayListOf()
     var activeTab: Int = 0
-    var inputCategory: String = ""
     var rewardPosition: Int = 1
     var upvoteState: Boolean = false
     var uploadedImageUrl: URL? = null
@@ -125,6 +124,12 @@ class EditorViewModel : BaseViewModel() {
             RepositoryProvider.getNetworkRepository().uploadNewPhoto(
                     uri,
                     object : NetworkRepository.OnRequestFinishCallback<URL?> {
+                        override fun onFailureRequestFinish(code: NetworkResponseCode, throwable: Throwable) {
+                            if (throwable.message != null) {
+                                stringError = throwable.message!!
+                            }
+                            state.value = ViewState.FAULT_RESULT
+                        }
 
                         override fun onSuccessRequestFinish(response: URL?) {
                             successCode = SUCCESS_IMAGE_UPLOAD
@@ -132,10 +137,6 @@ class EditorViewModel : BaseViewModel() {
                             state.value = ViewState.SUCCESS_RESULT
                             uploadTakenPhoto = false
                             uploadPickedPhoto = false
-                        }
-
-                        override fun onFailureRequestFinish(code: NetworkResponseCode, throwable: Throwable) {
-                            state.value = ViewState.FAULT_RESULT
                         }
                     })
         } else {
@@ -231,7 +232,7 @@ class EditorViewModel : BaseViewModel() {
 
     fun saveStoryData() {
         RepositoryProvider.getPreferencesRepository().saveStoryData(StoryInstance(title, story, categories))
-        RepositoryProvider.getFileRepository().saveStory(story, null)
+        RepositoryProvider.getFileRepository().saveStory(story,null)
     }
 
     fun loadStoryData() {
