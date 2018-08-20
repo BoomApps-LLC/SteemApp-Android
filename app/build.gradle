@@ -15,8 +15,8 @@ android {
         applicationId 'com.boomapps.steemapp'
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 26
-        versionName "2.1.4"
+        versionCode 27
+        versionName "2.2.4"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         // Enabling multidex support.
         multiDexEnabled true
