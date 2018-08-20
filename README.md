@@ -40,3 +40,6 @@ You can use this like to download the latest beta: https://play.google.com/apps/
 Utopian guidelines: https://join.utopian.io/guidelines/
 Bugreport template: https://github.com/utopian-io/editor-templates/blob/master/bug-hunting
 Example: https://busy.org/@javalord/steemapp-v1-0-3-camera-picture-not-uploading
+
+
+Developers who commit their code all agree that Utopian posts with development tag will be posted through @yuriks2000 account on Steemit.
