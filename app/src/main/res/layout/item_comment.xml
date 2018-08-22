@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="130dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <ImageView android:id="@+id/itemComment_avatar"
+        android:layout_height="36dp"
+        android:layout_width="36dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:srcCompat="@drawable/ic_account_circle_black_24dp" />
+
+    <TextView
+        android:id="@+id/itemComment_tvAuthor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:gravity="top"
+        android:hint="Unknown"
+        android:textColor="#0b0712"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/itemComment_avatar"
+        app:layout_constraintTop_toTopOf="@id/itemComment_avatar"
+        tools:text="yuriks2000" />
+
+    <TextView
+        android:id="@+id/itemComment_tvLastActivityTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:gravity="top"
+        android:paddingBottom="2dp"
+        android:textColor="#9c97a4"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@id/itemComment_avatar"
+        app:layout_constraintStart_toEndOf="@id/itemComment_avatar"
+        tools:text="5 days ago" />
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="2dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="2dp"
+        android:background="#e2e2e2"
+        app:layout_constraintBottom_toBottomOf="@id/itemComment_tvAuthor"
+        app:layout_constraintStart_toEndOf="@id/itemComment_tvAuthor"
+        app:layout_constraintTop_toTopOf="@id/itemComment_avatar" />
+
+    <TextView
+        android:id="@+id/itemComment_tvReputation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:gravity="top"
+        android:textColor="@color/violet"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@id/itemComment_tvAuthor"
+        app:layout_constraintStart_toEndOf="@id/itemComment_tvAuthor"
+        app:layout_constraintTop_toTopOf="@id/itemComment_tvAuthor"
+        tools:text="59" />
+
+    <ImageView
+        android:id="@+id/itemComment_ivMore"
+        android:layout_width="24dp"
+        android:layout_height="36dp"
+        app:srcCompat="@drawable/ic_more_vert_black_24dp"
+        app:layout_constraintBottom_toBottomOf="@id/itemComment_avatar"
+        app:layout_constraintStart_toEndOf="@id/itemComment_tvReputation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintTop_toTopOf="@id/itemComment_avatar"
+        />
+
+    <TextView
+        android:id="@+id/itemComment_tvText"
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        app:layout_constraintTop_toBottomOf="@id/itemComment_avatar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/itemComment_avatar"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:maxLines="2"
+        android:minLines="2"
+        android:ellipsize="end"
+        android:textColor="@color/black"
+        android:layout_marginTop="8dp"
+        android:textSize="14sp"
+        tools:text="I want to test SteemApp Feed on Android device my Google registered email is darrenjclaxton@gmail.com"
+        app:layout_constraintVertical_bias="0.0"/>
+
+
+    <LinearLayout
+        android:id="@+id/itemComment_votePriceLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="34dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_feed_card_price_voted_selector"
+        android:clickable="true"
+        android:focusable="false"
+        app:layout_constraintVertical_bias="0.0"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/itemComment_tvText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHorizontal_bias="1.0">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:layout_marginStart="8dp"
+            android:src="@drawable/ic_feed_card_price_selector" />
+
+        <TextView
+            android:id="@+id/itemComment_tvFullPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="4dp"
+            android:textColor="@color/feed_card_price_voted_text_selector"
+            tools:text="$127.33" />
+    </LinearLayout>
+
+
+    <ImageView
+        android:id="@+id/itemComment_ivVotesNum"
+        android:layout_width="12dp"
+        android:layout_height="8dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/ic_feed_card_votes"
+        app:layout_constraintBottom_toBottomOf="@id/itemComment_votePriceLayout"
+        app:layout_constraintTop_toTopOf="@id/itemComment_votePriceLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/itemComment_avatar"
+        app:layout_constraintHorizontal_bias="0.0"/>
+
+
+    <TextView
+        android:id="@+id/aPost_tvCommentNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="16dp"
+        android:textColor="#0b0712"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/itemComment_ivVotesNum"
+        app:layout_constraintBottom_toBottomOf="@id/itemComment_votePriceLayout"
+        app:layout_constraintTop_toTopOf="@id/itemComment_votePriceLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        tools:text="120" />
+
+
+
+    <ImageView
+        android:id="@+id/itemComment_ivReply"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/ic_feed_card_comments"
+        app:layout_constraintStart_toEndOf="@id/aPost_tvCommentNumber"
+        app:layout_constraintBottom_toBottomOf="@id/itemComment_votePriceLayout"
+        app:layout_constraintTop_toTopOf="@id/itemComment_votePriceLayout"
+        app:layout_constraintEnd_toStartOf="@id/itemComment_votePriceLayout"
+        app:layout_constraintHorizontal_bias="0.4" />
+
+    <TextView
+        android:id="@+id/aPost_tvLinkNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="16dp"
+        android:textColor="#0b0712"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/itemComment_ivReply"
+        app:layout_constraintBottom_toBottomOf="@id/itemComment_votePriceLayout"
+        app:layout_constraintTop_toTopOf="@id/itemComment_votePriceLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        tools:text="Reply" />
+
+</android.support.constraint.ConstraintLayout>
