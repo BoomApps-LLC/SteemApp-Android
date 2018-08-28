@@ -10,6 +10,7 @@ import android.graphics.Rect
 import android.support.v4.content.ContextCompat
 import android.support.v4.widget.ImageViewCompat
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.View
 import android.widget.HorizontalScrollView
 import android.widget.ImageView
@@ -48,6 +49,7 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
 
     private var isKeyboardOpened = true
     private val styledText = StyledText()
+    private var currentPosition = 0
     private var state: HashMap<String, Boolean> = hashMapOf(
             "bold" to false,
             "italic" to false,
@@ -97,8 +99,13 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
             editor.setPlaceholder(view.context.getString(R.string.a_editor_story_text_hint))
             editor.setOnTextChangeListener { _ ->
                 val value = editor.html
+                if (viewModel.story.length - value.length == 1) {
+                    val tags = StyledText().findTagsInHtml(currentPosition, viewModel.story)
+                    updateStyleState(tags)
+                }
                 viewModel.story = value
                 processFullDataChange(storyLength = value.length)
+                Log.i("StoryTab", "setOnTextChangeListener: $value, currentPosition = $currentPosition")
             }
             editor.setOnTextClickListener(this)
             editor.html = viewModel.story
@@ -202,6 +209,7 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
     }
 
     private fun switchButtonState(key: String, view: View) {
+        Log.i("StoryTab", "switchButtonState: key = $key, state = ${state[key] != true}")
         setButtonState(key, view, state[key] != true)
     }
 
@@ -251,6 +259,7 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
     }
 
     override fun onTextClick(position: Int) {
+        Log.i("StoryTab", "onTextClick: position = $position")
         val tags = StyledText().findTagsInHtml(position, viewModel.story)
         updateStyleState(tags)
     }
@@ -259,15 +268,42 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
         resetButtons()
         for (tag in tags) {
             when (tag.name) {
-                 styledText.styledTags.BOLD -> setButtonState(bold)
-                 styledText.styledTags.ITALIC -> setButtonState(italic)
-                 styledText.styledTags.UNDERLINE -> setButtonState(underline)
-                 styledText.styledTags.STRIKE -> setButtonState(strike)
-                 styledText.styledTags.H1 -> setButtonState(h1)
-                 styledText.styledTags.H2 -> setButtonState(h2)
-                 styledText.styledTags.H3 -> setButtonState(h3)
-                 styledText.styledTags.BULLET_LIST -> setButtonState(bulletList)
-                 styledText.styledTags.NUMBERED_LIST -> setButtonState(numberedList)
+                 styledText.styledTags.BOLD -> {
+                     setButtonState(bold)
+                     state["bold"] = true
+                 }
+                 styledText.styledTags.ITALIC -> {
+                     setButtonState(italic)
+                     state["italic"] = true
+                 }
+                 styledText.styledTags.UNDERLINE -> {
+                     setButtonState(underline)
+                     state["underline"] = true
+                 }
+                 styledText.styledTags.STRIKE -> {
+                     setButtonState(strike)
+                     state["strike"] = true
+                 }
+                 styledText.styledTags.H1 -> {
+                     setButtonState(h1)
+                     state["h1"] = true
+                 }
+                 styledText.styledTags.H2 -> {
+                     setButtonState(h2)
+                     state["h2"] = true
+                 }
+                 styledText.styledTags.H3 -> {
+                     setButtonState(h3)
+                     state["h3"] = true
+                 }
+                 styledText.styledTags.BULLET_LIST -> {
+                     setButtonState(bulletList)
+                     state["bullet_list"] = true
+                 }
+                 styledText.styledTags.NUMBERED_LIST -> {
+                     setButtonState(numberedList)
+                     state["numbered_list"] = true
+                 }
                  styledText.styledTags.LINK -> setButtonState(link)
             }
         }
@@ -284,6 +320,9 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
         resetButtonState(bulletList)
         resetButtonState(numberedList)
         resetButtonState(link)
+        for (key in state.keys) {
+            state[key] = false
+        }
     }
 
     private fun resetButtonState(view: View) {
@@ -303,7 +342,10 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
     }
 
     override fun onTextSelect(begin: Int, end: Int) {
-        //do nothing
+        Log.i("StoryTab", "onTextSelect: begin = $begin, end = $end")
+        if (begin == end) {
+            currentPosition = begin
+        }
     }
 
 }
