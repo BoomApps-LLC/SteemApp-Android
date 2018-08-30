@@ -3,6 +3,7 @@ package com.boomapps.steemapp.repository.steem
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
+import com.google.gson.JsonNull
 import timber.log.Timber
 import java.lang.reflect.Type
 
@@ -15,14 +16,26 @@ class StoryMetadataDeserializer : JsonDeserializer<StoryMetadata> {
             val jObject = json.asJsonObject
             if (jObject.has("tags")) {
                 if (jObject.get("tags").isJsonArray) {
-                    result.tags = jObject.getAsJsonArray("tags").map { it.asString }.toTypedArray()
+                    result.tags = jObject.getAsJsonArray("tags").map {
+                        if (it is JsonNull) {
+                            ""
+                        } else {
+                            it.asString
+                        }
+                    }.toTypedArray()
                 } else {
                     result.tags = arrayOf(jObject.getAsJsonPrimitive("tags").asString)
                 }
             }
             if (jObject.has("links")) {
                 if (jObject.get("links").isJsonArray) {
-                    result.links = jObject.getAsJsonArray("links").map { it.asString }.toTypedArray()
+                    result.links = jObject.getAsJsonArray("links").map {
+                        if (it is JsonNull) {
+                            ""
+                        } else {
+                            it.asString
+                        }
+                    }.toTypedArray()
                 } else {
                     result.links = arrayOf(jObject.getAsJsonPrimitive("links").asString)
                 }
