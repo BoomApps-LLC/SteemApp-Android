@@ -10,7 +10,6 @@ import android.graphics.Rect
 import android.support.v4.content.ContextCompat
 import android.support.v4.widget.ImageViewCompat
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.View
 import android.widget.HorizontalScrollView
 import android.widget.ImageView
@@ -105,7 +104,6 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
                 }
                 viewModel.story = value
                 processFullDataChange(storyLength = value.length)
-                Log.i("StoryTab", "setOnTextChangeListener: $value, currentPosition = $currentPosition")
             }
             editor.setOnTextClickListener(this)
             editor.html = viewModel.story
@@ -209,7 +207,6 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
     }
 
     private fun switchButtonState(key: String, view: View) {
-        Log.i("StoryTab", "switchButtonState: key = $key, state = ${state[key] != true}")
         setButtonState(key, view, state[key] != true)
     }
 
@@ -259,7 +256,6 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
     }
 
     override fun onTextClick(position: Int) {
-        Log.i("StoryTab", "onTextClick: position = $position")
         val tags = StyledText().findTagsInHtml(position, viewModel.story)
         updateStyleState(tags)
     }
@@ -342,7 +338,6 @@ class StoryTab(view: View, tabListener: TabListener, viewModel: EditorViewModel)
     }
 
     override fun onTextSelect(begin: Int, end: Int) {
-        Log.i("StoryTab", "onTextSelect: begin = $begin, end = $end")
         if (begin == end) {
             currentPosition = begin
         }
