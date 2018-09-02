@@ -7,7 +7,6 @@ package com.boomapps.steemapp
 import android.app.Application
 import android.arch.persistence.room.Room
 import android.content.Context
-import com.boomapps.steemapp.repository.steem.SteemWorker
 import com.boomapps.steemapp.logging.CrashReportingTree
 import com.boomapps.steemapp.repository.UserData
 import com.boomapps.steemapp.repository.db.AppDatabase

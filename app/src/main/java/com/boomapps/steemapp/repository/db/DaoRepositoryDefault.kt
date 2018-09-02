@@ -157,7 +157,7 @@ class DaoRepositoryDefault(
 
 
     /**
-     * Returns a Listing for the given subreddit.
+     * Returns a Listing for the given story
      */
     @MainThread
     override fun storiesFor(type: FeedType, pageSize: Int): Listing<StoryEntity> {
@@ -182,9 +182,9 @@ class DaoRepositoryDefault(
         // refresh method and gets a new live data. Each refresh request by the user becomes a newly
         // dispatched data in refreshTrigger
         val refreshTrigger = MutableLiveData<Unit>()
-        val refreshState = Transformations.switchMap(refreshTrigger, {
+        val refreshState = Transformations.switchMap(refreshTrigger) {
             refresh(type)
-        })
+        }
 
         return Listing(
                 pagedList = builder.build(),

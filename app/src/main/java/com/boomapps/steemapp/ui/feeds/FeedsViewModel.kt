@@ -23,39 +23,39 @@ class FeedsViewModel : BaseViewModel() {
 
     // BLOG
     private val blogType = MutableLiveData<FeedType>()
-    private val blogRepoResult = Transformations.map(blogType, {
+    private val blogRepoResult = Transformations.map(blogType) {
         RepositoryProvider.getDaoRepository().storiesFor(it, RepositoryProvider.DATABASE_PAGE_SIZE)
-    })
-    val blogs = Transformations.switchMap(blogRepoResult, { it.pagedList })!!
-    val blogsNetworkState = Transformations.switchMap(blogRepoResult, { it.networkState })!!
-    val blogsRefreshState = Transformations.switchMap(blogRepoResult, { it.refreshState })!!
+    }
+    private val blogs = Transformations.switchMap(blogRepoResult) { it.pagedList }!!
+    private val blogsNetworkState = Transformations.switchMap(blogRepoResult) { it.networkState }!!
+    private val blogsRefreshState = Transformations.switchMap(blogRepoResult) { it.refreshState }!!
 
     // FEED
     private val feedType = MutableLiveData<FeedType>()
-    private val feedRepoResult = Transformations.map(feedType, {
+    private val feedRepoResult = Transformations.map(feedType) {
         RepositoryProvider.getDaoRepository().storiesFor(it, RepositoryProvider.DATABASE_PAGE_SIZE)
-    })
-    val feeds = Transformations.switchMap(feedRepoResult, { it.pagedList })!!
-    val feedsNetworkState = Transformations.switchMap(feedRepoResult, { it.networkState })!!
-    val feedsRefreshState = Transformations.switchMap(feedRepoResult, { it.refreshState })!!
+    }
+    private val feeds = Transformations.switchMap(feedRepoResult) { it.pagedList }!!
+    private val feedsNetworkState = Transformations.switchMap(feedRepoResult) { it.networkState }!!
+    private val feedsRefreshState = Transformations.switchMap(feedRepoResult) { it.refreshState }!!
 
     // TRENDING
     private val trendingType = MutableLiveData<FeedType>()
-    private val trendingRepoResult = Transformations.map(trendingType, {
+    private val trendingRepoResult = Transformations.map(trendingType) {
         RepositoryProvider.getDaoRepository().storiesFor(it, RepositoryProvider.DATABASE_PAGE_SIZE)
-    })
-    val trendings = Transformations.switchMap(trendingRepoResult, { it.pagedList })!!
-    val trendingsNetworkState = Transformations.switchMap(trendingRepoResult, { it.networkState })!!
-    val trendingsRefreshState = Transformations.switchMap(trendingRepoResult, { it.refreshState })!!
+    }
+    private val trendings = Transformations.switchMap(trendingRepoResult) { it.pagedList }!!
+    private val trendingsNetworkState = Transformations.switchMap(trendingRepoResult) { it.networkState }!!
+    private val trendingsRefreshState = Transformations.switchMap(trendingRepoResult) { it.refreshState }!!
 
     // NEW
     private val novicesType = MutableLiveData<FeedType>()
-    private val novicesRepoResult = Transformations.map(novicesType, {
+    private val novicesRepoResult = Transformations.map(novicesType) {
         RepositoryProvider.getDaoRepository().storiesFor(it, RepositoryProvider.DATABASE_PAGE_SIZE)
-    })
-    val novices = Transformations.switchMap(novicesRepoResult, { it.pagedList })!!
-    val novicesNetworkState = Transformations.switchMap(novicesRepoResult, { it.networkState })!!
-    val novicesRefreshState = Transformations.switchMap(novicesRepoResult, { it.refreshState })!!
+    }
+    private val novices = Transformations.switchMap(novicesRepoResult) { it.pagedList }!!
+    private val novicesNetworkState = Transformations.switchMap(novicesRepoResult) { it.networkState }!!
+    private val novicesRefreshState = Transformations.switchMap(novicesRepoResult) { it.refreshState }!!
 
     fun getListLiveData(type: FeedType): LiveData<PagedList<StoryEntity>> {
         return when (type) {
@@ -145,6 +145,7 @@ class FeedsViewModel : BaseViewModel() {
             else -> feedRepoResult?.value // FeedType.FEED
         }
         listing?.retry?.invoke()
+
     }
 
     fun isActivated(type: FeedType): Boolean {

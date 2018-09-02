@@ -12,6 +12,7 @@ import com.boomapps.steemapp.repository.db.DiscussionToStoryMapper
 import com.boomapps.steemapp.repository.db.entities.StoryEntity
 import eu.bittrade.crypto.core.AddressFormatException
 import eu.bittrade.libs.steemj.SteemJ
+import eu.bittrade.libs.steemj.apis.database.models.state.Discussion
 import eu.bittrade.libs.steemj.base.models.AccountName
 import eu.bittrade.libs.steemj.base.models.DiscussionQuery
 import eu.bittrade.libs.steemj.base.models.Permlink
@@ -25,9 +26,9 @@ import eu.bittrade.libs.steemj.exceptions.SteemInvalidTransactionException
 import eu.bittrade.libs.steemj.exceptions.SteemResponseException
 import eu.bittrade.libs.steemj.image.upload.SteemJImageUpload
 import eu.bittrade.libs.steemj.image.upload.config.SteemJImageUploadConfig
-import eu.bittrade.libs.steemj.util.SteemJUtils
 import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import org.apache.commons.lang3.tuple.ImmutablePair
 import org.jetbrains.annotations.NotNull
@@ -88,7 +89,7 @@ class SteemRepositoryDefault : SteemRepository {
     /**
      *
      */
-    override fun login(nickname: String, postingKey: String?): SteemWorkerResponse {
+    override fun login(nickname: String, postingKey: String?): SteemRepoResponse {
         try {
             steemJConfig = SteemJConfig.getInstance()
             steemJConfig?.setAppName("SteemApp")
@@ -109,30 +110,30 @@ class SteemRepositoryDefault : SteemRepository {
             steemJ = SteemJ()
             var result = steemJ?.lookupAccounts(nickname, 1)
             if (result == null || result.size == 0 || result[0].toLowerCase() != nickname.toLowerCase()) {
-                return SteemWorkerResponse(false, SteemErrorCodes.INCORRECT_USER_DATA_ERROR, null)
+                return SteemRepoResponse(false, SteemErrorCodes.INCORRECT_USER_DATA_ERROR, null)
             }
         } catch (sce: SteemConnectionException) {
             Timber.e(sce)
             sce.printStackTrace()
-            return SteemWorkerResponse(false, SteemErrorCodes.CONNECTION_ERROR, null)
+            return SteemRepoResponse(false, SteemErrorCodes.CONNECTION_ERROR, null)
         } catch (sre: SteemResponseException) {
             Timber.e(sre)
             sre.printStackTrace()
-            return SteemWorkerResponse(false, SteemErrorCodes.TIMEOUT_ERROR, null)
+            return SteemRepoResponse(false, SteemErrorCodes.TIMEOUT_ERROR, null)
         } catch (afe: AddressFormatException) {
             Timber.e(afe)
             afe.printStackTrace()
-            return SteemWorkerResponse(false, SteemErrorCodes.INCORRECT_USER_DATA_ERROR, null)
+            return SteemRepoResponse(false, SteemErrorCodes.INCORRECT_USER_DATA_ERROR, null)
         } catch (ipe: InvalidParameterException) {
             Timber.e(ipe)
             ipe.printStackTrace()
-            return SteemWorkerResponse(false, SteemErrorCodes.INCORRECT_USER_DATA_ERROR, ipe.message)
+            return SteemRepoResponse(false, SteemErrorCodes.INCORRECT_USER_DATA_ERROR, ipe.message)
         } catch (ex: Exception) {
             Timber.e(ex)
             ex.printStackTrace()
-            return SteemWorkerResponse(false, SteemErrorCodes.UNDEFINED_ERROR, null)
+            return SteemRepoResponse(false, SteemErrorCodes.UNDEFINED_ERROR, null)
         }
-        return SteemWorkerResponse(true, SteemErrorCodes.EMPTY_ERROR, null)
+        return SteemRepoResponse(true, SteemErrorCodes.EMPTY_ERROR, null)
     }
 
     private fun addNewPostingKey(key: String) {
@@ -168,7 +169,6 @@ class SteemRepositoryDefault : SteemRepository {
             }
         } catch (communicationException: SteemCommunicationException) {
             Timber.e(communicationException)
-            // TODO define all codes for different errors
             return PostingResult(SteemAnswerCodes.UNKNOWN_ERROR, communicationException.localizedMessage, false)
         } catch (responseException: SteemResponseException) {
             Timber.e(responseException)
@@ -179,8 +179,9 @@ class SteemRepositoryDefault : SteemRepository {
         } catch (parameterException: InvalidParameterException) {
             Timber.e(parameterException)
             return PostingResult(SteemAnswerCodes.UNKNOWN_ERROR, parameterException.localizedMessage, false)
+        } finally {
+            return PostingResult(SteemAnswerCodes.SUCCESS, "", true)
         }
-        return PostingResult(SteemAnswerCodes.SUCCESS, "", true)
     }
 
 
@@ -370,6 +371,11 @@ class SteemRepositoryDefault : SteemRepository {
             dQuery.startPermlink = Permlink(storyEntity.permlink)
             dQuery.startAuthor = AccountName(storyEntity.author)
         }
+        run {
+            getStoryDiscussionTree(sortType, storyEntity?.permlink, storyEntity?.author, 0)
+        }
+
+
         val observable = Single.fromCallable {
             return@fromCallable steemJ?.getDiscussionsBy(dQuery, sortType)
         }
@@ -391,6 +397,38 @@ class SteemRepositoryDefault : SteemRepository {
     override fun getNewDataList(start: Int, limit: Int, storyEntity: StoryEntity?): Single<ArrayList<DiscussionData>>? {
         return getDiscussionsDataList(DiscussionSortType.GET_DISCUSSIONS_BY_CREATED, start, limit, storyEntity)
     }
+
+
+    fun getStoryDiscussionTree(sortType: DiscussionSortType, permlinkString: String?, authorName: String?, limit: Int) {
+//        val dQuery = DiscussionQuery()
+//        dQuery.parentAuthor = AccountName(authorName)
+//        dQuery.parentPermlink = Permlink(permlinkString)
+//        dQuery.limit = limit
+        Timber.d("TREE: for $authorName :: $permlinkString")
+        Single.fromCallable {
+            return@fromCallable steemJ?.getRepliesByLastUpdate(AccountName(authorName), Permlink(permlinkString), 10)
+        }
+                .subscribeOn(Schedulers.io())
+                .map {
+                    Timber.d("TREE: number = ${it.size}")
+                    val arrayList: ArrayList<DiscussionData> = arrayListOf()
+                    for ((index, discussion) in it.withIndex()) {
+                        arrayList.add(DiscussionData(index, discussion))
+                    }
+                    return@map arrayList
+                }
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    if (it != null && it.size > 0) {
+                        for (data in it) {
+                            Timber.d("TREE: ${data.discussion?.rootTitle}")
+                        }
+                    }
+                }, {
+
+                })
+    }
+
 
     /*
         * Upvote the post
@@ -506,4 +544,67 @@ class SteemRepositoryDefault : SteemRepository {
                         }
                 )
     }
+
+
+    override fun loadStoryComments(entity: StoryEntity) {
+        Observable
+                .fromCallable {
+                    val allComments: Array<CommentsOrderedData> = loadSubComments(entity.entityId, entity.author, entity.permlink)
+
+                    return@fromCallable allComments
+                }
+                .doOnNext {
+                    Timber.d("Story : ${entity.title}")
+                    Timber.d("Story's children number: " + entity.commentsNum + " >>\n")
+                    if(it != null && it.isNotEmpty()){
+                        logComments(it, 1)
+                    }
+
+                }
+                .observeOn(Schedulers.io())
+                .subscribeOn(Schedulers.io())
+                .subscribe()
+    }
+
+    fun loadSubComments(parentId: Long, parentAuthor: String, parentPermlink: String): Array<CommentsOrderedData> {
+        val response = steemJ?.getContentReplies(AccountName(parentAuthor), Permlink(parentPermlink))
+        val result: ArrayList<CommentsOrderedData> = arrayListOf()
+        if (response != null && response.size > 0) {
+            var order : Int = 0
+            for(discussion in response){
+                if(discussion == null){
+                    continue
+                }
+                val children: Array<CommentsOrderedData> = if(discussion.children > 0){
+                    loadSubComments(discussion.id, discussion.author.name, discussion.permlink.link)
+                }else{
+                    arrayOf()
+                }
+                result.add(CommentsOrderedData(parentId, parentAuthor, parentPermlink, order++, discussion, children))
+            }
+        }
+        return result.toTypedArray()
+    }
+
+    private fun logComments(allComments: Array<CommentsOrderedData>, level : Int){
+        val prefix = when(level){
+            1 -> "\n-- %s\n"
+            2 -> "\n---- %s\n"
+            3 -> "\n------ %s\n"
+            4 -> "\n-------- %s\n"
+            5 -> "\n---------- %s\n"
+            6 -> "\n------------ %s\n"
+            else -> "\n| %s\n"
+        }
+        for(data in allComments){
+            Timber.d(prefix, data.data.body)
+            if(data.children.isNotEmpty()){
+                logComments(data.children, level + 1)
+            }
+        }
+    }
+
+
+    data class CommentsOrderedData(val rootId: Long, val rootAuthor: String, val rootPermlink: String, val order : Int, val data: Discussion, var children: Array<CommentsOrderedData>)
+
 }

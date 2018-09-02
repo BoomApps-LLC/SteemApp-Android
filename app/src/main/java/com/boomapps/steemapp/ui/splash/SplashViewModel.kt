@@ -10,7 +10,6 @@ import android.util.Log
 import com.boomapps.steemapp.repository.RepositoryProvider
 import com.boomapps.steemapp.repository.network.NetworkRepository
 import com.boomapps.steemapp.repository.network.NetworkResponseCode
-import com.boomapps.steemapp.repository.steem.SteemWorker
 import com.boomapps.steemapp.ui.BaseViewModel
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -36,7 +35,7 @@ class SplashViewModel : BaseViewModel() {
     }
 
     fun getLoginState(): LiveData<LoginState> {
-        loginState.value = if (RepositoryProvider.getPreferencesRepository().isUserLogged() || !SteemWorker().isLogged()) {
+        loginState.value = if (RepositoryProvider.getPreferencesRepository().isUserLogged() ||  !RepositoryProvider.getSteemRepository().isLogged()) {
             LoginState.NOT_LOGGED
         } else {
             LoginState.LOGGED

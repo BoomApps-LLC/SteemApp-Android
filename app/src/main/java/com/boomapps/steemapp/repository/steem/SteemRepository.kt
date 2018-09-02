@@ -7,8 +7,6 @@ package com.boomapps.steemapp.repository.steem
 import android.net.Uri
 import com.boomapps.steemapp.repository.FeedType
 import com.boomapps.steemapp.repository.db.entities.StoryEntity
-import eu.bittrade.libs.steemj.apis.database.models.state.Discussion
-import eu.bittrade.libs.steemj.apis.follow.model.CommentFeedEntry
 import eu.bittrade.libs.steemj.base.models.AccountName
 import eu.bittrade.libs.steemj.base.models.Permlink
 import io.reactivex.Observable
@@ -32,7 +30,7 @@ interface SteemRepository {
      * Method only initialize {@link eu.bittrade.libs.steemj.configuration.SteemJConfig}
      * and {@link eu.bittrade.libs.steemj.SteemJ} objects
      */
-    fun login(nickname: String, postingKey: String?): SteemWorkerResponse
+    fun login(nickname: String, postingKey: String?): SteemRepoResponse
 
     fun hasPostingKey(): Boolean
 
@@ -74,4 +72,6 @@ interface SteemRepository {
     fun voteWithUpdate(story: StoryEntity, type: FeedType, percent: Int, callback: Callback<Boolean>)
 
     fun updatePostingKey(stringExtra: String?)
+
+    fun loadStoryComments(storyEntity: StoryEntity)
 }

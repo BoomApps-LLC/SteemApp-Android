@@ -48,6 +48,7 @@ class PostViewModel(val postId: Long, val postUrl: String, val title: String) : 
                         entity.entityId = postId
                         RepositoryProvider.getDaoRepository().insertPost(entity)
                     }
+                    loadComments()
                 }, {
                     Timber.e(it, "error loading url")
                 }, {
@@ -119,6 +120,14 @@ class PostViewModel(val postId: Long, val postUrl: String, val title: String) : 
         // add key into steemJ object
         RepositoryProvider.getSteemRepository().updatePostingKey(data.getStringExtra("POSTING_KEY"))
         return true
+    }
+
+    fun loadComments() {
+        val data = fullStoryData.value
+        if (data == null) {
+            return
+        }
+        RepositoryProvider.getSteemRepository().loadStoryComments(data)
     }
 
 }
