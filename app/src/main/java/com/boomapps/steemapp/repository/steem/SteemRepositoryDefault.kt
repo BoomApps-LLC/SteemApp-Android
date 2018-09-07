@@ -549,7 +549,8 @@ class SteemRepositoryDefault : SteemRepository {
     override fun loadStoryComments(entity: StoryEntity) {
         Observable
                 .fromCallable {
-                    val allComments: Array<CommentsOrderedData> = loadSubComments(entity.entityId, entity.author, entity.permlink)
+                    val allComments: Array<CommentsOrderedData> = loadSubComments(entity.entityId, entity.entityId,
+                        entity.author, entity.permlink)
 
                     return@fromCallable allComments
                 }
@@ -566,7 +567,8 @@ class SteemRepositoryDefault : SteemRepository {
                 .subscribe()
     }
 
-    fun loadSubComments(parentId: Long, parentAuthor: String, parentPermlink: String): Array<CommentsOrderedData> {
+    fun loadSubComments(rootId: Long, parentId: Long, parentAuthor: String, parentPermlink: String):
+        Array<CommentsOrderedData> {
         val response = steemJ?.getContentReplies(AccountName(parentAuthor), Permlink(parentPermlink))
         val result: ArrayList<CommentsOrderedData> = arrayListOf()
         if (response != null && response.size > 0) {
@@ -576,11 +578,11 @@ class SteemRepositoryDefault : SteemRepository {
                     continue
                 }
                 val children: Array<CommentsOrderedData> = if(discussion.children > 0){
-                    loadSubComments(discussion.id, discussion.author.name, discussion.permlink.link)
+                    loadSubComments(rootId, discussion.id, discussion.author.name, discussion.permlink.link)
                 }else{
                     arrayOf()
                 }
-                result.add(CommentsOrderedData(parentId, parentAuthor, parentPermlink, order++, discussion, children))
+                result.add(CommentsOrderedData(rootId, parentId, order++, discussion, children))
             }
         }
         return result.toTypedArray()
@@ -588,16 +590,16 @@ class SteemRepositoryDefault : SteemRepository {
 
     private fun logComments(allComments: Array<CommentsOrderedData>, level : Int){
         val prefix = when(level){
-            1 -> "\n-- %s\n"
-            2 -> "\n---- %s\n"
-            3 -> "\n------ %s\n"
-            4 -> "\n-------- %s\n"
-            5 -> "\n---------- %s\n"
-            6 -> "\n------------ %s\n"
-            else -> "\n| %s\n"
+            1 -> "-- %s\n %d-%d"
+            2 -> "---- %s\n %d-%d"
+            3 -> "------ %s\n %d-%d"
+            4 -> "-------- %s\n %d-%d"
+            5 -> "---------- %s\n %d-%d"
+            6 -> "------------ %s\n %d-%d"
+            else -> "\n| %s\n %d-%d"
         }
         for(data in allComments){
-            Timber.d(prefix, data.data.body)
+            Timber.d(prefix, data.data.body, data.rootId, data.parentId)
             if(data.children.isNotEmpty()){
                 logComments(data.children, level + 1)
             }
@@ -605,6 +607,7 @@ class SteemRepositoryDefault : SteemRepository {
     }
 
 
-    data class CommentsOrderedData(val rootId: Long, val rootAuthor: String, val rootPermlink: String, val order : Int, val data: Discussion, var children: Array<CommentsOrderedData>)
+    data class CommentsOrderedData(val rootId: Long, val parentId : Long, val order : Int, val data: Discussion, var
+    children: Array<CommentsOrderedData>)
 
 }
