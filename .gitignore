@@ -19,3 +19,19 @@ gradlew
 gradlew\.bat
 
 gradle/wrapper/
+
+\.project
+
+\.settings/org\.eclipse\.buildship\.core\.prefs
+
+app/\.classpath
+
+app/\.settings/org\.eclipse\.buildship\.core\.prefs
+
+richeditor/\.classpath
+
+richeditor/\.settings/org\.eclipse\.buildship\.core\.prefs
+
+steemj-core/\.classpath
+
+steemj-core/\.settings/org\.eclipse\.buildship\.core\.prefs
