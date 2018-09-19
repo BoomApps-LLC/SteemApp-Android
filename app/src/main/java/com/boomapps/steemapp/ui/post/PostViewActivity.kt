@@ -103,7 +103,9 @@ class PostViewActivity : BaseActivity() {
             }
 
         }
+        viewModel.comments.observe(this, Observer {
 
+        })
     }
 
     private fun observeState() {
@@ -149,7 +151,7 @@ class PostViewActivity : BaseActivity() {
             }
         })
 
-        postWebView.webViewClient = WebViewClient()// LoadingWebViewClient(loadingListener)
+        postWebView.webViewClient = WebViewClient()
         postWebView.webChromeClient = object : WebChromeClient() {
 
             override fun onProgressChanged(view: WebView, newProgress: Int) {
@@ -238,7 +240,7 @@ class PostViewActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.loadPost()
+        viewModel.loadPostWithComments()
     }
 
     private fun prettifyHtml(rawBody: String): String {

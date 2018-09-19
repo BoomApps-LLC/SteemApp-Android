@@ -9,6 +9,7 @@ import com.boomapps.steemapp.repository.db.entities.StoryEntity
 import com.boomapps.steemapp.repository.steem.DiscussionData
 import com.boomapps.steemapp.repository.steem.StoryMetadata
 import com.boomapps.steemapp.repository.steem.StoryMetadataDeserializer
+import com.boomapps.steemapp.repository.steem.getVotesNum
 import com.google.gson.GsonBuilder
 import eu.bittrade.libs.steemj.base.models.VoteState
 import timber.log.Timber
@@ -59,11 +60,8 @@ class DiscussionToStoryMapper(val data: ArrayList<DiscussionData>, val accountNa
         }
         outValue.linksNum = outValue.links.size
 
-        outValue.votesNum = if (inValue.activeVotes == null || inValue.activeVotes !is List<*>) {
-            0
-        } else {
-            getVotersNum(inValue.activeVotes)
-        }
+        outValue.votesNum = inValue.getVotesNum()
+
         outValue.commentsNum = inValue.children
         outValue.price = if (inValue.pendingPayoutValue.amount > 0) {
             inValue.pendingPayoutValue.toReal().toFloat()

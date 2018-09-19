@@ -8,6 +8,7 @@ import android.arch.lifecycle.LiveData
 import android.content.Intent
 import com.boomapps.steemapp.repository.FeedType
 import com.boomapps.steemapp.repository.RepositoryProvider
+import com.boomapps.steemapp.repository.db.entities.CommentEntity
 import com.boomapps.steemapp.repository.db.entities.PostEntity
 import com.boomapps.steemapp.repository.db.entities.StoryEntity
 import com.boomapps.steemapp.repository.steem.SteemRepository
@@ -22,14 +23,17 @@ class PostViewModel(val postId: Long, val postUrl: String, val title: String) : 
 
     var postData: LiveData<PostEntity>
 
+    var comments : LiveData<Array<CommentEntity>>
+
     var fullStoryData: LiveData<StoryEntity>
 
     init {
         postData = RepositoryProvider.getDaoRepository().getPostLiveData(postId)
         fullStoryData = RepositoryProvider.getDaoRepository().getStory(postId)
+        comments = RepositoryProvider.getDaoRepository().getCommentsLiveData(postId)
     }
 
-    fun loadPost() {
+    fun loadPostWithComments() {
         if (postData.value != null) {
             return
         }
@@ -48,11 +52,11 @@ class PostViewModel(val postId: Long, val postUrl: String, val title: String) : 
                         entity.entityId = postId
                         RepositoryProvider.getDaoRepository().insertPost(entity)
                     }
-                    loadComments()
                 }, {
                     Timber.e(it, "error loading url")
                 }, {
-
+                    // update comments every time
+                    loadComments()
                 })
     }
 

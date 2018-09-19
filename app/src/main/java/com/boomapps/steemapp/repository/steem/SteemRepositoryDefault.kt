@@ -9,6 +9,7 @@ import com.boomapps.steemapp.BuildConfig
 import com.boomapps.steemapp.repository.FeedType
 import com.boomapps.steemapp.repository.RepositoryProvider
 import com.boomapps.steemapp.repository.db.DiscussionToStoryMapper
+import com.boomapps.steemapp.repository.db.entities.CommentEntity
 import com.boomapps.steemapp.repository.db.entities.StoryEntity
 import eu.bittrade.crypto.core.AddressFormatException
 import eu.bittrade.libs.steemj.SteemJ
@@ -547,39 +548,88 @@ class SteemRepositoryDefault : SteemRepository {
 
 
     override fun loadStoryComments(entity: StoryEntity) {
+        val allComments: Array<CommentEntity> = arrayOf()
+
         Observable
                 .fromCallable {
-                    val allComments: Array<CommentsOrderedData> = loadSubComments(entity.entityId, entity.entityId,
-                        entity.author, entity.permlink)
-
-                    return@fromCallable allComments
+                    return@fromCallable loadSubComments(entity.entityId, entity.entityId,
+                            entity.author, entity.permlink)
                 }
                 .doOnNext {
                     Timber.d("Story : ${entity.title}")
                     Timber.d("Story's children number: " + entity.commentsNum + " >>\n")
-                    if(it != null && it.isNotEmpty()){
+                    if (it != null && it.isNotEmpty()) {
                         logComments(it, 1)
                     }
 
                 }
                 .observeOn(Schedulers.io())
                 .subscribeOn(Schedulers.io())
-                .subscribe()
+                .subscribe(
+                        {
+                            if (it != null && it.isNotEmpty()) {
+                                allComments.plus(getOneLevelCommentsArray(it, 0).toTypedArray())
+                            }
+                        },
+                        {
+                            // process error
+                        },
+                        {
+                            // store into db
+                            if (allComments.isNotEmpty()) {
+                                RepositoryProvider.getDaoRepository().insertComments(allComments)
+                            }
+                        })
+    }
+
+    private fun getOneLevelCommentsArray(ordered: Array<CommentsOrderedData>, level: Int): ArrayList<CommentEntity> {
+        val result: ArrayList<CommentEntity> = arrayListOf()
+        for (comment in ordered) {
+            result.add(mapCommentIntoEntity(comment, level))
+            if (comment.children.isNotEmpty()) {
+                result.addAll(getOneLevelCommentsArray(comment.children, level + 1))
+            }
+        }
+        return result
+    }
+
+    private fun mapCommentIntoEntity(raw: CommentsOrderedData, level: Int): CommentEntity {
+        val entity = CommentEntity()
+        entity.commentId = raw.data.id
+        entity.rootId = raw.rootId
+        entity.parentId = raw.parentId
+        entity.author = raw.data.author.name
+        entity.permlink = raw.data.permlink.link
+        entity.title = raw.data.title
+        entity.body = raw.data.body
+        entity.level = level
+        entity.order = raw.order
+        entity.votesNum = raw.data.getVotesNum()
+        val activeVoters: ArrayList<String> = arrayListOf()
+        if (raw.data.activeVotes.isNotEmpty()) {
+            activeVoters.addAll(raw.data.activeVotes.map { it.voter.name })
+        }
+        entity.voters = activeVoters.toTypedArray()
+        entity.price = raw.data.getUSDprice()
+        entity.created = raw.data.created.dateTimeAsTimestamp
+        entity.lastUpdate = raw.data.lastUpdate.dateTimeAsTimestamp
+        entity.entityLastLoadTime = System.currentTimeMillis()
+        return entity
     }
 
     fun loadSubComments(rootId: Long, parentId: Long, parentAuthor: String, parentPermlink: String):
-        Array<CommentsOrderedData> {
+            Array<CommentsOrderedData> {
         val response = steemJ?.getContentReplies(AccountName(parentAuthor), Permlink(parentPermlink))
         val result: ArrayList<CommentsOrderedData> = arrayListOf()
         if (response != null && response.size > 0) {
-            var order : Int = 0
-            for(discussion in response){
-                if(discussion == null){
+            var order: Int = 0
+            for (discussion in response) {
+                if (discussion == null) {
                     continue
                 }
-                val children: Array<CommentsOrderedData> = if(discussion.children > 0){
+                val children: Array<CommentsOrderedData> = if (discussion.children > 0) {
                     loadSubComments(rootId, discussion.id, discussion.author.name, discussion.permlink.link)
-                }else{
+                } else {
                     arrayOf()
                 }
                 result.add(CommentsOrderedData(rootId, parentId, order++, discussion, children))
@@ -588,8 +638,8 @@ class SteemRepositoryDefault : SteemRepository {
         return result.toTypedArray()
     }
 
-    private fun logComments(allComments: Array<CommentsOrderedData>, level : Int){
-        val prefix = when(level){
+    private fun logComments(allComments: Array<CommentsOrderedData>, level: Int) {
+        val prefix = when (level) {
             1 -> "-- %s\n %d-%d"
             2 -> "---- %s\n %d-%d"
             3 -> "------ %s\n %d-%d"
@@ -598,16 +648,16 @@ class SteemRepositoryDefault : SteemRepository {
             6 -> "------------ %s\n %d-%d"
             else -> "\n| %s\n %d-%d"
         }
-        for(data in allComments){
+        for (data in allComments) {
             Timber.d(prefix, data.data.body, data.rootId, data.parentId)
-            if(data.children.isNotEmpty()){
+            if (data.children.isNotEmpty()) {
                 logComments(data.children, level + 1)
             }
         }
     }
 
 
-    data class CommentsOrderedData(val rootId: Long, val parentId : Long, val order : Int, val data: Discussion, var
+    data class CommentsOrderedData(val rootId: Long, val parentId: Long, val order: Int, val data: Discussion, var
     children: Array<CommentsOrderedData>)
 
 }

@@ -8,6 +8,7 @@ import android.arch.lifecycle.LiveData
 import com.boomapps.steemapp.repository.FeedType
 import com.boomapps.steemapp.repository.Listing
 import com.boomapps.steemapp.repository.NetworkState
+import com.boomapps.steemapp.repository.db.entities.CommentEntity
 import com.boomapps.steemapp.repository.db.entities.PostEntity
 import com.boomapps.steemapp.repository.db.entities.StoryEntity
 
@@ -31,6 +32,10 @@ interface DaoRepository {
 
     fun getPostLiveData(postId: Long): LiveData<PostEntity>
 
+    fun getCommentsLiveData(postId: Long): LiveData<Array<CommentEntity>>
+
+    fun insertComments(data : Array<CommentEntity>)
+
     fun updatePost(postEntity: PostEntity)
 
     fun insertPost(postEntity: PostEntity)
@@ -40,5 +45,6 @@ interface DaoRepository {
     fun deletePost(postEntity: PostEntity)
 
     fun clearDB()
+
 
 }

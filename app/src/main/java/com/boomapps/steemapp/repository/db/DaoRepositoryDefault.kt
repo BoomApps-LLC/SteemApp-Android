@@ -10,6 +10,7 @@ import android.arch.lifecycle.Transformations
 import android.arch.paging.LivePagedListBuilder
 import android.support.annotation.MainThread
 import com.boomapps.steemapp.repository.*
+import com.boomapps.steemapp.repository.db.entities.CommentEntity
 import com.boomapps.steemapp.repository.db.entities.PostEntity
 import com.boomapps.steemapp.repository.db.entities.StoryEntity
 import com.boomapps.steemapp.repository.steem.DiscussionData
@@ -227,5 +228,14 @@ class DaoRepositoryDefault(
     override fun clearDB() {
         db.postsDao().deleteAllPosts()
         db.storiesDao().deleteAllStories()
+    }
+
+
+    override fun getCommentsLiveData(storyId: Long): LiveData<Array<CommentEntity>> {
+        return db.commentsDao().loadAllCommentsForStory(storyId)
+    }
+
+    override fun insertComments(data: Array<CommentEntity>) {
+        db.commentsDao().insertComments(data)
     }
 }
