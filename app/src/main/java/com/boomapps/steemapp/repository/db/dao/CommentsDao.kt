@@ -12,7 +12,7 @@ import com.boomapps.steemapp.repository.db.entities.CommentEntity
 @Dao
 interface CommentsDao {
 
-  @Query("SELECT * FROM comments WHERE root_id=:storyId ORDER BY level, time_last_update ASC")
+  @Query("SELECT * FROM comments WHERE root_id=:storyId ORDER BY \"order\" ASC")
   fun loadAllCommentsForStory(storyId : Long) : LiveData<Array<CommentEntity>>
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)

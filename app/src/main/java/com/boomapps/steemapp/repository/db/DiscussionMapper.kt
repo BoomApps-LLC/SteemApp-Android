@@ -14,7 +14,7 @@ import com.google.gson.GsonBuilder
 import eu.bittrade.libs.steemj.base.models.VoteState
 import timber.log.Timber
 
-class DiscussionToStoryMapper(val data: ArrayList<DiscussionData>, val accountName: String) {
+class DiscussionMapper(val data: ArrayList<DiscussionData>, val accountName: String) {
     constructor(data: DiscussionData, accountName: String) : this(arrayListOf(data), accountName)
 
     fun map(): ArrayList<StoryEntity> {

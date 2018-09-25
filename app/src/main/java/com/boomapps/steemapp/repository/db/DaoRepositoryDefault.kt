@@ -107,7 +107,7 @@ class DaoRepositoryDefault(
 
                             // process new discussions
                             val result = discussions.map {
-                                return@map DiscussionToStoryMapper(it, RepositoryProvider.getPreferencesRepository().loadUserData().nickname
+                                return@map DiscussionMapper(it, RepositoryProvider.getPreferencesRepository().loadUserData().nickname
                                         ?: "_").map()[0]
                             }.toTypedArray()
                             db.runInTransaction {
@@ -138,7 +138,7 @@ class DaoRepositoryDefault(
                 ?.subscribe(
                         {
                             // process new discussions
-                            val result = DiscussionToStoryMapper(it, RepositoryProvider.getPreferencesRepository().loadUserData().nickname
+                            val result = DiscussionMapper(it, RepositoryProvider.getPreferencesRepository().loadUserData().nickname
                                     ?: "_").map().toTypedArray()
                             db.runInTransaction {
                                 // clear data for type
@@ -232,6 +232,7 @@ class DaoRepositoryDefault(
 
 
     override fun getCommentsLiveData(storyId: Long): LiveData<Array<CommentEntity>> {
+        Timber.d("getCommentsLiveData for $storyId")
         return db.commentsDao().loadAllCommentsForStory(storyId)
     }
 

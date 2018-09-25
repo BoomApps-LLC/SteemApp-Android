@@ -33,44 +33,44 @@ class PostViewModel(val postId: Long, val postUrl: String, val title: String) : 
         comments = RepositoryProvider.getDaoRepository().getCommentsLiveData(postId)
     }
 
-    fun loadPostWithComments() {
-        if (postData.value != null) {
-            return
-        }
-        Observable.fromCallable {
-            getTransformedPage(postUrl)
-        }
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
-                .subscribe({
-                    if (it != null) {
-                        // save it to db
-                        val entity = PostEntity()
-                        entity.body = it
-                        entity.url = postUrl
-                        entity.title = title
-                        entity.entityId = postId
-                        RepositoryProvider.getDaoRepository().insertPost(entity)
-                    }
-                }, {
-                    Timber.e(it, "error loading url")
-                }, {
-                    // update comments every time
-                    loadComments()
-                })
-    }
+//    fun loadPostWithComments() {
+//        if (postData.value != null) {
+//            return
+//        }
+//        Observable.fromCallable {
+//            getTransformedPage(postUrl)
+//        }
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(Schedulers.io())
+//                .subscribe({
+//                    if (it != null) {
+//                        // save it to db
+//                        val entity = PostEntity()
+//                        entity.body = it
+//                        entity.url = postUrl
+//                        entity.title = title
+//                        entity.entityId = postId
+//                        RepositoryProvider.getDaoRepository().insertPost(entity)
+//                    }
+//                }, {
+//                    Timber.e(it, "error loading url")
+//                }, {
+//                    // update comments every time
+//                    loadComments()
+//                })
+//    }
 
-
-    fun getTransformedPage(url: String): String {
-        val html = Jsoup.connect(url).get()
-        val element = html.body().getElementsByClass("PostFull__body entry-content")
-        if (element != null) {
-            return element.html()
-        } else {
-            return html.body().html()
-        }
-
-    }
+//
+//    fun getTransformedPage(url: String): String {
+//        val html = Jsoup.connect(url).get()
+//        val element = html.body().getElementsByClass("PostFull__body entry-content")
+//        if (element != null) {
+//            return element.html()
+//        } else {
+//            return html.body().html()
+//        }
+//
+//    }
 
     fun isVoted(): Boolean? {
         return fullStoryData.value?.isVoted
@@ -127,11 +127,10 @@ class PostViewModel(val postId: Long, val postUrl: String, val title: String) : 
     }
 
     fun loadComments() {
-        val data = fullStoryData.value
-        if (data == null) {
-            return
-        }
+        Timber.d("COMMENTS: loadComments")
+        val data = fullStoryData.value ?: return
         RepositoryProvider.getSteemRepository().loadStoryComments(data)
     }
+
 
 }

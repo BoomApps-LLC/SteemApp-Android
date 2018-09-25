@@ -7,7 +7,7 @@ package com.boomapps.steemapp.repository
 import android.arch.lifecycle.MutableLiveData
 import android.arch.paging.PagedList
 import android.support.annotation.MainThread
-import com.boomapps.steemapp.repository.db.DiscussionToStoryMapper
+import com.boomapps.steemapp.repository.db.DiscussionMapper
 import com.boomapps.steemapp.repository.db.entities.StoryEntity
 import com.boomapps.steemapp.repository.steem.DiscussionData
 import com.boomapps.steemapp.repository.steem.SteemRepository
@@ -29,7 +29,7 @@ class FeedBoundaryCallback(
 
     private fun insertItemsIntoDb(items: ArrayList<DiscussionData>) {
         ioExecutor.execute {
-            handleResponse(type, DiscussionToStoryMapper(items, RepositoryProvider.getPreferencesRepository().loadUserData().nickname
+            handleResponse(type, DiscussionMapper(items, RepositoryProvider.getPreferencesRepository().loadUserData().nickname
                     ?: "_").map().toTypedArray())
         }
     }

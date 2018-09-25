@@ -8,7 +8,7 @@ import android.net.Uri
 import com.boomapps.steemapp.BuildConfig
 import com.boomapps.steemapp.repository.FeedType
 import com.boomapps.steemapp.repository.RepositoryProvider
-import com.boomapps.steemapp.repository.db.DiscussionToStoryMapper
+import com.boomapps.steemapp.repository.db.DiscussionMapper
 import com.boomapps.steemapp.repository.db.entities.CommentEntity
 import com.boomapps.steemapp.repository.db.entities.StoryEntity
 import eu.bittrade.crypto.core.AddressFormatException
@@ -493,7 +493,7 @@ class SteemRepositoryDefault : SteemRepository {
                         {
                             val result = it
                             if (result?.discussion != null) {
-                                val mapped = DiscussionToStoryMapper(result, steemJConfig?.defaultAccount?.name
+                                val mapped = DiscussionMapper(result, steemJConfig?.defaultAccount?.name
                                         ?: "_").map()
                                 if (mapped.isNotEmpty()) {
                                     mapped[0].storyType = type.ordinal
@@ -527,7 +527,7 @@ class SteemRepositoryDefault : SteemRepository {
                             val result = it
                             if (result?.discussion != null) {
 //                                Timber.d("voteWithUpdate.subscribe.onNext(discussion != null)")
-                                val mapped = DiscussionToStoryMapper(result, steemJConfig?.defaultAccount?.name
+                                val mapped = DiscussionMapper(result, steemJConfig?.defaultAccount?.name
                                         ?: "_").map()
                                 if (mapped.isNotEmpty()) {
                                     mapped[0].storyType = type.ordinal
@@ -548,7 +548,8 @@ class SteemRepositoryDefault : SteemRepository {
 
 
     override fun loadStoryComments(entity: StoryEntity) {
-        val allComments: Array<CommentEntity> = arrayOf()
+        Timber.d("COMMENTS: loadStoryComments for ${entity.entityId}")
+        val allComments: ArrayList<CommentEntity> = arrayListOf()
 
         Observable
                 .fromCallable {
@@ -556,8 +557,8 @@ class SteemRepositoryDefault : SteemRepository {
                             entity.author, entity.permlink)
                 }
                 .doOnNext {
-                    Timber.d("Story : ${entity.title}")
-                    Timber.d("Story's children number: " + entity.commentsNum + " >>\n")
+                    Timber.d("COMMENTS: Story : ${entity.title}")
+                    Timber.d("COMMENTS: Story's children number: " + entity.commentsNum + " >>\n")
                     if (it != null && it.isNotEmpty()) {
                         logComments(it, 1)
                     }
@@ -568,7 +569,7 @@ class SteemRepositoryDefault : SteemRepository {
                 .subscribe(
                         {
                             if (it != null && it.isNotEmpty()) {
-                                allComments.plus(getOneLevelCommentsArray(it, 0).toTypedArray())
+                                allComments.addAll(getOneLevelCommentsArray(it, 0))
                             }
                         },
                         {
@@ -577,7 +578,8 @@ class SteemRepositoryDefault : SteemRepository {
                         {
                             // store into db
                             if (allComments.isNotEmpty()) {
-                                RepositoryProvider.getDaoRepository().insertComments(allComments)
+                                Timber.d("COMMENTS: loadStoryComments >> input in DB ${allComments.size} comments")
+                                RepositoryProvider.getDaoRepository().insertComments(allComments.toTypedArray())
                             }
                         })
     }
@@ -593,6 +595,7 @@ class SteemRepositoryDefault : SteemRepository {
         return result
     }
 
+
     private fun mapCommentIntoEntity(raw: CommentsOrderedData, level: Int): CommentEntity {
         val entity = CommentEntity()
         entity.commentId = raw.data.id
@@ -603,7 +606,7 @@ class SteemRepositoryDefault : SteemRepository {
         entity.title = raw.data.title
         entity.body = raw.data.body
         entity.level = level
-        entity.order = raw.order
+        entity.order = levelWeight[level] + raw.order
         entity.votesNum = raw.data.getVotesNum()
         val activeVoters: ArrayList<String> = arrayListOf()
         if (raw.data.activeVotes.isNotEmpty()) {
@@ -638,6 +641,17 @@ class SteemRepositoryDefault : SteemRepository {
         return result.toTypedArray()
     }
 
+    private val levelWeight: Array<Long> = arrayOf(
+            1000000000L,
+            1100000000L,
+            1110000000L,
+            1111000000L,
+            1111100000L,
+            1111110000L,
+            1111111000L,
+            1111111100L
+    )
+
     private fun logComments(allComments: Array<CommentsOrderedData>, level: Int) {
         val prefix = when (level) {
             1 -> "-- %s\n %d-%d"
@@ -658,6 +672,31 @@ class SteemRepositoryDefault : SteemRepository {
 
 
     data class CommentsOrderedData(val rootId: Long, val parentId: Long, val order: Int, val data: Discussion, var
-    children: Array<CommentsOrderedData>)
+    children: Array<CommentsOrderedData>) : Comparable<CommentsOrderedData> {
+
+        override fun compareTo(other: CommentsOrderedData): Int {
+            return data.created.dateTimeAsInt - other.data.created.dateTimeAsInt
+        }
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as CommentsOrderedData
+
+            if (rootId != other.rootId) return false
+            if (parentId != other.parentId) return false
+            if (data.author != other.data.author && data.permlink != other.data.permlink) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = rootId.hashCode()
+            result = 31 * result + parentId.hashCode()
+            result = 31 * result + data.author.hashCode() + data.permlink.hashCode()
+            return result
+        }
+    }
 
 }

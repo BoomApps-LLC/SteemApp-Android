@@ -7,17 +7,15 @@
     android:layout_height="match_parent"
     android:id="@+id/rootView">
 
-
-    <WebView
-        android:id="@+id/postWebView"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/postContentList"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:paddingTop="2dp"
         app:layout_constraintBottom_toTopOf="@id/aPost_bottomDivider"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
+        app:layout_constraintTop_toTopOf="parent"
+        />
 
     <ProgressBar
         android:id="@+id/postWebViewProgress"

@@ -29,7 +29,7 @@ class CommentEntity {
 
   var level : Int = 0
 
-  var order : Int = 0
+  var order : Long = 0
 
   @ColumnInfo(name = "votes_id")
   var votesNum : Int = 0

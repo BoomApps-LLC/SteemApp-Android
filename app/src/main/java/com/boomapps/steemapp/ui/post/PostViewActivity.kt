@@ -13,12 +13,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.constraint.ConstraintLayout
 import android.support.v4.content.ContextCompat
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.view.MenuItem
 import android.view.View
-import android.webkit.WebChromeClient
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import com.boomapps.steemapp.R
+import com.boomapps.steemapp.Utils
 import com.boomapps.steemapp.ui.BaseActivity
 import com.boomapps.steemapp.ui.ViewState
 import com.boomapps.steemapp.ui.dialogs.VotePostDialog
@@ -28,7 +28,6 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import kotlinx.android.synthetic.main.activity_post.*
-import java.util.*
 
 class PostViewActivity : BaseActivity() {
 
@@ -49,7 +48,7 @@ class PostViewActivity : BaseActivity() {
     private val INPUT_NEW_KEY_POST_ACTIVITY_CODE = 32
 
     lateinit var viewModel: PostViewModel
-    var pFullWidth = 0
+//    var pFullWidth = 0
 
     lateinit var extraUrl: String
     var extraPostId: Long = -1
@@ -61,6 +60,9 @@ class PostViewActivity : BaseActivity() {
     var extraCommentNum = 0
     var extraLinksNum = 0
     var extraVoteNum = 0
+
+    lateinit var contentList: RecyclerView
+    lateinit var contentAdapter: ArticleAdapter
 
 
     private lateinit var progressParams: ConstraintLayout.LayoutParams
@@ -78,7 +80,12 @@ class PostViewActivity : BaseActivity() {
         title = intent.extras.getString(EXTRA_ACTIVITY_TITLE)
         viewModel = ViewModelProviders.of(this, PostViewModelFactory(extraPostId, extraUrl, extraTitle)).get(PostViewModel::class.java)
         progressParams = postWebViewProgress.layoutParams as ConstraintLayout.LayoutParams
-        initWebView()
+//        viewModel.postData.observe(this, Observer {
+//            if (it != null) {
+//                postWebViewProgress.visibility = View.GONE
+//                contentAdapter.updateBody(extraTitle, it.body)
+//            }
+//        })
         observeState()
         viewModel.fullStoryData.observe(this, Observer {
             if (it?.isVoted == true) {
@@ -88,6 +95,9 @@ class PostViewActivity : BaseActivity() {
                 aPost_votePriceLayout.setBackgroundResource(R.drawable.bg_feed_card_price_unvoted_selector)
                 aPost_tvFullPrice.setTextColor(ContextCompat.getColorStateList(this, R.color.feed_card_price_voted_text_selector))
             }
+            postWebViewProgress.visibility = View.GONE
+            contentAdapter.updateBody(extraTitle, it?.rawBody ?: "")
+            viewModel.loadComments()
         })
         aPost_votePriceLayout.setOnClickListener {
             if (!viewModel.hasPostingKey()) {
@@ -104,8 +114,15 @@ class PostViewActivity : BaseActivity() {
 
         }
         viewModel.comments.observe(this, Observer {
-
+            contentAdapter.resetComments(it)
         })
+
+        contentList = findViewById(R.id.postContentList)
+        val manager = LinearLayoutManager(this)
+        manager.orientation = LinearLayoutManager.VERTICAL
+        contentList.layoutManager = manager
+        contentAdapter = ArticleAdapter(this)
+        contentList.adapter = contentAdapter
     }
 
     private fun observeState() {
@@ -140,38 +157,6 @@ class PostViewActivity : BaseActivity() {
     }
 
 
-    private fun initWebView() {
-        postWebView.addOnLayoutChangeListener(object : View.OnLayoutChangeListener {
-
-            override fun onLayoutChange(v: View?, left: Int, top: Int, right: Int, bottom: Int, oldLeft: Int, oldTop: Int, oldRight: Int, oldBottom: Int) {
-                if (right > 0) {
-                    pFullWidth = right - left
-                    postWebView.removeOnLayoutChangeListener(this)
-                }
-            }
-        })
-
-        postWebView.webViewClient = WebViewClient()
-        postWebView.webChromeClient = object : WebChromeClient() {
-
-            override fun onProgressChanged(view: WebView, newProgress: Int) {
-                super.onProgressChanged(view, newProgress)
-            }
-
-        }
-        postWebView.visibility = View.VISIBLE
-        postWebView.settings.javaScriptEnabled = true
-        postWebView.settings.loadWithOverviewMode = true
-
-        postWebView.postDelayed({
-            viewModel.postData.observe(this, Observer {
-                if (it != null) {
-                    showHtml(it.body)
-                }
-            })
-        }, 1000)
-    }
-
     private fun extractExtras() {
         val inData = intent
         if (inData != null) {
@@ -204,43 +189,14 @@ class PostViewActivity : BaseActivity() {
         aPost_tvVotesNumber.text = extraVoteNum.toString()
         aPost_tvCommentNumber.text = extraCommentNum.toString()
         aPost_tvLinkNumber.text = extraLinksNum.toString()
-        if (extraDate > 0) {
-            val created = Calendar.getInstance()
-            created.timeInMillis = extraDate
-            var sCreated = "unknown"
-            if (created.timeInMillis > 0) {
-                val curCal = currentDate()
-                val yearsDelta = curCal.get(Calendar.YEAR) - created.get(Calendar.YEAR)
-                val monthDelta = curCal.get(Calendar.MONTH) - created.get(Calendar.MONTH)
-                val dayDelta = curCal.get(Calendar.DAY_OF_YEAR) - created.get(Calendar.DAY_OF_YEAR)
-                if (yearsDelta > 0) {
-                    aPost_tvLastActivityTime.text = formatDate(yearsDelta, resources.getQuantityString(R.plurals.years, yearsDelta))
-                } else if (monthDelta > 0) {
-                    aPost_tvLastActivityTime.text = formatDate(monthDelta, resources.getQuantityString(R.plurals.months, monthDelta))
-                } else if (dayDelta > 1) {
-                    aPost_tvLastActivityTime.text = formatDate(dayDelta, resources.getQuantityString(R.plurals.days, dayDelta))
-                } else {
-                    aPost_tvLastActivityTime.text = getString(R.string.feed_card_date_format_yesterday)
-                }
-            }
-        }
+        aPost_tvLastActivityTime.text = Utils.get().getFormattedCommentTime(this, extraDate)
         aPost_tvFullPrice.text = String.format("$ %.2f", extraAmount)
     }
 
 
-    private fun currentDate(): Calendar {
-        val c = Calendar.getInstance()
-        c.timeInMillis = System.currentTimeMillis()
-        return c
-    }
-
-    private fun formatDate(days: Int, pluralValue: String): String {
-        return String.format(getString(R.string.feed_card_date_format_common), days, pluralValue)
-    }
-
     override fun onResume() {
         super.onResume()
-        viewModel.loadPostWithComments()
+        viewModel.loadComments()
     }
 
     private fun prettifyHtml(rawBody: String): String {
@@ -292,18 +248,6 @@ class PostViewActivity : BaseActivity() {
         return "<a href=\"https://steemit.com/$inLink\">$inLink</a>"
     }
 
-
-    private fun showHtml(html: String) {
-        val sb = StringBuilder()
-                .append(getString(R.string.post_new_prefix))
-                .append("<h1>").append(extraTitle).append("</h1>")
-                .append(html)
-                .append(getString(R.string.pos_postfix))
-        val fullHtml = sb.toString()
-        postWebView.loadData(sb.toString(), "text/html", "UTF-8")
-        postWebViewProgress.visibility = View.GONE
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
             finish()
@@ -313,11 +257,7 @@ class PostViewActivity : BaseActivity() {
     }
 
     override fun onBackPressed() {
-        if (postWebView.canGoBack()) {
-            postWebView.goBack()
-        } else {
-            finish()
-        }
+        finish()
     }
 
     private fun showVoteDialog() {

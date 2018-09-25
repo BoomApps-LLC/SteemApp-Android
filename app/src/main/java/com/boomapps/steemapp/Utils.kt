@@ -14,9 +14,6 @@ import android.widget.EditText
 import java.io.File
 import java.io.IOException
 import java.util.*
-import android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT
-import android.content.Context.INPUT_METHOD_SERVICE
-import android.view.inputmethod.InputMethodManager
 
 
 /**
@@ -111,6 +108,35 @@ class Utils {
         if (et != null) {
             et.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(limit))
         }
+    }
+
+    fun getFormattedCommentTime(context: Context, timeInMillis: Long): String {
+        val created = Calendar.getInstance()
+        created.timeInMillis = timeInMillis
+        var sCreated = "unknown"
+        if (created.timeInMillis > 0) {
+            val curCal = currentDate()
+            val yearsDelta = curCal.get(Calendar.YEAR) - created.get(Calendar.YEAR)
+            val monthDelta = curCal.get(Calendar.MONTH) - created.get(Calendar.MONTH)
+            val dayDelta = curCal.get(Calendar.DAY_OF_YEAR) - created.get(Calendar.DAY_OF_YEAR)
+            return when {
+                yearsDelta > 0 -> formatDate(context, yearsDelta, context.resources.getQuantityString(R.plurals.years, yearsDelta))
+                monthDelta > 0 -> formatDate(context, monthDelta, context.resources.getQuantityString(R.plurals.months, monthDelta))
+                dayDelta > 1 -> formatDate(context, dayDelta, context.resources.getQuantityString(R.plurals.days, dayDelta))
+                else -> context.getString(R.string.feed_card_date_format_yesterday)
+            }
+        }
+        return ""
+    }
+
+    private fun currentDate(): Calendar {
+        val c = Calendar.getInstance()
+        c.timeInMillis = System.currentTimeMillis()
+        return c
+    }
+
+    private fun formatDate(context: Context, days: Int, pluralValue: String): String {
+        return String.format(context.getString(R.string.feed_card_date_format_common), days, pluralValue)
     }
 
 }
