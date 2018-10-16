@@ -4,12 +4,12 @@
 */
 package com.boomapps.steemapp.ui.feeds
 
-import android.arch.lifecycle.Observer
-import android.arch.paging.PagedList
-import android.support.v4.app.Fragment
-import android.support.v4.widget.SwipeRefreshLayout
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.lifecycle.Observer
+import androidx.paging.PagedList
+import androidx.fragment.app.Fragment
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 import com.boomapps.steemapp.R
 import com.boomapps.steemapp.repository.FeedType
@@ -37,9 +37,9 @@ class FeedListHolder(val type: FeedType, val tabName: String, val feedView: View
         // TODO use real link to Fragment instead callback as Fragment
         recyclerView.adapter = adapter
         feedViewModel.getListLiveData(type).observe(callback as Fragment, Observer<PagedList<StoryEntity>> {
-            val recyclerViewState = recyclerView.layoutManager.onSaveInstanceState()
+            val recyclerViewState = recyclerView.layoutManager?.onSaveInstanceState()
             adapter.submitList(it)
-            recyclerView.layoutManager.onRestoreInstanceState(recyclerViewState)
+            recyclerView.layoutManager?.onRestoreInstanceState(recyclerViewState)
         })
         feedViewModel.getNetworkState(type).observe(callback as Fragment, Observer {
             adapter.setNetworkState(it)

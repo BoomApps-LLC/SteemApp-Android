@@ -4,9 +4,9 @@
 */
 package com.boomapps.steemapp.repository.db
 
-import android.arch.persistence.room.Database
-import android.arch.persistence.room.RoomDatabase
-import android.arch.persistence.room.TypeConverters
+import androidx.room.Database
+import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import com.boomapps.steemapp.repository.db.converters.Converters
 import com.boomapps.steemapp.repository.db.dao.CommentsDao
 import com.boomapps.steemapp.repository.db.dao.PostsDao

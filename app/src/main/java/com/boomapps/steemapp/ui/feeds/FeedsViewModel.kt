@@ -4,10 +4,10 @@
 */
 package com.boomapps.steemapp.ui.feeds
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.Transformations
-import android.arch.paging.PagedList
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
+import androidx.paging.PagedList
 import android.content.Intent
 import com.boomapps.steemapp.repository.FeedType
 import com.boomapps.steemapp.repository.NetworkState

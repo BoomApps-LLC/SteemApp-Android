@@ -44,20 +44,18 @@ interface SteemRepository {
 
     fun getStoryDetails(aName: AccountName?, pLink: Permlink, orderId: Int): Observable<DiscussionData>
 
-    fun getFeedShortDataList(aName: AccountName?): Observable<ArrayList<StoryShortEntry>>
-
     fun getFeedShortDataList(aName: AccountName?, start: Int, limit: Int): Observable<ArrayList<StoryShortEntry>>
 
-    fun getBlogShortDataList(aName: AccountName?): Observable<ArrayList<StoryShortEntry>>
-
-
     fun getBlogShortDataList(aName: AccountName?, start: Int, limit: Int): Observable<ArrayList<StoryShortEntry>>
-
 
     fun getFeedStories(aName: AccountName?, start: Int, limit: Int): Single<ArrayList<DiscussionData>>
 
 
     fun getBlogStories(aName: AccountName?, start: Int, limit: Int): Single<ArrayList<DiscussionData>>
+
+    fun getBlogDataList(start : Int, limit : Int, storyEntity: StoryEntity?) : Single<ArrayList<DiscussionData>>?
+
+    fun getFeedDataList(start : Int, limit : Int, storyEntity: StoryEntity?) : Single<ArrayList<DiscussionData>>?
 
     fun getTrendingDataList(start: Int, limit: Int, storyEntity: StoryEntity?): Single<ArrayList<DiscussionData>>?
 

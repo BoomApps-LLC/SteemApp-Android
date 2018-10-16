@@ -4,19 +4,18 @@
 */
 package com.boomapps.steemapp.ui.post
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
-import android.support.constraint.ConstraintLayout
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.MenuItem
 import android.view.View
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.boomapps.steemapp.R
 import com.boomapps.steemapp.Utils
 import com.boomapps.steemapp.ui.BaseActivity
@@ -67,7 +66,6 @@ class PostViewActivity : BaseActivity() {
 
     private lateinit var progressParams: ConstraintLayout.LayoutParams
 
-    @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_post)
@@ -80,12 +78,6 @@ class PostViewActivity : BaseActivity() {
         title = intent.extras.getString(EXTRA_ACTIVITY_TITLE)
         viewModel = ViewModelProviders.of(this, PostViewModelFactory(extraPostId, extraUrl, extraTitle)).get(PostViewModel::class.java)
         progressParams = postWebViewProgress.layoutParams as ConstraintLayout.LayoutParams
-//        viewModel.postData.observe(this, Observer {
-//            if (it != null) {
-//                postWebViewProgress.visibility = View.GONE
-//                contentAdapter.updateBody(extraTitle, it.body)
-//            }
-//        })
         observeState()
         viewModel.fullStoryData.observe(this, Observer {
             if (it?.isVoted == true) {
@@ -119,7 +111,7 @@ class PostViewActivity : BaseActivity() {
 
         contentList = findViewById(R.id.postContentList)
         val manager = LinearLayoutManager(this)
-        manager.orientation = LinearLayoutManager.VERTICAL
+        manager.orientation = RecyclerView.VERTICAL
         contentList.layoutManager = manager
         contentAdapter = ArticleAdapter(this)
         contentList.adapter = contentAdapter

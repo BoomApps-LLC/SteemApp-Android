@@ -1,7 +1,7 @@
 package com.boomapps.steemapp.repository.db
 
-import android.arch.persistence.db.SupportSQLiteDatabase
-import android.arch.persistence.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
+import androidx.room.migration.Migration
 
 /**
  * Migration class from 1st to 2nd version

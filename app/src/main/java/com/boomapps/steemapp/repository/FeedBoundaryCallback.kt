@@ -4,9 +4,9 @@
 */
 package com.boomapps.steemapp.repository
 
-import android.arch.lifecycle.MutableLiveData
-import android.arch.paging.PagedList
-import android.support.annotation.MainThread
+import androidx.lifecycle.MutableLiveData
+import androidx.paging.PagedList
+import androidx.annotation.MainThread
 import com.boomapps.steemapp.repository.db.DiscussionMapper
 import com.boomapps.steemapp.repository.db.entities.StoryEntity
 import com.boomapps.steemapp.repository.steem.DiscussionData
@@ -40,7 +40,7 @@ class FeedBoundaryCallback(
     @MainThread
     override fun onZeroItemsLoaded() {
         networkState.value = NetworkState.LOADING
-        Timber.d("onZeroItemsLoaded()")
+        Timber.d("onZeroItemsLoaded($type)")
         val observable = when (type) {
             FeedType.BLOG -> RepositoryProvider.getSteemRepository().getBlogStories(null, 0, networkPageSize)
             FeedType.TRENDING -> RepositoryProvider.getSteemRepository().getTrendingDataList(0, networkPageSize, null)
@@ -70,6 +70,7 @@ class FeedBoundaryCallback(
     @MainThread
     override fun onItemAtEndLoaded(itemAtEnd: StoryEntity) {
         networkState.value = NetworkState.LOADING
+        Timber.d(" >> onItemAtEndLoaded($type)")
         val single = when (type) {
             FeedType.BLOG -> RepositoryProvider.getSteemRepository().getBlogStories(null, itemAtEnd.indexInResponse, networkPageSize)
             FeedType.TRENDING -> RepositoryProvider.getSteemRepository().getTrendingDataList(itemAtEnd.indexInResponse, networkPageSize, itemAtEnd)

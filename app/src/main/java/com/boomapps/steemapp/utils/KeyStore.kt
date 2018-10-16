@@ -13,11 +13,11 @@ import javax.crypto.*
 import javax.crypto.spec.GCMParameterSpec
 import android.security.keystore.KeyProperties
 import android.security.keystore.KeyGenParameterSpec
-import android.support.annotation.NonNull
+import androidx.annotation.NonNull
 import android.security.KeyPairGeneratorSpec
 import android.content.Context
 import android.preference.PreferenceManager
-import android.support.annotation.RequiresApi
+import androidx.annotation.RequiresApi
 import android.util.Base64
 import com.boomapps.steemapp.SteemApplication
 import java.io.ByteArrayInputStream

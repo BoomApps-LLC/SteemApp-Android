@@ -22,6 +22,7 @@ class FeedShortEntriesRequest(val type: FeedType, var steemJ: SteemJ?, val accou
     var allEntries = arrayListOf<StoryShortEntry>()
 
     fun load(): ArrayList<StoryShortEntry> {
+        Timber.d("load for $type")
         val steemJInstance = steemJ
         if (accountName == null || steemJInstance == null) {
             return allEntries

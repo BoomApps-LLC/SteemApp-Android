@@ -4,7 +4,7 @@
 */
 package com.boomapps.steemapp.ui.main
 
-import android.arch.lifecycle.MutableLiveData
+import androidx.lifecycle.MutableLiveData
 import android.util.Log
 import com.boomapps.steemapp.repository.Balance
 import com.boomapps.steemapp.repository.RepositoryProvider

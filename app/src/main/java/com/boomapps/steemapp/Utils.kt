@@ -7,7 +7,7 @@ package com.boomapps.steemapp
 import android.content.Context
 import android.net.Uri
 import android.os.Build
-import android.support.v4.content.FileProvider
+import androidx.core.content.FileProvider
 import android.text.InputFilter
 import android.util.Log
 import android.widget.EditText

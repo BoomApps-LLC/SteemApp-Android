@@ -6,7 +6,7 @@ package com.boomapps.steemapp.ui.dialogs
 
 import android.app.DialogFragment
 import android.os.Bundle
-import android.support.design.widget.TextInputLayout
+import com.google.android.material.textfield.TextInputLayout
 import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View

@@ -4,7 +4,7 @@
 */
 package com.boomapps.steemapp.repository.db
 
-import android.arch.lifecycle.LiveData
+import androidx.lifecycle.LiveData
 import com.boomapps.steemapp.repository.FeedType
 import com.boomapps.steemapp.repository.Listing
 import com.boomapps.steemapp.repository.NetworkState

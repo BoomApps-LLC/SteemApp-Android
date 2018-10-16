@@ -7,10 +7,10 @@ package com.boomapps.steemapp.ui.dialogs
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
-import android.support.design.widget.TextInputEditText
-import android.support.v4.app.FragmentManager
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatDialogFragment
+import com.google.android.material.textfield.TextInputEditText
+import androidx.fragment.app.FragmentManager
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatDialogFragment
 import android.view.LayoutInflater
 import android.view.WindowManager
 import com.boomapps.steemapp.R

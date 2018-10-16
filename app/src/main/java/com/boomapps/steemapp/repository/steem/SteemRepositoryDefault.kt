@@ -274,16 +274,6 @@ class SteemRepositoryDefault : SteemRepository {
         }
     }
 
-    override fun getFeedShortDataList(aName: AccountName?): Observable<ArrayList<StoryShortEntry>> {
-        val aName = if (aName != null) {
-            aName
-        } else {
-            steemJConfig?.defaultAccount
-        }
-        return Observable.fromCallable { return@fromCallable FeedShortEntriesRequest(FeedType.FEED, steemJ, aName).load() }
-    }
-
-
     override fun getFeedShortDataList(aName: AccountName?, start: Int, limit: Int): Observable<ArrayList<StoryShortEntry>> {
         val aName = if (aName != null) {
             aName
@@ -291,15 +281,6 @@ class SteemRepositoryDefault : SteemRepository {
             steemJConfig?.defaultAccount
         }
         return Observable.fromCallable { return@fromCallable FeedShortEntriesRequest(FeedType.FEED, steemJ, aName, start, limit).load() }
-    }
-
-    override fun getBlogShortDataList(aName: AccountName?): Observable<ArrayList<StoryShortEntry>> {
-        val aName = if (aName != null) {
-            aName
-        } else {
-            steemJConfig?.defaultAccount
-        }
-        return Observable.fromCallable { return@fromCallable FeedShortEntriesRequest(FeedType.BLOG, steemJ, aName).load() }
     }
 
     override fun getBlogShortDataList(aName: AccountName?, start: Int, limit: Int): Observable<ArrayList<StoryShortEntry>> {
@@ -372,10 +353,6 @@ class SteemRepositoryDefault : SteemRepository {
             dQuery.startPermlink = Permlink(storyEntity.permlink)
             dQuery.startAuthor = AccountName(storyEntity.author)
         }
-        run {
-            getStoryDiscussionTree(sortType, storyEntity?.permlink, storyEntity?.author, 0)
-        }
-
 
         val observable = Single.fromCallable {
             return@fromCallable steemJ?.getDiscussionsBy(dQuery, sortType)
@@ -389,6 +366,14 @@ class SteemRepositoryDefault : SteemRepository {
                     return@map arrayList
                 }
         return observable
+    }
+
+    override fun getBlogDataList(start: Int, limit: Int, storyEntity: StoryEntity?): Single<ArrayList<DiscussionData>>? {
+        return getDiscussionsDataList(DiscussionSortType.GET_DISCUSSIONS_BY_BLOG, start, limit, storyEntity)
+    }
+
+    override fun getFeedDataList(start: Int, limit: Int, storyEntity: StoryEntity?): Single<ArrayList<DiscussionData>>? {
+        return getDiscussionsDataList(DiscussionSortType.GET_DISCUSSIONS_BY_FEED, start, limit, storyEntity)
     }
 
     override fun getTrendingDataList(start: Int, limit: Int, storyEntity: StoryEntity?): Single<ArrayList<DiscussionData>>? {
@@ -597,6 +582,7 @@ class SteemRepositoryDefault : SteemRepository {
 
 
     private fun mapCommentIntoEntity(raw: CommentsOrderedData, level: Int): CommentEntity {
+        val ownName = steemJConfig?.defaultAccount?.name
         val entity = CommentEntity()
         entity.commentId = raw.data.id
         entity.rootId = raw.rootId
@@ -606,17 +592,28 @@ class SteemRepositoryDefault : SteemRepository {
         entity.title = raw.data.title
         entity.body = raw.data.body
         entity.level = level
-        entity.order = levelWeight[level] + raw.order
+        entity.order = raw.order
         entity.votesNum = raw.data.getVotesNum()
         val activeVoters: ArrayList<String> = arrayListOf()
         if (raw.data.activeVotes.isNotEmpty()) {
             activeVoters.addAll(raw.data.activeVotes.map { it.voter.name })
+            val voter = raw.data.activeVotes.filter {
+                it.voter.name == ownName
+            }
+            if (voter.isNotEmpty()) {
+                // get 1st
+                entity.isVoted = true
+                entity.votePercent = voter[0].percent
+                entity.voteDate = voter[0].time.dateTimeAsTimestamp
+            }
         }
+        entity.repliesNum = raw.data.getRepliesNum()
         entity.voters = activeVoters.toTypedArray()
         entity.price = raw.data.getUSDprice()
         entity.created = raw.data.created.dateTimeAsTimestamp
         entity.lastUpdate = raw.data.lastUpdate.dateTimeAsTimestamp
         entity.entityLastLoadTime = System.currentTimeMillis()
+        entity.childrenNum = raw.children.size
         return entity
     }
 
@@ -640,17 +637,6 @@ class SteemRepositoryDefault : SteemRepository {
         }
         return result.toTypedArray()
     }
-
-    private val levelWeight: Array<Long> = arrayOf(
-            1000000000L,
-            1100000000L,
-            1110000000L,
-            1111000000L,
-            1111100000L,
-            1111110000L,
-            1111111000L,
-            1111111100L
-    )
 
     private fun logComments(allComments: Array<CommentsOrderedData>, level: Int) {
         val prefix = when (level) {

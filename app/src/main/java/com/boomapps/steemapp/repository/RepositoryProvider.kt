@@ -5,7 +5,7 @@
 package com.boomapps.steemapp.repository
 
 import android.app.Application
-import android.arch.persistence.room.Room
+import androidx.room.Room
 import com.boomapps.steemapp.SteemApplication
 import com.boomapps.steemapp.repository.db.AppDatabase
 import com.boomapps.steemapp.repository.db.DaoRepository

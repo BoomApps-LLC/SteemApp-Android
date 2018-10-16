@@ -4,7 +4,7 @@
 */
 package com.boomapps.steemapp.ui.post
 
-import android.arch.lifecycle.LiveData
+import androidx.lifecycle.LiveData
 import android.content.Intent
 import com.boomapps.steemapp.repository.FeedType
 import com.boomapps.steemapp.repository.RepositoryProvider
@@ -14,9 +14,6 @@ import com.boomapps.steemapp.repository.db.entities.StoryEntity
 import com.boomapps.steemapp.repository.steem.SteemRepository
 import com.boomapps.steemapp.ui.BaseViewModel
 import com.boomapps.steemapp.ui.ViewState
-import io.reactivex.Observable
-import io.reactivex.schedulers.Schedulers
-import org.jsoup.Jsoup
 import timber.log.Timber
 
 class PostViewModel(val postId: Long, val postUrl: String, val title: String) : BaseViewModel() {

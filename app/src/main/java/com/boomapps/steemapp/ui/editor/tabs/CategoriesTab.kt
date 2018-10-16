@@ -4,20 +4,21 @@
 */
 package com.boomapps.steemapp.ui.editor.tabs
 
-import android.support.v7.widget.RecyclerView
 import android.text.InputFilter
 import android.view.KeyEvent
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
-import com.boomapps.steemapp.*
+import androidx.recyclerview.widget.RecyclerView
+import com.boomapps.steemapp.MDCOLOR_TYPE
+import com.boomapps.steemapp.R
+import com.boomapps.steemapp.getMatColor
 import com.boomapps.steemapp.ui.dialogs.WarningDialog
 import com.boomapps.steemapp.ui.editor.ChipItemDecoration
 import com.boomapps.steemapp.ui.editor.EditorViewModel
 import com.boomapps.steemapp.ui.showKeyboard
 import com.xiaofeng.flowlayoutmanager.Alignment
 import com.xiaofeng.flowlayoutmanager.FlowLayoutManager
-import android.text.Spanned
 
 
 /**
@@ -54,15 +55,15 @@ class CategoriesTab(view: View, tabListener: TabListener, viewModel: EditorViewM
         }
         // set next button state; it depend on number of tags
         dataListener.onDataChange(
-                categoriesList.adapter.itemCount > 0
+                categoriesList.adapter?.itemCount?:0 > 0
         )
         // add listener to RecyclerView to control children number for setting Next button state
         categoriesList.addOnChildAttachStateChangeListener(object : RecyclerView.OnChildAttachStateChangeListener {
-            override fun onChildViewDetachedFromWindow(view: View?) {
+            override fun onChildViewDetachedFromWindow(view: View) {
                 notifyDataChanged()
             }
 
-            override fun onChildViewAttachedToWindow(view: View?) {
+            override fun onChildViewAttachedToWindow(view: View) {
                 notifyDataChanged()
             }
         })
@@ -97,7 +98,7 @@ class CategoriesTab(view: View, tabListener: TabListener, viewModel: EditorViewM
 
     fun notifyDataChanged() {
         dataListener.onDataChange(
-                categoriesList.adapter.itemCount > 0
+                categoriesList.adapter?.itemCount?:0 > 0
         )
     }
 

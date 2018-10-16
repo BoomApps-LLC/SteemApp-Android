@@ -4,9 +4,9 @@
 */
 package com.boomapps.steemapp.ui.feeds
 
-import android.arch.paging.PagedListAdapter
-import android.support.v7.util.DiffUtil
-import android.support.v7.widget.RecyclerView
+import androidx.paging.PagedListAdapter
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import android.view.ViewGroup
 import com.boomapps.steemapp.R
 import com.boomapps.steemapp.repository.NetworkState

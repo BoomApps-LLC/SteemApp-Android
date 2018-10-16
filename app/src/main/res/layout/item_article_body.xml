@@ -1,15 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/itemArticleBody_rootView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="400dp">
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/article_titleView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:textSize="24sp"
+        android:gravity="center"
+        android:padding="8dp" />
 
     <TextView
         android:id="@+id/article_textView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="200dp"
+        android:minHeight="20dp"
         android:padding="8dp"
-        android:textColor="@color/black"/>
+        android:textColor="@color/black"
+        android:textSize="16sp" />
 
 </LinearLayout>

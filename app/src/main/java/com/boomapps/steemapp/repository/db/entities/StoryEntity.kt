@@ -4,7 +4,7 @@
 */
 package com.boomapps.steemapp.repository.db.entities
 
-import android.arch.persistence.room.*
+import androidx.room.*
 
 @Entity(tableName = "story_entities", indices = [(Index(value = ["story_type", "permlink"], unique = false))])
 class StoryEntity {
@@ -59,7 +59,7 @@ class StoryEntity {
     var isVoted = false
 
     @ColumnInfo(name = "vote_percent")
-    var votePervecnt = 0
+    var votePercent = 0
 
     @ColumnInfo(name = "vote_date")
     var voteDate = 0L

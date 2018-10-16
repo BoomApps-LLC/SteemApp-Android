@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="@android:color/white">
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/rewardConstraintLayout"
         android:layout_width="match_parent"
         android:layout_height="600dp"
@@ -169,7 +169,7 @@
             app:layout_constraintTop_toBottomOf="@id/upvoteTopDivider"
             app:layout_constraintVertical_bias="0.0" />
 
-        <android.support.v7.widget.SwitchCompat
+        <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/upvoteSwitcher"
             style="@style/Custom.Widget.SwitchCompat"
             android:layout_width="wrap_content"
@@ -206,6 +206,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/upvoteSwitcher"
             app:layout_constraintVertical_bias="1.0" />
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </ScrollView>

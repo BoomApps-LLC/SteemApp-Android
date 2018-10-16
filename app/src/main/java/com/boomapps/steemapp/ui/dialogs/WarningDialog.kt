@@ -5,7 +5,7 @@
 package com.boomapps.steemapp.ui.dialogs
 
 import android.content.Context
-import android.support.v7.app.AlertDialog
+import androidx.appcompat.app.AlertDialog
 import com.boomapps.steemapp.R
 
 /**

@@ -7,9 +7,9 @@ package com.boomapps.steemapp.ui.editor.tabs
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Rect
-import android.support.v4.content.ContextCompat
-import android.support.v4.widget.ImageViewCompat
-import android.support.v7.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.widget.ImageViewCompat
+import androidx.appcompat.app.AppCompatActivity
 import android.view.View
 import android.widget.HorizontalScrollView
 import android.widget.ImageView

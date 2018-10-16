@@ -4,7 +4,7 @@
 */
 package com.boomapps.steemapp.repository.db.converters
 
-import android.arch.persistence.room.TypeConverter
+import androidx.room.TypeConverter
 
 const val DELIMITER: String = "::##::"
 

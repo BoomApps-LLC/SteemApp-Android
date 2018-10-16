@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "82eba7f5b136ef5927495cd32a8d158b",
+    "identityHash": "6e2eb1aac518fdccc6a6bf48f9a149b5",
     "entities": [
       {
         "tableName": "story_entities",
@@ -165,7 +165,7 @@
             "notNull": true
           },
           {
-            "fieldPath": "votePervecnt",
+            "fieldPath": "votePercent",
             "columnName": "vote_percent",
             "affinity": "INTEGER",
             "notNull": true
@@ -245,7 +245,7 @@
       },
       {
         "tableName": "comments",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`comment_id` INTEGER NOT NULL, `root_id` INTEGER NOT NULL, `parent_id` INTEGER NOT NULL, `author` TEXT NOT NULL, `permlink` TEXT NOT NULL, `title` TEXT NOT NULL, `body` TEXT NOT NULL, `level` INTEGER NOT NULL, `order` INTEGER NOT NULL, `votes_id` INTEGER NOT NULL, `voters` TEXT NOT NULL, `price` REAL NOT NULL, `time_last_update` INTEGER NOT NULL, `time_created` INTEGER NOT NULL, `comment_last_time_load` INTEGER NOT NULL, PRIMARY KEY(`comment_id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`comment_id` INTEGER NOT NULL, `root_id` INTEGER NOT NULL, `parent_id` INTEGER NOT NULL, `author` TEXT NOT NULL, `permlink` TEXT NOT NULL, `title` TEXT NOT NULL, `body` TEXT NOT NULL, `level` INTEGER NOT NULL, `order` INTEGER NOT NULL, `votes_num` INTEGER NOT NULL, `replies_num` INTEGER NOT NULL, `price` REAL NOT NULL, `time_last_update` INTEGER NOT NULL, `time_created` INTEGER NOT NULL, `comment_last_time_load` INTEGER NOT NULL, `children_num` INTEGER NOT NULL, `is_voted` INTEGER NOT NULL, `vote_percent` INTEGER NOT NULL, `vote_date` INTEGER NOT NULL, PRIMARY KEY(`comment_id`))",
         "fields": [
           {
             "fieldPath": "commentId",
@@ -303,14 +303,14 @@
           },
           {
             "fieldPath": "votesNum",
-            "columnName": "votes_id",
+            "columnName": "votes_num",
             "affinity": "INTEGER",
             "notNull": true
           },
           {
-            "fieldPath": "voters",
-            "columnName": "voters",
-            "affinity": "TEXT",
+            "fieldPath": "repliesNum",
+            "columnName": "replies_num",
+            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -334,6 +334,30 @@
           {
             "fieldPath": "entityLastLoadTime",
             "columnName": "comment_last_time_load",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "childrenNum",
+            "columnName": "children_num",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isVoted",
+            "columnName": "is_voted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "votePercent",
+            "columnName": "vote_percent",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "voteDate",
+            "columnName": "vote_date",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -415,7 +439,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"82eba7f5b136ef5927495cd32a8d158b\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"6e2eb1aac518fdccc6a6bf48f9a149b5\")"
     ]
   }
 }

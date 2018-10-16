@@ -4,8 +4,8 @@
 */
 package com.boomapps.steemapp.ui.post
 
-import android.arch.lifecycle.ViewModel
-import android.arch.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 
 class PostViewModelFactory(val postId: Long, val postUrl: String, val title : String) : ViewModelProvider.NewInstanceFactory() {
 

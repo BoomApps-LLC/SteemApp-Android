@@ -5,9 +5,9 @@
 package com.boomapps.steemapp.ui.editor.tabs
 
 import android.os.CountDownTimer
-import android.support.constraint.ConstraintLayout
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.SwitchCompat
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
+import androidx.appcompat.widget.SwitchCompat
 import android.util.Log
 import android.view.View
 import android.widget.LinearLayout

@@ -4,11 +4,11 @@
 */
 package com.boomapps.steemapp.ui.splash
 
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import com.boomapps.steemapp.R
 import com.boomapps.steemapp.ui.dialogs.WarningDialog
 import com.boomapps.steemapp.ui.main.MainActivity

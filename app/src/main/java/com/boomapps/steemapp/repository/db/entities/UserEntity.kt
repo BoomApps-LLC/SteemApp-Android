@@ -1,9 +1,9 @@
 package com.boomapps.steemapp.repository.db.entities
 
-import android.arch.persistence.room.ColumnInfo
-import android.arch.persistence.room.Entity
-import android.arch.persistence.room.Index
-import android.arch.persistence.room.PrimaryKey
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.Index
+import androidx.room.PrimaryKey
 
 // TODO use name as foreign key in other entities;
 // TODO look at {@url='https://developer.android.com/training/data-storage/room/defining-data'}

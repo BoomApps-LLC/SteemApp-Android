@@ -4,11 +4,11 @@
 */
 package com.boomapps.steemapp.repository.db
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.Transformations
-import android.arch.paging.LivePagedListBuilder
-import android.support.annotation.MainThread
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
+import androidx.paging.LivePagedListBuilder
+import androidx.annotation.MainThread
 import com.boomapps.steemapp.repository.*
 import com.boomapps.steemapp.repository.db.entities.CommentEntity
 import com.boomapps.steemapp.repository.db.entities.PostEntity
@@ -82,15 +82,12 @@ class DaoRepositoryDefault(
                 .take(networkPageSize.toLong())
                 .flatMap {
                     return@flatMap Observable.fromIterable(it)
-                            .doOnNext {
-                                Timber.d("Feed: First fromIterable >> permlink = ${it.permlink}")
-                            }
                             .flatMap {
                                 return@flatMap RepositoryProvider.getSteemRepository().getStoryDetails(AccountName(it.author), Permlink(it.permlink), it.id)
                             }
-                            .doOnNext {
-                                Timber.d("Feed: onNext Details for(%s) >> title = %s", it.discussion?.permlink, it.discussion?.title)
-                            }
+//                            .doOnNext {
+//                                Timber.d("Feed: onNext Details for(%s) >> title = %s", it.discussion?.permlink, it.discussion?.title)
+//                            }
                             .subscribeOn(Schedulers.io())
                 }
                 .observeOn(Schedulers.io())

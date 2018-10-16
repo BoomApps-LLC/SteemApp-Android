@@ -1,6 +1,6 @@
 package com.boomapps.steemapp.ui.currencies
 
-import android.arch.lifecycle.MutableLiveData
+import androidx.lifecycle.MutableLiveData
 import com.boomapps.steemapp.repository.RepositoryProvider
 import com.boomapps.steemapp.repository.currency.AmountRequestData
 import com.boomapps.steemapp.repository.currency.OutputAmount

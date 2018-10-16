@@ -4,8 +4,8 @@
 */
 package com.boomapps.steemapp.ui.splash
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MutableLiveData
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import android.util.Log
 import com.boomapps.steemapp.repository.RepositoryProvider
 import com.boomapps.steemapp.repository.network.NetworkRepository

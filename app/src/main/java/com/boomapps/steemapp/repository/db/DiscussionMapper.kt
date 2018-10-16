@@ -88,7 +88,7 @@ class DiscussionMapper(val data: ArrayList<DiscussionData>, val accountName: Str
             if (voter.isNotEmpty()) {
                 // get 1st
                 outValue.isVoted = true
-                outValue.votePervecnt = voter[0].percent
+                outValue.votePercent = voter[0].percent
                 outValue.voteDate = voter[0].time.dateTimeAsTimestamp
             }
         }

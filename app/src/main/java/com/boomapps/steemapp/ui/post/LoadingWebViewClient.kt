@@ -6,7 +6,7 @@ package com.boomapps.steemapp.ui.post
 
 import android.graphics.Bitmap
 import android.os.Build
-import android.support.annotation.RequiresApi
+import androidx.annotation.RequiresApi
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient

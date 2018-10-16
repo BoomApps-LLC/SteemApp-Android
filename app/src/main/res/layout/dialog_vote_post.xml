@@ -42,7 +42,7 @@
         android:paddingRight="24dp"
         android:layout_marginTop="16dp">
 
-        <android.support.v7.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/dialogVotePost_btnConfirm"
             style="@style/DialogButton"
             android:layout_width="wrap_content"
@@ -50,7 +50,7 @@
             android:layout_marginLeft="4dp"
             android:text="@string/dialog_positive_button" />
 
-        <android.support.v7.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/dialogVotePost_btnCancel"
             style="@style/DialogButton"
             android:layout_marginRight="4dp"

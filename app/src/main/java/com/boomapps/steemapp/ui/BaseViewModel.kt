@@ -4,8 +4,8 @@
 */
 package com.boomapps.steemapp.ui
 
-import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 
 /**
  * Created by vgrechikha on 29.01.2018.

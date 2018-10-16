@@ -1,16 +1,9 @@
 package com.boomapps.steemapp.ui.currencies
 
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.DefaultItemAnimator
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.RecyclerView.ItemDecoration
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.TextPaint
@@ -18,12 +11,18 @@ import android.text.style.ClickableSpan
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import com.boomapps.steemapp.R
 import com.boomapps.steemapp.repository.currency.OutputAmount
 import com.boomapps.steemapp.ui.BaseActivity
 import com.boomapps.steemapp.ui.ViewState
-import kotlinx.android.synthetic.main.activity_current_rate.aCurrentRate_rvList
-import kotlinx.android.synthetic.main.activity_current_rate.aCurrentRate_tvPowered
+import kotlinx.android.synthetic.main.activity_current_rate.*
 
 class CurrenciesActivity : BaseActivity() {
 
@@ -80,7 +79,7 @@ class CurrenciesActivity : BaseActivity() {
   fun setCurrenciesList() {
     currenciesList = aCurrentRate_rvList
     val manager = LinearLayoutManager(this)
-    manager.orientation = LinearLayoutManager.VERTICAL
+    manager.orientation = RecyclerView.VERTICAL
     currenciesList.layoutManager = manager
     currenciesList.itemAnimator = DefaultItemAnimator()
     currenciesList.addItemDecoration(object : ItemDecoration() {
